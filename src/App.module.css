@@ -1,0 +1,39 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.banner {
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.workspace {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(320px, 560px) 1fr;
+  min-height: 0;
+}
+
+.gridPane {
+  overflow: auto;
+  border-right: 1px solid var(--color-border);
+}
+
+.timelinePane {
+  overflow: auto;
+  background: var(--color-surface);
+}
+
+@media (max-width: 720px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .timelinePane {
+    display: none;
+  }
+}

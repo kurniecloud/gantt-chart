@@ -1,0 +1,40 @@
+name: CI
+
+# main only changes through pull requests (repository ruleset); the deploy workflow re-checks
+# main after each merge.
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run format:check
+      # Date bugs hide behind timezones: run unit tests on both sides of UTC.
+      - run: npm run test -- --run
+        env:
+          TZ: America/Los_Angeles
+      - run: npm run test -- --run
+        env:
+          TZ: Asia/Tokyo
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7
