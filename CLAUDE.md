@@ -112,3 +112,16 @@ docs/            Product and architecture docs.
 - New features follow the `add-feature` skill: spec in `docs/PRODUCT.md` → domain + tests →
   store command → UI → e2e test → update the roadmap status.
 - Commit messages: Conventional Commits (`feat(timeline): drag to resize bars`).
+
+## Git & GitHub
+
+- Remote: `git@github.com:kurniecloud/gantt-chart.git` (SSH). Site:
+  https://kurniecloud.github.io/gantt-chart/
+- `main` is protected by a repository ruleset: **changes only via pull request**, **CodeQL
+  code-scanning results required**, **signed commits required**. Never push to `main` directly
+  and never force-push it.
+- Work on a branch (`feat/…`, `fix/…`, `chore/…`), push it, open a PR; CI runs on the PR.
+  Merge with **Squash and merge**.
+- Commits are SSH-signed via this repo's git config (`gpg.format=ssh`, `commit.gpgsign=true`).
+  If signing fails, stop and report it — don't disable signing.
+- After a PR merges: `git switch main && git pull --ff-only`, then delete the merged branch.
