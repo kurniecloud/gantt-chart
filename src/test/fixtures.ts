@@ -15,6 +15,7 @@ type TaskSpec = {
 type ProjectSpec = {
   name?: string;
   description?: string;
+  milestones?: { id?: string; name: string; date: ISODate }[];
   start?: ISODate;
   tasks?: TaskSpec[];
   holidays?: ISODate[];
@@ -28,6 +29,7 @@ type ProjectSpec = {
 export function makeProject(spec: ProjectSpec = {}): Project {
   const project = createProject(spec.name ?? 'Test project', spec.start ?? '2026-11-02');
   project.description = spec.description ?? '';
+  project.milestones = (spec.milestones ?? []).map((m, i) => ({ ...m, id: m.id ?? `M${i}` }));
   const calendar = calendarFor(project);
   if (spec.holidays) {
     calendar.exceptions = spec.holidays.map((date) => ({ date, working: false }));

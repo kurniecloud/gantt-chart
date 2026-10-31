@@ -17,6 +17,9 @@ function readMode(): ViewMode {
 type ViewState = {
   mode: ViewMode;
   setMode: (mode: ViewMode) => void;
+  /** Whether critical-path lines are drawn (recalculated live while on). Not remembered. */
+  showCriticalPath: boolean;
+  toggleCriticalPath: () => void;
 };
 
 export const useViewStore = create<ViewState>()((set) => ({
@@ -29,4 +32,6 @@ export const useViewStore = create<ViewState>()((set) => ({
     }
     set({ mode });
   },
+  showCriticalPath: false,
+  toggleCriticalPath: () => set((state) => ({ showCriticalPath: !state.showCriticalPath })),
 }));

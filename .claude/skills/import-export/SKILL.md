@@ -12,14 +12,20 @@ Imported files are **untrusted**: validate everything, cap file size (50 MB), ne
 never inject strings as HTML. Import produces a new `Project` and runs the scheduler; report
 anything dropped or adjusted in an import summary shown to the user.
 
-## Native JSON (`.gantt.json`)
+## Native JSON (`.gantt.json`) — implemented in `src/io/projectFile.ts`
 
 ```json
-{ "format": "gantt-chart", "schemaVersion": 1, "exportedAt": "2026-10-30", "project": { ... } }
+{ "format": "gantt-chart", "schemaVersion": 3, "exportedAt": "2026-11-01", "project": { ... } }
 ```
 
-On import: check `format`, run migrations from `schemaVersion`, validate with a schema
-(hand-written type guards or `zod`), regenerate ids only on collision.
+- Export: header button → `serializeProject()` → `downloadTextFile()` (`src/io/download.ts`),
+  file named `exportFileName()` (slug of the title).
+- Import: header button → hidden file input → `parseProjectFile()`: checks `format`, runs
+  `migrateProject()` (older schemas upgrade), then validates every task, parent chain (no loops),
+  task order, dependency and milestone. Any problem → `ProjectFileError` with a readable reason
+  shown in a dialog; nothing changes. Valid → confirm dialog → `importProject()` command
+  replaces the open project's content (keeps its id), undoable in one step.
+- Cap: 20 MB. Task order is rebuilt so each task precedes its subtasks.
 
 ## CSV
 

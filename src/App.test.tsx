@@ -41,7 +41,7 @@ describe('first view', () => {
   it('warns when browser storage is unavailable', () => {
     useProjectStore.getState().loadProject(makeProject());
     render(<App storageAvailable={false} />);
-    expect(screen.getByRole('status')).toHaveTextContent(/won’t be saved/);
+    expect(screen.getByText(/won’t be saved/)).toHaveAttribute('role', 'status');
   });
 });
 
@@ -296,5 +296,42 @@ describe('expand / collapse', () => {
     expect(screen.getByRole('button', { name: 'Website' })).toHaveFocus();
     await user.keyboard('{End}');
     expect(screen.getByRole('button', { name: 'Add task' })).toHaveFocus();
+  });
+});
+
+describe('depends on', () => {
+  it('picks tasks a new task depends on, and edits them later', async () => {
+    const user = setup({
+      tasks: [
+        { id: 'A', name: 'Design' },
+        { id: 'B', name: 'Build', deps: [{ from: 'A' }] },
+      ],
+    });
+    await user.click(screen.getByRole('button', { name: 'Add task' }));
+    await user.type(within(dialog()).getByRole('textbox', { name: 'Task name' }), 'Launch');
+    const dependsOn = within(dialog()).getByRole('combobox', { name: 'Depends on' });
+    await user.selectOptions(dependsOn, 'Build');
+    await user.selectOptions(dependsOn, 'Design');
+    expect(
+      within(within(dialog()).getByRole('list', { name: 'Tasks it depends on' })).getAllByRole(
+        'listitem',
+      ),
+    ).toHaveLength(2);
+    await user.click(within(dialog()).getByRole('button', { name: 'Remove dependency on Design' }));
+    await user.click(within(dialog()).getByRole('button', { name: 'Add' }));
+
+    const launchId = useProjectStore.getState().project.taskOrder[2]!;
+    const links = () =>
+      Object.values(useProjectStore.getState().project.dependencies)
+        .filter((d) => d.successorId === launchId)
+        .map((d) => d.predecessorId);
+    expect(links()).toEqual(['B']);
+
+    // Design can't depend on Launch or Build: they already wait for it.
+    await user.click(screen.getByRole('button', { name: 'Design' }));
+    const options = within(
+      within(dialog()).getByRole('combobox', { name: 'Depends on' }),
+    ).getAllByRole('option');
+    expect(options.map((o) => o.textContent)).toEqual(['No other tasks to choose from']);
   });
 });

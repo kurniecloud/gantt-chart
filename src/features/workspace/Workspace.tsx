@@ -1,18 +1,24 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { Button } from '../../components/Button';
+import { FlagIcon } from '../../components/icons';
+import { criticalPath } from '../../domain/criticalPath';
 import { todayISO } from '../../domain/dates';
 import { effectiveSpans } from '../../domain/taskDates';
 import { visibleTaskRows } from '../../domain/tree';
 import { useProjectStore } from '../../store/projectStore';
+import { useUiStore } from '../../store/uiStore';
 import { useViewStore } from '../../store/viewStore';
 import { TaskList } from '../tasks/TaskList';
 import { TimelineBody } from '../timeline/TimelineBody';
 import { TimelineHeader } from '../timeline/TimelineHeader';
 import { TimelineToolbar } from '../timeline/TimelineToolbar';
+import { milestoneMarks } from '../timeline/labels';
 import {
   columnOfDate,
   createScale,
   dateAtX,
+  dayRange,
   initialColumn,
   todayColumn,
   type TimelineScale,
@@ -51,6 +57,8 @@ function useTaskPanelWidth(): number {
 export function Workspace() {
   const project = useProjectStore((s) => s.project);
   const mode = useViewStore((s) => s.mode);
+  const showCriticalPath = useViewStore((s) => s.showCriticalPath);
+  const openDialog = useUiStore((s) => s.openDialog);
   const [today] = useState(todayISO);
   const panelWidth = useTaskPanelWidth();
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -59,6 +67,19 @@ export function Workspace() {
   const spans = useMemo(() => effectiveSpans(project), [project]);
   const scale = useMemo(() => createScale(mode, today), [mode, today]);
   const highlighted = todayColumn(scale, today);
+  const todaySlot = dayRange(scale, today);
+  const milestones = useMemo(
+    () => milestoneMarks(scale, project.milestones),
+    [scale, project.milestones],
+  );
+  // Recalculated on every change while the toggle is on.
+  const critical = useMemo(
+    () => (showCriticalPath ? criticalPath(project) : null),
+    [showCriticalPath, project],
+  );
+  const criticalCount = critical
+    ? [...critical.slack.values()].filter((slack) => slack <= 0).length
+    : null;
   const rowsHeight = (rows.length + 1) * ROW_HEIGHT; // + the "+" row
 
   // The project doesn't use the React Compiler, so this hook not being memoizable doesn't matter.
@@ -127,8 +148,13 @@ export function Workspace() {
       }
     >
       <div className={styles.toolbarRow}>
-        <div className={styles.toolbarSpacer} />
-        <TimelineToolbar onToday={scrollToToday} />
+        <div className={styles.panelTools}>
+          <Button onClick={() => openDialog({ kind: 'milestones' })}>
+            <FlagIcon />
+            Milestones
+          </Button>
+        </div>
+        <TimelineToolbar onToday={scrollToToday} criticalCount={criticalCount} />
       </div>
       <div ref={scrollerRef} className={styles.scroller} data-testid="workspace-scroller">
         <div className={styles.grid}>
@@ -136,11 +162,18 @@ export function Workspace() {
             Task name
           </div>
           <div className={styles.timelineHeader}>
-            <TimelineHeader scale={scale} columns={columns} todayColumn={highlighted} />
+            <TimelineHeader
+              scale={scale}
+              columns={columns}
+              todayColumn={highlighted}
+              todaySlot={todaySlot}
+              milestones={milestones}
+            />
           </div>
           <div className={styles.taskColumn}>
             <TaskList
               rows={rows}
+              spans={spans}
               virtualRows={virtualRows}
               totalHeight={rowsHeight}
               scrollToRow={(index) => rowVirtualizer.scrollToIndex(index)}
@@ -154,7 +187,9 @@ export function Workspace() {
               spans={spans}
               virtualRows={virtualRows}
               rowsHeight={rowsHeight}
-              todayColumn={highlighted}
+              todaySlot={todaySlot}
+              milestones={milestones}
+              criticalIds={critical?.criticalIds ?? null}
             />
           </div>
         </div>

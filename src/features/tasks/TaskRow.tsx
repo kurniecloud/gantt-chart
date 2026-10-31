@@ -1,11 +1,16 @@
 import { memo, type CSSProperties, type MouseEvent } from 'react';
 import { IconButton } from '../../components/Button';
 import { ChevronRightIcon, CirclePlusIcon, CrossIcon } from '../../components/icons';
+import type { Priority } from '../../domain/types';
+import { priorityTextColorVar } from '../../utils/priority';
 import styles from './TaskList.module.css';
 
 type TaskRowProps = {
   id: string;
   name: string;
+  /** Weekdays the task spans, or null when it has no dates. */
+  days: number | null;
+  priority: Priority | undefined;
   /** Position in the visible list (0-based) and how many rows the list has, for screen readers. */
   index: number;
   setSize: number;
@@ -30,6 +35,8 @@ function stop(action: () => void) {
 export const TaskRow = memo(function TaskRow({
   id,
   name,
+  days,
+  priority,
   index,
   setSize,
   top,
@@ -74,6 +81,14 @@ export const TaskRow = memo(function TaskRow({
       >
         {name}
       </button>
+      {days !== null && (
+        <span className={styles.days} style={{ color: priorityTextColorVar(priority) }}>
+          <span aria-hidden="true">({days}D)</span>
+          <span className="visually-hidden">
+            {days} {days === 1 ? 'weekday' : 'weekdays'}
+          </span>
+        </span>
+      )}
       <span className={styles.actions}>
         <IconButton label={`Add subtask to ${name}`} onClick={stop(() => onAddSubtask(id))}>
           <CirclePlusIcon />

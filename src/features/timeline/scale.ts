@@ -99,3 +99,30 @@ export function todayColumn(scale: TimelineScale, today: ISODate): number | null
 export function initialColumn(scale: TimelineScale, today: ISODate): number {
   return columnOfDate(scale, scale.mode === 'daily' ? nextWeekday(today) : today);
 }
+
+/** The horizontal slot of one weekday: a whole column in daily view, a fifth of one in weekly view. */
+export function dayRange(scale: TimelineScale, date: ISODate): { x: number; width: number } | null {
+  if (isWeekend(date)) return null;
+  return { x: (weekdayIndex(date) - scale.originIndex) * scale.dayWidth, width: scale.dayWidth };
+}
+
+/**
+ * First and last column of the month containing `date`: its weekdays (daily), or the weeks whose
+ * Monday falls in it (weekly).
+ */
+export function monthColumns(scale: TimelineScale, date: ISODate): { first: number; last: number } {
+  const firstDay = `${date.slice(0, 7)}-01`;
+  const lastDay = addDays(`${addDays(firstDay, 31).slice(0, 7)}-01`, -1);
+  if (scale.mode === 'daily') {
+    return {
+      first: columnOfDate(scale, nextWeekday(firstDay)),
+      last: columnOfDate(scale, previousWeekday(lastDay)),
+    };
+  }
+  const firstMonday =
+    startOfWeek(firstDay) === firstDay ? firstDay : addDays(startOfWeek(firstDay), 7);
+  return {
+    first: columnOfDate(scale, firstMonday),
+    last: columnOfDate(scale, startOfWeek(lastDay)),
+  };
+}

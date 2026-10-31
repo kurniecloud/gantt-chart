@@ -17,6 +17,8 @@ type DatePickerProps = {
   /** Days before this are disabled (e.g. the start date, for an end-date picker). */
   minDate?: ISODate;
   error?: string;
+  /** Keep the label for screen readers only (e.g. inside a table with a column header). */
+  hideLabel?: boolean;
 };
 
 const WEEKENDS: Matcher = { dayOfWeek: [0, 6] };
@@ -30,6 +32,7 @@ export function DatePicker({
   onOpenChange,
   minDate,
   error,
+  hideLabel = false,
 }: DatePickerProps) {
   const labelId = useId();
   const buttonId = useId();
@@ -41,7 +44,7 @@ export function DatePicker({
 
   return (
     <div className={styles.field}>
-      <span id={labelId} className={styles.label}>
+      <span id={labelId} className={hideLabel ? 'visually-hidden' : styles.label}>
         {label}
       </span>
       <div className={styles.controls}>

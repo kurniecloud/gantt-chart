@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { makeProject } from '../test/fixtures';
-import { effectiveSpans, ownSpan } from './taskDates';
+import { effectiveSpans, ownSpan, spanWeekdays } from './taskDates';
 
 describe('ownSpan', () => {
   it.each([
@@ -72,5 +72,16 @@ describe('effectiveSpans', () => {
       finish: '2026-11-03',
       fromSubtasks: false,
     });
+  });
+});
+
+describe('spanWeekdays', () => {
+  it.each([
+    ['2026-11-02', '2026-11-06', 5], // Mon–Fri
+    ['2026-11-04', '2026-11-04', 1],
+    ['2026-11-05', '2026-11-10', 4], // across a weekend
+    ['2026-10-31', '2026-11-01', 0], // weekend only
+  ])('%s → %s = %i', (start, finish, expected) => {
+    expect(spanWeekdays({ start, finish })).toBe(expected);
   });
 });

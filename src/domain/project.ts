@@ -3,7 +3,7 @@ import { newId } from './ids';
 import type { Calendar, ISODate, Project, Task } from './types';
 
 /** Bump together with a migration in `src/persistence/migrations.ts`. */
-export const CURRENT_SCHEMA_VERSION = 2;
+export const CURRENT_SCHEMA_VERSION = 3;
 
 export const DEFAULT_PROJECT_NAME = 'Untitled project';
 
@@ -24,6 +24,7 @@ export function createProject(name: string, startDate: ISODate): Project {
     assignments: {},
     baselines: [],
     customFields: [],
+    milestones: [],
   };
 }
 

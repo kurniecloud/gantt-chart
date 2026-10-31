@@ -25,21 +25,22 @@ Status legend: ⬜ not started · 🟨 in progress · ✅ done
 
 Spec: [specs/task-list-and-timeline.md](specs/task-list-and-timeline.md).
 
-| #    | Feature                                                                                | Status |
-| ---- | -------------------------------------------------------------------------------------- | ------ |
-| 1.1  | Project title and description at the top, edited in place                              | ✅     |
-| 1.2  | Nested tasks to any depth, indented per level, expand / collapse                       | ✅     |
-| 1.3  | Add / edit dialog: name, weekday-only start & end pickers, priority                    | ✅     |
-| 1.4  | Add subtask (⊕) and delete with confirmation (✕) on every row                          | ✅     |
-| 1.5  | Timeline: daily / weekly views, weekdays only, scroll past & future, today highlighted | ✅     |
-| 1.6  | Task bars: colour by priority, parents span subtasks, 1-day bars for single dates      | ✅     |
-| 1.7  | Native JSON import / export                                                            | ⬜     |
-| 1.8  | Drag bar to move, drag edges to resize                                                 | ⬜     |
-| 1.9  | Finish-to-Start dependencies: draw by dragging between bars, arrows rendered           | ⬜     |
-| 1.10 | Undo / redo (Ctrl/Cmd+Z, Shift+Ctrl/Cmd+Z)                                             | ✅     |
-| 1.11 | Reorder, indent / outdent tasks                                                        | ⬜     |
-| 1.12 | Light / dark theme                                                                     | 🟨     |
-| 1.13 | Milestones (zero duration, diamond)                                                    | ⬜     |
+| #    | Feature                                                                                    | Status |
+| ---- | ------------------------------------------------------------------------------------------ | ------ |
+| 1.1  | Project title and description at the top, edited in place                                  | ✅     |
+| 1.2  | Nested tasks to any depth, indented per level, expand / collapse                           | ✅     |
+| 1.3  | Add / edit dialog: name, weekday-only start & end pickers, priority                        | ✅     |
+| 1.4  | Add subtask (⊕) and delete with confirmation (✕) on every row                              | ✅     |
+| 1.5  | Timeline: daily / weekly views, weekdays only, scroll past & future, today highlighted     | ✅     |
+| 1.6  | Task bars: colour by priority, parents span subtasks, 1-day bars for single dates          | ✅     |
+| 1.7  | Native JSON import / export                                                                | ✅     |
+| 1.8  | Drag bar to move, drag edges to resize                                                     | ⬜     |
+| 1.9  | Finish-to-Start dependencies ("Depends on" in the task dialog ✅; arrows, drag-to-link ⬜) | 🟨     |
+| 1.10 | Undo / redo (Ctrl/Cmd+Z, Shift+Ctrl/Cmd+Z)                                                 | ✅     |
+| 1.11 | Reorder, indent / outdent tasks                                                            | ⬜     |
+| 1.12 | Light / dark theme                                                                         | 🟨     |
+| 1.13 | Project milestones: managed in a dialog, highlighted green with a ◆ marker                 | ✅     |
+| 1.14 | Weekday count "(7D)" per task in its priority colour                                       | ✅     |
 
 ## Phase 2 — MS Project parity (scheduling)
 
@@ -47,7 +48,7 @@ Spec: [specs/task-list-and-timeline.md](specs/task-list-and-timeline.md).
 | ---- | ----------------------------------------------------------------------------------- | ------ |
 | 2.1  | All dependency types: FS, SS, FF, SF, with lead/lag (days or %)                     | ⬜     |
 | 2.2  | Working calendars: weekends, holidays, exceptions; per-task calendars               | ⬜     |
-| 2.3  | Critical path (CPM forward/backward pass), total & free slack, highlight            | ⬜     |
+| 2.3  | Critical path (CPM forward/backward pass), total & free slack, highlight            | 🟨     |
 | 2.4  | Constraints: ASAP, ALAP, SNET, SNLT, FNET, FNLT, MSO, MFO                           | ⬜     |
 | 2.5  | Manual vs auto-scheduled tasks per task                                             | ⬜     |
 | 2.6  | Baselines (save up to 11), baseline vs actual bars, variance columns                | ⬜     |
@@ -86,6 +87,9 @@ Spec: [specs/task-list-and-timeline.md](specs/task-list-and-timeline.md).
 - Timesheets and billing.
 
 ## Notes on partially done items
+
+- **2.3** — critical path toggle works from the user's own dates + finish-to-start links (total
+  slack ≤ 0, red line); free slack and auto-scheduling (moving tasks) are still to do.
 
 - **0.4** — autosave, reload and `listProjects()` work; a UI to switch/create/delete projects is still to do.
 - **1.12** — follows the OS light/dark setting via tokens; a manual toggle (`data-theme`) is still to do.

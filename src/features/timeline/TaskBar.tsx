@@ -13,6 +13,8 @@ type TaskBarProps = {
   top: number;
   /** Parents are drawn as a thinner bracket spanning their subtasks. */
   summary: boolean;
+  /** On the critical path: a red line through the middle of the bar. */
+  critical: boolean;
   priority: Priority | undefined;
   onEdit: (id: string) => void;
 };
@@ -24,6 +26,7 @@ export const TaskBar = memo(function TaskBar({
   width,
   top,
   summary,
+  critical,
   priority,
   onEdit,
 }: TaskBarProps) {
@@ -37,6 +40,7 @@ export const TaskBar = memo(function TaskBar({
       title={label}
       data-task-id={id}
       data-priority={priority ?? 'none'}
+      data-critical={critical || undefined}
       style={
         {
           '--bar-color': priorityColorVar(priority),

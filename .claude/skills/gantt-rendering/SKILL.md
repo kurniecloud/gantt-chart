@@ -25,7 +25,9 @@ Behaviour is specified in `docs/specs/task-list-and-timeline.md`. This skill is 
   scroller or sync scroll positions in JS.
 - Sizes come from TS constants in `Workspace.tsx` (`ROW_HEIGHT` 36, `HEADER_HEIGHT` 56, task
   panel 320 px, 196 px under 720 px wide) and are passed down as CSS custom properties.
-- `scroll-padding-top/left` on the scroller keep focused rows clear of the pinned header/panel.
+- `scroll-padding-top` keeps focused rows clear of the pinned header. **Never add
+  `scroll-padding-left`:** focus lands in the pinned task panel (e.g. when a dialog closes) and
+  the browser would scroll the timeline sideways by the panel width each time (e2e-guarded).
 
 ## Virtualization (`@tanstack/react-virtual`)
 
@@ -48,15 +50,21 @@ Behaviour is specified in `docs/specs/task-list-and-timeline.md`. This skill is 
 - `barGeometry(scale, span)`: `x = (weekdayIndex(start) − origin) × dayWidth`,
   `width = weekdays in span × dayWidth`; weekend ends are trimmed, weekend-only spans → width 0
   (CSS `min-width` draws a 4 px marker).
-- `todayColumn()`: null on a weekend in daily view; weekly highlights the week containing today
-  (Mon–Sun). `initialColumn()`: today, or the next Monday on a weekend (daily).
+- `dayRange(scale, date)`: one weekday's slot (a whole column daily, a fifth of the week
+  weekly) — used for today (light yellow) and milestones (light green); null on weekends.
+- `todayColumn()`: the header cell whose label is emphasised (the day, or the week containing
+  today). `initialColumn()`: today, or the next Monday on a weekend (daily).
+- `monthColumns()`: a month's full column range, so month labels can be centred.
 - Switching views keeps the date at the left edge (`dateAtX` → `columnOfDate`).
 
 ## Header labels (`features/timeline/labels.ts`)
 
-Month row "November 2026" (label sticks beside the task panel); daily cells "Mon 2"; weekly
-cells "28 Sep - 2 Oct". Mondays get a stronger left border in daily view. Today's cell and
-column use `--color-today` / `--color-today-text`.
+Month row "November 2026", centred over the month and kept on screen with `position: sticky`
+(left = task panel, right = edge). Daily cells "Mon 2"; weekly cells "28 Sep - 2 Oct". Mondays
+get a stronger line in daily view; weekly columns get four thin day lines (CSS gradients).
+Today: `--color-today` slot behind the header cells and in the body. Milestones
+(`milestoneMarks()`): `--color-milestone` slot plus a ◆ marker (`role="img"`, name in
+`aria-label`/`title`) pinned to the header's bottom edge.
 
 ## Bars (`TaskBar.tsx`, `TimelineBody.tsx`)
 
@@ -66,6 +74,9 @@ column use `--color-today` / `--color-today-text`.
 - `aria-label`/`title` = `barLabel()` ("Design: Mon 2 Nov 2026 – Fri 6 Nov 2026 · High
   priority"), so colour is never the only signal. Bars are `tabIndex={-1}` buttons — the task
   list is the keyboard path; clicking a bar opens the edit dialog.
+- Critical path (toolbar toggle, `domain/criticalPath.ts`, recomputed while on): `data-critical`
+  adds a `--color-critical-line` stripe via `::after`, 20 % of the bar's height, centred (in the
+  bracket's solid band for parents); the label gains "· Critical".
 - Keep `TaskBar` memoized with primitive props.
 
 ## Performance (5,000 tasks, production build)

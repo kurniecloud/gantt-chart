@@ -58,14 +58,14 @@ src/
                  NO React, NO DOM, NO store imports. 100% unit-testable.
   store/         Zustand stores, commands (for undo/redo), selectors.
   features/
-    header/      Project title + description (edited in place), undo/redo buttons and shortcuts.
+    header/      Title + description (edited in place), Import/Export, undo/redo + shortcuts.
     tasks/       Left panel: nested task list, expand/collapse, add-subtask / delete row actions.
-    dialogs/     Add / edit task dialog, delete confirmation (opened via store/uiStore.ts).
+    dialogs/     Task, delete, milestones and import dialogs; AppDialogs shows the one in uiStore.
     timeline/    Right panel: weekday-only daily/weekly scale, date header, task bars, view toolbar.
     workspace/   The shared scroll area: sticky task panel + header, row/column virtualization.
   components/    Shared UI: Button/IconButton, Dialog (native <dialog>), DatePicker, icons.
   persistence/   IndexedDB autosave, project list, migrations between schema versions.
-  io/            Import/export: JSON (native), CSV, MS Project XML, PNG/PDF export.
+  io/            Import/export: native .gantt.json (done); CSV, MS Project XML, PNG/PDF later.
   utils/         Small generic helpers.
 tests/e2e/       Playwright specs.
 docs/            Product and architecture docs.

@@ -31,9 +31,11 @@ describe('migrateProject', () => {
     delete v1.description;
     v1.tasks = { A: { ...(v1.tasks as Record<string, object>).A, mode: 'auto', durationDays: 3 } };
 
+    delete v1.milestones;
     const upgraded = migrateProject(v1);
     expect(upgraded.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
     expect(upgraded.description).toBe('');
+    expect(upgraded.milestones).toEqual([]);
     expect(upgraded.tasks.A).toEqual({
       id: 'A',
       parentId: null,
@@ -43,6 +45,12 @@ describe('migrateProject', () => {
       start: '2026-11-02',
       finish: '2026-11-04',
     });
+  });
+
+  it('upgrades a v2 project by adding an empty milestone list', () => {
+    const v2 = { ...makeProject(), schemaVersion: 2 } as Record<string, unknown>;
+    delete v2.milestones;
+    expect(migrateProject(v2)).toMatchObject({ schemaVersion: 3, milestones: [] });
   });
 
   it('names the invalid fields', () => {

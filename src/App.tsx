@@ -1,5 +1,5 @@
 import styles from './App.module.css';
-import { TaskDialogs } from './features/dialogs/TaskDialogs';
+import { AppDialogs } from './features/dialogs/AppDialogs';
 import { ProjectHeader } from './features/header/ProjectHeader';
 import { useUndoRedoShortcuts } from './features/header/useUndoRedoShortcuts';
 import { Workspace } from './features/workspace/Workspace';
@@ -22,7 +22,7 @@ export function App({ storageAvailable }: AppProps) {
       <main className={styles.main}>
         <Workspace />
       </main>
-      <TaskDialogs />
+      <AppDialogs />
     </div>
   );
 }

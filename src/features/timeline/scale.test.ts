@@ -8,7 +8,9 @@ import {
   columnStartDate,
   createScale,
   dateAtX,
+  dayRange,
   initialColumn,
+  monthColumns,
   todayColumn,
 } from './scale';
 
@@ -108,5 +110,42 @@ describe('today', () => {
     const column = todayColumn(weekly, SAT)!;
     expect(columnStartDate(weekly, column)).toBe('2026-10-26');
     expect(initialColumn(weekly, SAT)).toBe(column);
+  });
+});
+
+describe('dayRange', () => {
+  it('is a whole column in daily view and a fifth of the week in weekly view', () => {
+    const daily = createScale('daily', WED);
+    const weekly = createScale('weekly', WED);
+    expect(dayRange(daily, WED)).toEqual({
+      x: columnOfDate(daily, WED) * DAY_WIDTH,
+      width: DAY_WIDTH,
+    });
+    const slot = dayRange(weekly, WED)!; // Wednesday = third day of its week
+    expect(slot.x).toBeCloseTo(columnOfDate(weekly, WED) * WEEK_WIDTH + 2 * weekly.dayWidth);
+    expect(slot.width).toBeCloseTo(WEEK_WIDTH / 5);
+  });
+
+  it('is empty on weekends', () => {
+    expect(dayRange(createScale('weekly', WED), SAT)).toBeNull();
+  });
+});
+
+describe('monthColumns', () => {
+  it('spans the weekdays of the month in daily view', () => {
+    const daily = createScale('daily', WED);
+    const { first, last } = monthColumns(daily, '2026-11-17');
+    expect(columnStartDate(daily, first)).toBe('2026-11-02'); // 1 Nov is a Sunday
+    expect(columnStartDate(daily, last)).toBe('2026-11-30');
+  });
+
+  it('spans the weeks whose Monday is in the month in weekly view', () => {
+    const weekly = createScale('weekly', WED);
+    const { first, last } = monthColumns(weekly, '2026-11-17');
+    expect(columnStartDate(weekly, first)).toBe('2026-11-02');
+    expect(columnStartDate(weekly, last)).toBe('2026-11-30');
+    const june = monthColumns(weekly, '2026-06-10'); // 1 Jun 2026 is a Monday
+    expect(columnStartDate(weekly, june.first)).toBe('2026-06-01');
+    expect(columnStartDate(weekly, june.last)).toBe('2026-06-29');
   });
 });

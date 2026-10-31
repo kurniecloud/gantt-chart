@@ -81,6 +81,13 @@ export type Baseline = {
   tasks: Record<string, { start: ISODate; finish: ISODate; durationDays: number }>;
 };
 
+/** A dated marker on the timeline (e.g. "Design sign-off"). Dates are weekdays. */
+export type Milestone = {
+  id: string;
+  name: string;
+  date: ISODate;
+};
+
 export type CustomFieldDef = {
   id: string;
   name: string;
@@ -105,4 +112,5 @@ export type Project = {
   assignments: Record<string, Assignment>;
   baselines: Baseline[];
   customFields: CustomFieldDef[];
+  milestones: Milestone[];
 };

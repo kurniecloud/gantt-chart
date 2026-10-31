@@ -9,6 +9,7 @@ import {
   selectUndoLabel,
   useProjectStore,
 } from '../../store/projectStore';
+import { FileActions } from './FileActions';
 import styles from './ProjectHeader.module.css';
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
@@ -110,6 +111,8 @@ export function ProjectHeader() {
         />
       </div>
       <div className={styles.actions}>
+        <FileActions />
+        <span className={styles.divider} aria-hidden="true" />
         <IconButton
           label="Undo"
           title={undoLabel ? `Undo ${undoLabel.toLowerCase()} (${mod}Z)` : 'Nothing to undo'}

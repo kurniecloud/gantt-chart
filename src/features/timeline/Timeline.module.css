@@ -41,6 +41,18 @@
   outline-offset: 1px;
 }
 
+.criticalOn {
+  border-color: var(--color-critical-line);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.status {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
 /* Date header: month row, then one cell per column */
 
 .header {
@@ -61,19 +73,22 @@
   border-bottom: 1px solid var(--color-border);
 }
 
+/* The month name sits in the middle of its month, but is kept on screen (between the task panel
+   and the right edge) while only part of the month is visible. */
 .month {
   position: absolute;
   top: 0;
   bottom: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   border-left: 1px solid var(--color-grid-week);
 }
 
-/* Keeps the month name visible beside the task panel while scrolling through the month. */
 .monthLabel {
   position: sticky;
-  left: var(--task-panel-width);
+  right: var(--space-2);
+  left: calc(var(--task-panel-width) + var(--space-2));
   padding: 0 var(--space-2);
   font-weight: 600;
   white-space: nowrap;
@@ -95,19 +110,50 @@
 }
 
 .column[data-today] {
-  background: var(--color-today);
   color: var(--color-today-text);
   font-weight: 600;
 }
 
-/* Body: column lines (stronger on Mondays in daily view), row lines, today, bars */
+.todaySlot,
+.milestoneSlot {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+.todaySlot {
+  background: var(--color-today);
+}
+
+.milestoneSlot {
+  background: var(--color-milestone);
+}
+
+/* A diamond pinned to the header's bottom edge, centred on the milestone's day. */
+.milestoneMarker {
+  position: absolute;
+  bottom: -6px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 12px;
+  height: 12px;
+  color: var(--color-milestone-marker);
+  transform: translateX(-50%);
+  cursor: default;
+}
+
+.milestoneMarker svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Body: column lines (Mondays / week starts stronger), row lines, highlights, bars */
 
 .body {
   position: relative;
   height: 100%;
   overflow: hidden;
-  background-image: linear-gradient(to right, var(--color-grid-week) 1px, transparent 1px);
-  background-size: var(--column-width) 100%;
 }
 
 .body[data-mode='daily'] {
@@ -119,11 +165,29 @@
     var(--column-width) 100%;
 }
 
-.todayColumn {
+/* Weekly: a line at each week start plus four thin lines splitting the week into its five days. */
+.body[data-mode='weekly'] {
+  background-image:
+    linear-gradient(to right, var(--color-grid-week) 1px, transparent 1px),
+    linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px);
+  background-size:
+    var(--column-width) 100%,
+    calc(var(--column-width) / 5) 100%;
+}
+
+.todayColumn,
+.milestoneColumn {
   position: absolute;
   top: 0;
   bottom: 0;
+}
+
+.todayColumn {
   background: var(--color-today);
+}
+
+.milestoneColumn {
+  background: var(--color-milestone);
 }
 
 .rowLines {
@@ -156,7 +220,7 @@
   height: 20px;
   margin-top: calc((var(--row-height) - 20px) / 2);
   border-radius: var(--radius-sm);
-  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 12%);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 14%);
 }
 
 /* A thin bar with downward end caps, like MS Project's summary tasks. */
@@ -168,5 +232,25 @@
 
 .bar:hover,
 .summaryBar:hover {
-  filter: brightness(1.12);
+  filter: brightness(1.06) saturate(1.2);
+}
+
+/* Critical path: a bright red line through the middle, 20% of the bar's thickness. */
+.bar[data-critical]::after,
+.summaryBar[data-critical]::after {
+  position: absolute;
+  right: 0;
+  left: 0;
+  height: 20%;
+  background: var(--color-critical-line);
+  content: '';
+}
+
+.bar[data-critical]::after {
+  top: 40%;
+}
+
+/* Centred in the bracket's solid band (its top half). */
+.summaryBar[data-critical]::after {
+  top: 15%;
 }
