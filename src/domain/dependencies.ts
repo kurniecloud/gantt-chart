@@ -159,3 +159,35 @@ export function linkCandidates(
     project.taskOrder.filter((id) => project.tasks[id] && !related.has(id) && !excluded.has(id));
   return { blockedBy: allowed(downstream), blocking: allowed(upstream) };
 }
+
+/**
+ * Why the project's links are inconsistent, or null if they're fine: a link between a task and
+ * one of its own parents, or a loop (links to parents count for all their subtasks).
+ */
+export function linkProblem(project: Project): string | null {
+  for (const dep of Object.values(project.dependencies)) {
+    const { predecessorId: from, successorId: to } = dep;
+    if (!project.tasks[from] || !project.tasks[to]) continue;
+    if (ancestorIds(project, to).includes(from) || ancestorIds(project, from).includes(to)) {
+      return `“${project.tasks[from]!.name}” and “${project.tasks[to]!.name}” are linked, so one can’t be inside the other.`;
+    }
+  }
+  // Kahn's algorithm: anything left over is on a loop.
+  const graph = leafSuccessors(project);
+  const indegree = new Map<string, number>();
+  for (const [from, tos] of graph) {
+    if (!indegree.has(from)) indegree.set(from, 0);
+    for (const to of tos) indegree.set(to, (indegree.get(to) ?? 0) + 1);
+  }
+  const ready = [...indegree].filter(([, n]) => n === 0).map(([id]) => id);
+  let seen = 0;
+  while (ready.length > 0) {
+    const id = ready.pop()!;
+    seen++;
+    for (const to of graph.get(id) ?? []) {
+      indegree.set(to, indegree.get(to)! - 1);
+      if (indegree.get(to) === 0) ready.push(to);
+    }
+  }
+  return seen < indegree.size ? 'That would make a loop of blocking links.' : null;
+}

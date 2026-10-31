@@ -2,13 +2,13 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { Button } from '../../components/Button';
 import { FlagIcon } from '../../components/icons';
-import { criticalPath } from '../../domain/criticalPath';
 import { todayISO } from '../../domain/dates';
 import { effectiveSpans } from '../../domain/taskDates';
 import { visibleTaskRows } from '../../domain/tree';
 import { useProjectStore } from '../../store/projectStore';
 import { useUiStore } from '../../store/uiStore';
 import { useViewStore } from '../../store/viewStore';
+import { useCriticalPath } from '../criticalPath/useCriticalPath';
 import { TaskList } from '../tasks/TaskList';
 import { TimelineBody } from '../timeline/TimelineBody';
 import { TimelineHeader } from '../timeline/TimelineHeader';
@@ -66,6 +66,7 @@ export function Workspace() {
 
   const rows = useMemo(() => visibleTaskRows(project), [project]);
   const spans = useMemo(() => effectiveSpans(project), [project]);
+  const actualSpans = useMemo(() => effectiveSpans(project, 'actual', today), [project, today]);
   const scale = useMemo(() => createScale(mode, today), [mode, today]);
   const highlighted = todayColumn(scale, today);
   const todaySlot = dayRange(scale, today);
@@ -73,11 +74,8 @@ export function Workspace() {
     () => milestoneMarks(scale, project.milestones),
     [scale, project.milestones],
   );
-  // Recalculated on every change while the toggle is on.
-  const critical = useMemo(
-    () => (showCriticalPath ? criticalPath(project) : null),
-    [showCriticalPath, project],
-  );
+  // Recalculated after every change while the toggle is on (input blocked meanwhile).
+  const critical = useCriticalPath(project, showCriticalPath);
   const criticalCount = critical ? critical.leafIds.size : null;
   const arrows = useMemo(
     () => dependencyArrows(project, rows, spans, scale, ROW_HEIGHT),
@@ -180,6 +178,8 @@ export function Workspace() {
               virtualRows={virtualRows}
               totalHeight={rowsHeight}
               scrollToRow={(index) => rowVirtualizer.scrollToIndex(index)}
+              rowHeight={ROW_HEIGHT}
+              headerHeight={HEADER_HEIGHT}
             />
           </div>
           <div className={styles.timelineBody}>
@@ -188,6 +188,7 @@ export function Workspace() {
               rows={rows}
               tasks={project.tasks}
               spans={spans}
+              actualSpans={actualSpans}
               virtualRows={virtualRows}
               rowsHeight={rowsHeight}
               todaySlot={todaySlot}

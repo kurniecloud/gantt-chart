@@ -16,6 +16,12 @@ describe('validateTaskInput', () => {
       { name: 'Design', start: '2026-11-06', finish: '2026-11-02' },
       { finish: "End date can't be before the start date" },
     ],
+    [{ name: 'Design', actualStart: '2026-11-03', actualFinish: '2026-11-05' }, {}],
+    [{ name: 'Design', actualStart: '2026-11-07' }, { actualStart: 'Pick a weekday' }],
+    [
+      { name: 'Design', actualStart: '2026-11-05', actualFinish: '2026-11-03' },
+      { actualFinish: "End date can't be before the start date" },
+    ],
   ])('%j → %j', (input, expected) => {
     expect(validateTaskInput(input)).toEqual(expected);
   });

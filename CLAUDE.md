@@ -59,10 +59,11 @@ src/
   store/         Zustand stores, commands (for undo/redo), selectors.
   features/
     header/      Title + description (edited in place), Import/Export, undo/redo + shortcuts.
-    tasks/       Left panel: nested task list, expand/collapse, add-subtask / delete row actions.
+    tasks/       Left panel: nested task list, expand/collapse, row actions, drag/keyboard moves.
     dialogs/     Task, delete, milestones and import dialogs; AppDialogs shows the one in uiStore.
-    timeline/    Right panel: weekday-only daily/weekly scale, date header, task bars, view toolbar.
+    timeline/    Right panel: weekday scale, date header, bars (drag/resize), arrows, actual line.
     workspace/   The shared scroll area: sticky task panel + header, row/column virtualization.
+    criticalPath/ Recalculation after every change while on, and the input-blocking overlay.
   components/    Shared UI: Button/IconButton, Dialog (native <dialog>), DatePicker, icons.
   persistence/   IndexedDB autosave, project list, migrations between schema versions.
   io/            Import/export: native .gantt.json (done); CSV, MS Project XML, PNG/PDF later.

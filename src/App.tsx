@@ -1,4 +1,5 @@
 import styles from './App.module.css';
+import { BusyOverlay } from './features/criticalPath/BusyOverlay';
 import { AppDialogs } from './features/dialogs/AppDialogs';
 import { ProjectHeader } from './features/header/ProjectHeader';
 import { useUndoRedoShortcuts } from './features/header/useUndoRedoShortcuts';
@@ -23,6 +24,7 @@ export function App({ storageAvailable }: AppProps) {
         <Workspace />
       </main>
       <AppDialogs />
+      <BusyOverlay />
     </div>
   );
 }

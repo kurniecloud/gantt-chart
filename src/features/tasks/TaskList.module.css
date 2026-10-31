@@ -15,7 +15,7 @@
   gap: 2px;
   height: var(--row-height);
   padding-right: var(--space-2);
-  padding-left: calc(var(--space-2) + var(--depth, 0) * var(--indent-per-level));
+  padding-left: calc(18px + var(--depth, 0) * var(--indent-per-level));
   border-bottom: 1px solid var(--color-border);
   cursor: pointer;
 }
@@ -126,5 +126,98 @@
   .actions button {
     width: 24px;
     height: 24px;
+  }
+}
+
+/* Drag-to-move: grip, dragged row, drop indicator */
+
+.grip {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  opacity: 0;
+  cursor: grab;
+  touch-action: none;
+  transform: translateY(-50%);
+}
+
+.grip svg {
+  width: 14px;
+  height: 14px;
+}
+
+.row:hover .grip,
+.row:focus-within .grip {
+  opacity: 1;
+}
+
+.row[data-dragging] {
+  opacity: 0.45;
+}
+
+:global(body[data-dragging]) {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.dropLine,
+.dropInto,
+.dropReason {
+  position: absolute;
+  z-index: 2;
+  list-style: none;
+  pointer-events: none;
+}
+
+.dropLine {
+  right: var(--space-2);
+  left: calc(18px + var(--depth, 0) * var(--indent-per-level));
+  height: 2px;
+  margin-top: -1px;
+  border-radius: 1px;
+  background: var(--color-accent);
+}
+
+.dropInto {
+  right: 0;
+  left: 0;
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-soft);
+  opacity: 0.6;
+}
+
+.dropLine[data-invalid] {
+  background: var(--color-danger);
+}
+
+.dropInto[data-invalid] {
+  border-color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
+.dropReason {
+  left: var(--space-2);
+  max-width: calc(100% - 2 * var(--space-2));
+  padding: 4px var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-danger);
+  color: var(--color-danger-contrast);
+  font-size: var(--font-size-sm);
+  box-shadow: var(--shadow-dialog);
+}
+
+@media (hover: none) {
+  .grip {
+    opacity: 1;
   }
 }

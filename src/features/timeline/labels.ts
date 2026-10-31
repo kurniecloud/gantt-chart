@@ -63,3 +63,12 @@ export function milestoneMarks(scale: TimelineScale, milestones: Milestone[]): M
   }
   return marks;
 }
+
+/** Tooltip for the actual-dates line, e.g. "Actual: Mon 2 Nov 2026 – Wed 4 Nov 2026 (in progress)". */
+export function actualLabel(span: DateSpan, inProgress: boolean): string {
+  const dates =
+    span.start === span.finish
+      ? formatDate(span.start)
+      : `${formatDate(span.start)} – ${formatDate(span.finish)}`;
+  return `Actual: ${dates}${inProgress ? ' (in progress)' : ''}`;
+}

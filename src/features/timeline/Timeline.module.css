@@ -284,9 +284,78 @@
   clip-path: polygon(0 0, 100% 0, 100% 100%, calc(100% - 7px) 50%, 7px 50%, 0 100%);
 }
 
+/* Dragging: body moves, 6px edge handles resize. */
+.bar[data-draggable] {
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.handleStart,
+.handleEnd {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.handleStart {
+  left: -1px;
+}
+
+.handleEnd {
+  right: -1px;
+}
+
+.bar[data-dragging] {
+  z-index: 2;
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 20%),
+    0 2px 8px rgb(0 0 0 / 25%);
+  cursor: grabbing;
+}
+
+:global(body[data-dragging='bar']) {
+  cursor: grabbing;
+  user-select: none;
+}
+
+:global(body[data-dragging='bar-resize']) {
+  cursor: ew-resize;
+  user-select: none;
+}
+
+.dragLabel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  margin-top: -18px;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--color-text);
+  color: var(--color-bg);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 .bar:hover,
 .summaryBar:hover {
   filter: brightness(1.06) saturate(1.2);
+}
+
+/* Actual dates: a bright blue line just under the bar, as thick as the critical-path line. */
+.actualLine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-width: 4px;
+  height: 4px;
+  margin-top: calc((var(--row-height) + 20px) / 2 + 2px);
+  border-radius: 2px;
+  background: var(--color-actual);
 }
 
 /* Critical path: a bright red line through the middle, 20% of the bar's thickness. */

@@ -6,6 +6,8 @@ type TaskSpec = {
   name?: string;
   start?: ISODate;
   finish?: ISODate;
+  actualStart?: ISODate;
+  actualFinish?: ISODate;
   parent?: string;
   priority?: Priority;
   collapsed?: boolean;
@@ -45,6 +47,8 @@ export function makeProject(spec: ProjectSpec = {}): Project {
       percentComplete: 0,
       ...(t.start && { start: t.start }),
       ...(t.finish && { finish: t.finish }),
+      ...(t.actualStart && { actualStart: t.actualStart }),
+      ...(t.actualFinish && { actualFinish: t.actualFinish }),
       ...(t.priority && { priority: t.priority }),
       ...(t.collapsed && { collapsed: true }),
     };

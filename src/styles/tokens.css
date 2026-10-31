@@ -39,6 +39,7 @@
   --color-milestone-marker: #2f9e44;
   --color-critical-line: #ff1f1f;
   --color-arrow: #8b95a3;
+  --color-actual: #0a84ff;
   --color-arrow-broken: #d97706;
   --color-grid-line: #eef0f3;
   --color-grid-day: #f3f4f6;
@@ -102,6 +103,7 @@
     --color-milestone-marker: #5fd17a;
     --color-critical-line: #ff3b3b;
     --color-arrow: #7b8597;
+    --color-actual: #3d9bff;
     --color-arrow-broken: #f59e0b;
     --color-grid-line: #1f242e;
     --color-grid-day: #1a1e26;
@@ -145,6 +147,7 @@
   --color-milestone-marker: #5fd17a;
   --color-critical-line: #ff3b3b;
   --color-arrow: #7b8597;
+  --color-actual: #3d9bff;
   --color-arrow-broken: #f59e0b;
   --color-grid-line: #1f242e;
   --color-grid-day: #1a1e26;

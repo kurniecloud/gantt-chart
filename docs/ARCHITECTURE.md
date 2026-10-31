@@ -52,8 +52,10 @@ type Task = {
   parentId: string | null;
   name: string;
   mode: 'auto' | 'manual'; // 'manual' until the scheduler exists: dates are set by the user
-  start?: ISODate; // optional, inclusive; start only = 1-day bar
-  finish?: ISODate; // optional, inclusive; end only = 1-day bar
+  start?: ISODate; // planned; optional, inclusive; start only = 1-day bar
+  finish?: ISODate; // planned; optional, inclusive; end only = 1-day bar
+  actualStart?: ISODate; // what really happened; drawn as a blue line under the bar
+  actualFinish?: ISODate; // missing while in progress (line runs to today)
   priority?: 'urgent' | 'high' | 'normal' | 'low'; // bar colour
   percentComplete: number; // 0–100
   constraint?: { type: ConstraintType; date?: ISODate };

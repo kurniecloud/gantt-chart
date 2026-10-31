@@ -18,6 +18,8 @@ import { PRIORITY_LABELS, priorityColorVar } from '../../utils/priority';
 import { LinkField } from './LinkField';
 import styles from './TaskDialog.module.css';
 
+type DateField = 'start' | 'finish' | 'actualStart' | 'actualFinish';
+
 type TaskDialogProps =
   | { mode: 'add'; parentId: string | null; onClose: () => void }
   | { mode: 'edit'; taskId: string; onClose: () => void };
@@ -34,10 +36,16 @@ export function TaskDialog(props: TaskDialogProps) {
     const span = editTaskId ? effectiveSpans(project).get(editTaskId) : undefined;
     return span?.fromSubtasks ? span : undefined;
   }, [project, editTaskId]);
+  const derivedActual = useMemo(() => {
+    const span = editTaskId ? effectiveSpans(project, 'actual').get(editTaskId) : undefined;
+    return span?.fromSubtasks ? span : undefined;
+  }, [project, editTaskId]);
 
   const [name, setName] = useState(task?.name ?? '');
   const [start, setStart] = useState(task?.start);
   const [finish, setFinish] = useState(task?.finish);
+  const [actualStart, setActualStart] = useState(task?.actualStart);
+  const [actualFinish, setActualFinish] = useState(task?.actualFinish);
   const [priority, setPriority] = useState<Priority | undefined>(task?.priority);
   const [blockedBy, setBlockedBy] = useState<string[]>(() =>
     editTaskId ? predecessorIds(project, editTaskId) : [],
@@ -51,7 +59,7 @@ export function TaskDialog(props: TaskDialogProps) {
     () => linkCandidates(project, editTaskId, parentId, { blockedBy, blocking }),
     [project, editTaskId, parentId, blockedBy, blocking],
   );
-  const [openPicker, setOpenPicker] = useState<'start' | 'finish' | null>(null);
+  const [openPicker, setOpenPicker] = useState<DateField | null>(null);
   const [errors, setErrors] = useState<TaskInputErrors>({});
   const nameId = useId();
   const nameErrorId = useId();
@@ -61,7 +69,7 @@ export function TaskDialog(props: TaskDialogProps) {
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    const input = { name, start, finish, priority };
+    const input = { name, start, finish, actualStart, actualFinish, priority };
     const found = validateTaskInput(input);
     setErrors(found);
     if (Object.keys(found).length > 0) return;
@@ -75,6 +83,7 @@ export function TaskDialog(props: TaskDialogProps) {
   return (
     <Dialog
       title={title}
+      size="wide"
       onClose={props.onClose}
       onEscape={() => (openPicker ? setOpenPicker(null) : props.onClose())}
     >
@@ -101,35 +110,80 @@ export function TaskDialog(props: TaskDialogProps) {
           )}
         </div>
 
-        {derivedSpan ? (
-          <div className={styles.field}>
-            <span className={styles.label}>Dates</span>
-            <p className={styles.derived}>
-              {formatDate(derivedSpan.start)} – {formatDate(derivedSpan.finish)}
-              <span className={styles.hint}>Calculated from subtasks</span>
-            </p>
-          </div>
-        ) : (
-          <div className={styles.dates}>
-            <DatePicker
-              label="Start date"
-              value={start}
-              error={errors.start}
-              open={openPicker === 'start'}
-              onOpenChange={(open) => setOpenPicker(open ? 'start' : null)}
-              onChange={setStart}
-            />
-            <DatePicker
-              label="End date"
-              value={finish}
-              minDate={start}
-              error={errors.finish}
-              open={openPicker === 'finish'}
-              onOpenChange={(open) => setOpenPicker(open ? 'finish' : null)}
-              onChange={setFinish}
-            />
-          </div>
-        )}
+        <div className={styles.dateBoxes}>
+          <fieldset className={styles.dateBox}>
+            <legend className={styles.boxLegend}>Planned</legend>
+            {derivedSpan ? (
+              <p className={styles.derived}>
+                {formatDate(derivedSpan.start)} – {formatDate(derivedSpan.finish)}
+                <span className={styles.hint}>Calculated from subtasks</span>
+              </p>
+            ) : (
+              <div className={styles.dates}>
+                <DatePicker
+                  context="Planned"
+                  label="Start date"
+                  value={start}
+                  error={errors.start}
+                  open={openPicker === 'start'}
+                  onOpenChange={(open) => setOpenPicker(open ? 'start' : null)}
+                  onChange={setStart}
+                />
+                <DatePicker
+                  context="Planned"
+                  label="End date"
+                  value={finish}
+                  minDate={start}
+                  error={errors.finish}
+                  open={openPicker === 'finish'}
+                  onOpenChange={(open) => setOpenPicker(open ? 'finish' : null)}
+                  onChange={setFinish}
+                />
+              </div>
+            )}
+          </fieldset>
+
+          <fieldset className={styles.dateBox}>
+            <legend className={styles.boxLegend}>Actual</legend>
+            {derivedActual ? (
+              <p className={styles.derived}>
+                {formatDate(derivedActual.start)} – {formatDate(derivedActual.finish)}
+                <span className={styles.hint}>Calculated from subtasks</span>
+              </p>
+            ) : (
+              <div className={styles.dates}>
+                <DatePicker
+                  context="Actual"
+                  label="Start date"
+                  value={actualStart}
+                  openMonth={start}
+                  error={errors.actualStart}
+                  open={openPicker === 'actualStart'}
+                  onOpenChange={(open) => setOpenPicker(open ? 'actualStart' : null)}
+                  onChange={(date) => {
+                    setActualStart(date);
+                    // An actual date fills an empty planned one (not a parent's calculated one).
+                    if (date && !start && !derivedSpan) setStart(date);
+                  }}
+                />
+                <DatePicker
+                  context="Actual"
+                  label="End date"
+                  value={actualFinish}
+                  minDate={actualStart}
+                  openMonth={finish ?? start}
+                  error={errors.actualFinish}
+                  open={openPicker === 'actualFinish'}
+                  onOpenChange={(open) => setOpenPicker(open ? 'actualFinish' : null)}
+                  onChange={(date) => {
+                    setActualFinish(date);
+                    if (date && !finish && !derivedSpan) setFinish(date);
+                  }}
+                />
+              </div>
+            )}
+          </fieldset>
+        </div>
 
         <LinkField
           label="Is blocked by"

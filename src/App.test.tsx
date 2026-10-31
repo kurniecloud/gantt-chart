@@ -143,7 +143,7 @@ describe('adding tasks', () => {
     await user.click(screen.getByRole('button', { name: 'Add task' }));
     await user.type(within(dialog()).getByRole('textbox', { name: 'Task name' }), 'Build');
     await user.click(within(dialog()).getByRole('radio', { name: 'High' }));
-    await user.click(within(dialog()).getByRole('button', { name: /^Start date/ }));
+    await user.click(within(dialog()).getByRole('button', { name: /^Planned Start date/ }));
     expect(within(dialog()).getByRole('grid')).toBeInTheDocument();
     await user.keyboard('{Escape}'); // closes the calendar, not the dialog
     expect(dialog()).toBeInTheDocument();
@@ -165,7 +165,7 @@ describe('date pickers', () => {
 
   it('greys out weekends', async () => {
     const user = await editDated();
-    await user.click(within(dialog()).getByRole('button', { name: /^Start date/ }));
+    await user.click(within(dialog()).getByRole('button', { name: /^Planned Start date/ }));
     const day = (label: RegExp) => within(dialog()).getByRole('button', { name: label });
     expect(day(/Saturday, November 7th, 2026/)).toBeDisabled();
     expect(day(/Sunday, November 8th, 2026/)).toBeDisabled();
@@ -174,7 +174,7 @@ describe('date pickers', () => {
 
   it('greys out end dates before the start date', async () => {
     const user = await editDated();
-    await user.click(within(dialog()).getByRole('button', { name: /^End date/ }));
+    await user.click(within(dialog()).getByRole('button', { name: /^Planned End date/ }));
     const day = (label: RegExp) => within(dialog()).getByRole('button', { name: label });
     expect(day(/Tuesday, November 3rd, 2026/)).toBeDisabled();
     expect(day(/Wednesday, November 4th, 2026/)).toBeEnabled();
@@ -182,12 +182,12 @@ describe('date pickers', () => {
 
   it('picks and clears dates', async () => {
     const user = await editDated();
-    await user.click(within(dialog()).getByRole('button', { name: /^End date/ }));
+    await user.click(within(dialog()).getByRole('button', { name: /^Planned End date/ }));
     await user.click(within(dialog()).getByRole('button', { name: /Friday, November 13th, 2026/ }));
-    expect(within(dialog()).getByRole('button', { name: /^End date/ })).toHaveTextContent(
+    expect(within(dialog()).getByRole('button', { name: /^Planned End date/ })).toHaveTextContent(
       'Fri 13 Nov 2026',
     );
-    await user.click(within(dialog()).getByRole('button', { name: 'Clear start date' }));
+    await user.click(within(dialog()).getByRole('button', { name: 'Clear planned start date' }));
     await user.click(within(dialog()).getByRole('button', { name: 'Save' }));
     const task = useProjectStore.getState().project.tasks.A;
     expect(task).toMatchObject({ finish: '2026-11-13' });
@@ -203,7 +203,7 @@ describe('editing tasks', () => {
     await user.click(rowOf('Design'));
     expect(dialog()).toHaveAccessibleName('Edit task');
     expect(within(dialog()).getByRole('textbox', { name: 'Task name' })).toHaveValue('Design');
-    expect(within(dialog()).getByRole('button', { name: /^Start date/ })).toHaveTextContent(
+    expect(within(dialog()).getByRole('button', { name: /^Planned Start date/ })).toHaveTextContent(
       'Mon 2 Nov 2026',
     );
     expect(within(dialog()).getByRole('radio', { name: 'Urgent' })).toBeChecked();
@@ -225,7 +225,9 @@ describe('editing tasks', () => {
     await user.click(screen.getByRole('button', { name: 'Website' }));
     expect(dialog()).toHaveTextContent('Mon 2 Nov 2026 – Fri 13 Nov 2026');
     expect(dialog()).toHaveTextContent('Calculated from subtasks');
-    expect(within(dialog()).queryByRole('button', { name: /^Start date/ })).not.toBeInTheDocument();
+    expect(
+      within(dialog()).queryByRole('button', { name: /^Planned Start date/ }),
+    ).not.toBeInTheDocument();
   });
 });
 
@@ -363,5 +365,56 @@ describe('blocking links', () => {
     expect(options('Is blocked by')).toContain('Launch');
     await user.click(within(dialog()).getByRole('button', { name: 'Save' }));
     expect(links()).toEqual(['Design → Build']);
+  });
+});
+
+describe('planned vs actual dates', () => {
+  it('shows Planned and Actual boxes; an actual date fills an empty planned one', async () => {
+    const user = setup({ tasks: [{ id: 'A', name: 'Build', start: '2026-11-04' }] }); // Wed
+    await user.click(screen.getByRole('button', { name: 'Build' }));
+    expect(within(dialog()).getByRole('group', { name: 'Planned' })).toBeInTheDocument();
+    expect(within(dialog()).getByRole('group', { name: 'Actual' })).toBeInTheDocument();
+
+    // Planned end is empty: picking an actual end fills it; the planned start stays as it was.
+    await user.click(within(dialog()).getByRole('button', { name: /^Actual Start date/ }));
+    await user.click(
+      within(dialog()).getByRole('button', { name: /Thursday, November 5th, 2026/ }),
+    );
+    await user.click(within(dialog()).getByRole('button', { name: /^Actual End date/ }));
+    await user.click(within(dialog()).getByRole('button', { name: /Monday, November 9th, 2026/ }));
+    expect(within(dialog()).getByRole('button', { name: /^Planned Start date/ })).toHaveTextContent(
+      'Wed 4 Nov 2026',
+    );
+    expect(within(dialog()).getByRole('button', { name: /^Planned End date/ })).toHaveTextContent(
+      'Mon 9 Nov 2026',
+    );
+
+    await user.click(within(dialog()).getByRole('button', { name: 'Save' }));
+    expect(useProjectStore.getState().project.tasks.A).toMatchObject({
+      start: '2026-11-04',
+      finish: '2026-11-09',
+      actualStart: '2026-11-05',
+      actualFinish: '2026-11-09',
+    });
+  });
+
+  it('shows a parent’s actual dates as calculated from its subtasks', async () => {
+    const user = setup({
+      tasks: [
+        { id: 'P', name: 'Website' },
+        {
+          id: 'C',
+          name: 'Design',
+          parent: 'P',
+          start: '2026-11-02',
+          actualStart: '2026-11-03',
+          actualFinish: '2026-11-06',
+        },
+      ],
+    });
+    await user.click(screen.getByRole('button', { name: 'Website' }));
+    const actual = within(dialog()).getByRole('group', { name: 'Actual' });
+    expect(actual).toHaveTextContent('Tue 3 Nov 2026 – Fri 6 Nov 2026');
+    expect(actual).toHaveTextContent('Calculated from subtasks');
   });
 });

@@ -16,11 +16,11 @@ async function addTask(page: Page, name: string, dates?: [string, string], block
   await dialog(page).getByRole('textbox', { name: 'Task name' }).fill(name);
   if (dates) {
     await dialog(page)
-      .getByRole('button', { name: /^Start date/ })
+      .getByRole('button', { name: /^Planned Start date/ })
       .click();
     await day(page, dates[0]).click();
     await dialog(page)
-      .getByRole('button', { name: /^End date/ })
+      .getByRole('button', { name: /^Planned End date/ })
       .click();
     await day(page, dates[1]).click();
   }
@@ -156,7 +156,7 @@ test('blocking links are drawn as arrows from bar end to bar start', async ({ pa
     .getByRole('button', { name: /^Build:/ })
     .click();
   await dialog(page)
-    .getByRole('button', { name: /^Start date/ })
+    .getByRole('button', { name: /^Planned Start date/ })
     .click();
   await day(page, '2026-11-05').click();
   await dialog(page).getByRole('button', { name: 'Save' }).click();

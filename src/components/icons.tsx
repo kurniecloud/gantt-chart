@@ -124,3 +124,16 @@ export function PathIcon(props: IconProps) {
     </Icon>
   );
 }
+
+export function GripIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      {[4, 8, 12].map((y) => (
+        <g key={y}>
+          <circle cx="6" cy={y} r="1.1" fill="currentColor" stroke="none" />
+          <circle cx="10" cy={y} r="1.1" fill="currentColor" stroke="none" />
+        </g>
+      ))}
+    </Icon>
+  );
+}

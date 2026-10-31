@@ -1,4 +1,4 @@
-import { act, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from '../../App';
@@ -276,17 +276,21 @@ describe('critical path', () => {
 
     await user.click(toggle);
     expect(toggle).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByText('2 critical tasks')).toBeInTheDocument();
+    expect(await screen.findByText('2 critical tasks')).toBeInTheDocument();
     expect(bar(/^Design:.*Critical$/)).toHaveAttribute('data-critical', 'true');
     expect(bar(/^Build:.*Critical$/)).toBeInTheDocument();
     expect(bar(/^Docs:/)).not.toHaveAttribute('data-critical');
+    expect(screen.queryByTestId('busy-overlay')).not.toBeInTheDocument();
 
-    // Pushing Docs to the last day makes it critical too — recalculated without clicking again.
+    // Pushing Docs to the last day makes it critical too — recalculated without clicking again,
+    // with input blocked until the new result is in.
     act(() =>
       useProjectStore.getState().dispatch(updateTask('C', { name: 'Docs', start: '2026-11-06' })),
     );
+    expect(screen.getByTestId('busy-overlay')).toBeInTheDocument();
+    expect(await screen.findByText('3 critical tasks')).toBeInTheDocument();
     expect(bar(/^Docs:.*Critical$/)).toBeInTheDocument();
-    expect(screen.getByText('3 critical tasks')).toBeInTheDocument();
+    expect(screen.queryByTestId('busy-overlay')).not.toBeInTheDocument();
 
     await user.click(toggle);
     expect(within(timeline()).queryAllByRole('button', { name: /Critical$/ })).toHaveLength(0);
@@ -338,5 +342,89 @@ describe('dependency arrows', () => {
         .dispatch(updateTask('B', { name: 'Build', start: '2026-11-09' }, { blockedBy: [] })),
     );
     expect(arrows()).toHaveLength(0);
+  });
+});
+
+describe('dragging bars', () => {
+  const spec: Spec = {
+    tasks: [
+      { id: 'P', name: 'Website' },
+      { id: 'A', name: 'Design', parent: 'P', start: '2026-11-04', finish: '2026-11-06' }, // Wed–Fri
+    ],
+  };
+  const dates = () => {
+    const { start, finish } = useProjectStore.getState().project.tasks.A!;
+    return [start, finish];
+  };
+  const dragBar = (element: Element, dx: number, { release = true } = {}) => {
+    fireEvent.pointerDown(element, { button: 0, clientX: 500, clientY: 10 });
+    fireEvent.pointerMove(window, { clientX: 500 + dx, clientY: 10 });
+    if (release) fireEvent.pointerUp(window, { clientX: 500 + dx, clientY: 10 });
+  };
+
+  it('moves a task by whole weekdays, showing the new dates while dragging', () => {
+    setup(spec);
+    dragBar(bar(/^Design:/), 2 * DAY_WIDTH + 10, { release: false });
+    expect(within(timeline()).getByRole('status')).toHaveTextContent('Fri 6 Nov – Tue 10 Nov (3D)');
+    fireEvent.pointerUp(window);
+    expect(dates()).toEqual(['2026-11-06', '2026-11-10']);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument(); // the drag wasn't a click
+  });
+
+  it('resizes from either edge, never below one day', () => {
+    setup(spec);
+    dragBar(bar(/^Design:/).querySelector('[data-handle="end"]')!, 2 * DAY_WIDTH);
+    expect(dates()).toEqual(['2026-11-04', '2026-11-10']);
+    dragBar(bar(/^Design:/).querySelector('[data-handle="start"]')!, 10 * DAY_WIDTH);
+    expect(dates()).toEqual(['2026-11-10', '2026-11-10']);
+  });
+
+  it('cancels on Esc, and a plain click still opens the dialog', async () => {
+    const { user } = setup(spec);
+    dragBar(bar(/^Design:/), 3 * DAY_WIDTH, { release: false });
+    fireEvent.keyDown(window, { key: 'Escape' });
+    fireEvent.pointerUp(window);
+    expect(dates()).toEqual(['2026-11-04', '2026-11-06']);
+    await user.click(bar(/^Design:/));
+    expect(screen.getByRole('dialog')).toHaveAccessibleName('Edit task');
+  });
+
+  it('does not drag parent bars', () => {
+    setup(spec);
+    const parent = bar(/^Website:/);
+    expect(parent.querySelector('[data-handle]')).toBeNull();
+    dragBar(parent, 2 * DAY_WIDTH);
+    expect(useProjectStore.getState().past).toHaveLength(0);
+  });
+});
+
+describe('actual dates line', () => {
+  it('draws a blue line under the bar for actual dates, up to today while in progress', () => {
+    setup({
+      tasks: [
+        {
+          id: 'A',
+          name: 'Design',
+          start: '2026-11-02',
+          finish: '2026-11-06',
+          actualStart: '2026-11-03',
+          actualFinish: '2026-11-05',
+        },
+        {
+          id: 'B',
+          name: 'Build',
+          start: '2026-11-02',
+          finish: '2026-11-13',
+          actualStart: '2026-11-02',
+        },
+        { id: 'C', name: 'Docs', start: '2026-11-02' },
+      ],
+    });
+    const lines = screen.getAllByTestId('actual-line');
+    expect(lines.map((l) => l.getAttribute('aria-label'))).toEqual([
+      'Design: Actual: Tue 3 Nov 2026 – Thu 5 Nov 2026',
+      'Build: Actual: Mon 2 Nov 2026 – Wed 4 Nov 2026 (in progress)', // today is Wed 4
+    ]);
+    expect(lines[0]).toHaveStyle({ width: `${3 * DAY_WIDTH}px` });
   });
 });

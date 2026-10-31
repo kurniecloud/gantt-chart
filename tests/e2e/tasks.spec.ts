@@ -76,7 +76,7 @@ test('weekends cannot be picked, and edits are saved', async ({ page }) => {
   await expect(dialog(page)).toHaveAccessibleName('Edit task');
 
   await dialog(page)
-    .getByRole('button', { name: /^Start date/ })
+    .getByRole('button', { name: /^Planned Start date/ })
     .click();
   const disabledDays = dialog(page).locator('[data-day][data-disabled]');
   expect(await disabledDays.count()).toBeGreaterThanOrEqual(8); // every Sat & Sun shown
@@ -85,7 +85,7 @@ test('weekends cannot be picked, and edits are saved', async ({ page }) => {
     expect([0, 6]).toContain(weekday);
   }
   await dialog(page).locator('[data-day]:not([data-disabled]) button').first().click();
-  await expect(dialog(page).getByRole('button', { name: /^Start date/ })).not.toContainText(
+  await expect(dialog(page).getByRole('button', { name: /^Planned Start date/ })).not.toContainText(
     'No date',
   );
 
