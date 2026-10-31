@@ -1,14 +1,11 @@
-import {
-  STANDARD_CALENDAR_ID,
-  createStandardCalendar,
-  finishFromStart,
-  nextWorkingDay,
-} from './calendar';
+import { STANDARD_CALENDAR_ID, createStandardCalendar } from './calendar';
 import { newId } from './ids';
 import type { Calendar, ISODate, Project, Task } from './types';
 
 /** Bump together with a migration in `src/persistence/migrations.ts`. */
-export const CURRENT_SCHEMA_VERSION = 1;
+export const CURRENT_SCHEMA_VERSION = 2;
+
+export const DEFAULT_PROJECT_NAME = 'Untitled project';
 
 export function createProject(name: string, startDate: ISODate): Project {
   const calendar = createStandardCalendar();
@@ -16,6 +13,7 @@ export function createProject(name: string, startDate: ISODate): Project {
     schemaVersion: CURRENT_SCHEMA_VERSION,
     id: newId(),
     name,
+    description: '',
     startDate,
     defaultCalendarId: calendar.id,
     tasks: {},
@@ -36,31 +34,17 @@ export function calendarFor(project: Project, task?: Task): Calendar {
   );
 }
 
-export function createTask(
-  project: Project,
-  fields: Partial<Omit<Task, 'id'>> & { name: string },
-): Task {
-  const durationDays = fields.durationDays ?? 1;
-  const calendar = calendarFor(project);
-  const start = nextWorkingDay(calendar, fields.start ?? project.startDate);
-  return {
-    id: newId(),
-    parentId: null,
-    mode: 'auto',
-    percentComplete: 0,
-    ...fields,
-    start,
-    finish: fields.finish ?? finishFromStart(calendar, start, durationDays),
-    durationDays,
-  };
-}
+export type TaskFields = Pick<Task, 'name' | 'start' | 'finish' | 'priority'>;
 
-/** Depth of each task in the hierarchy (0 = top level), in `taskOrder` order. */
-export function taskDepths(project: Project): Map<string, number> {
-  const depths = new Map<string, number>();
-  for (const id of project.taskOrder) {
-    const parentId = project.tasks[id]?.parentId;
-    depths.set(id, parentId ? (depths.get(parentId) ?? 0) + 1 : 0);
-  }
-  return depths;
+/** A new task with the given fields. Absent dates/priority are left off the object entirely. */
+export function createTask(
+  fields: TaskFields,
+  parentId: string | null = null,
+  id: string = newId(),
+): Task {
+  const task: Task = { id, parentId, name: fields.name, mode: 'manual', percentComplete: 0 };
+  if (fields.start) task.start = fields.start;
+  if (fields.finish) task.finish = fields.finish;
+  if (fields.priority) task.priority = fields.priority;
+  return task;
 }

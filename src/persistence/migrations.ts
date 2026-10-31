@@ -8,7 +8,21 @@ type RawProject = Record<string, unknown>;
  * `MIGRATIONS[n]` upgrades a project from schema version n to n + 1.
  * Add an entry (with a test) every time `CURRENT_SCHEMA_VERSION` is bumped.
  */
-const MIGRATIONS: Record<number, (project: RawProject) => RawProject> = {};
+const MIGRATIONS: Record<number, (project: RawProject) => RawProject> = {
+  // v2: project description; task durations are derived from dates, which the user sets
+  // directly (there was no scheduler in v1, so every task's dates were effectively manual).
+  1: (project) => ({
+    ...project,
+    description: '',
+    tasks: Object.fromEntries(
+      Object.entries(isRecord(project.tasks) ? project.tasks : {}).map(([id, task]) => {
+        if (!isRecord(task)) return [id, task];
+        const { durationDays, ...rest } = task;
+        return [id, { ...rest, mode: 'manual' }];
+      }),
+    ),
+  }),
+};
 
 function isRecord(value: unknown): value is RawProject {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -43,6 +57,7 @@ function assertProjectShape(data: RawProject): asserts data is Project {
   const problems: string[] = [];
   if (typeof data.id !== 'string') problems.push('id');
   if (typeof data.name !== 'string') problems.push('name');
+  if (typeof data.description !== 'string') problems.push('description');
   if (!isISODate(data.startDate)) problems.push('startDate');
   if (typeof data.defaultCalendarId !== 'string') problems.push('defaultCalendarId');
   for (const key of ['tasks', 'dependencies', 'calendars', 'resources', 'assignments']) {

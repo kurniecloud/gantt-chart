@@ -6,11 +6,15 @@ function isTextEntry(target: EventTarget | null): boolean {
   return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
 }
 
-/** Ctrl/Cmd+Z undoes, Ctrl/Cmd+Shift+Z and Ctrl+Y redo — except while typing in a field. */
+/**
+ * Ctrl/Cmd+Z undoes, Ctrl/Cmd+Shift+Z and Ctrl+Y redo — except while typing in a field or while
+ * a dialog is open (undoing behind a modal would change things the user can't see).
+ */
 export function useUndoRedoShortcuts() {
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (!(e.ctrlKey || e.metaKey) || e.altKey || isTextEntry(e.target)) return;
+      if (document.querySelector('dialog[open]')) return;
       const key = e.key.toLowerCase();
       const { undo, redo } = useProjectStore.getState();
       if (key === 'z' && !e.shiftKey) {

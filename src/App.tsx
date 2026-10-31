@@ -1,8 +1,9 @@
 import styles from './App.module.css';
-import { TaskGrid } from './features/grid/TaskGrid';
+import { TaskDialogs } from './features/dialogs/TaskDialogs';
+import { ProjectHeader } from './features/header/ProjectHeader';
+import { useUndoRedoShortcuts } from './features/header/useUndoRedoShortcuts';
+import { TaskList } from './features/tasks/TaskList';
 import { Timeline } from './features/timeline/Timeline';
-import { Toolbar } from './features/toolbar/Toolbar';
-import { useUndoRedoShortcuts } from './features/toolbar/useUndoRedoShortcuts';
 
 type AppProps = {
   storageAvailable: boolean;
@@ -13,21 +14,21 @@ export function App({ storageAvailable }: AppProps) {
 
   return (
     <div className={styles.app}>
-      <Toolbar />
+      <ProjectHeader />
       {!storageAvailable && (
         <div role="status" className={styles.banner}>
-          Browser storage is unavailable, so changes won’t be saved. Export your project before
-          closing this tab.
+          Browser storage is unavailable, so changes won’t be saved when you close this tab.
         </div>
       )}
       <main className={styles.workspace}>
-        <section className={styles.gridPane} aria-label="Task list">
-          <TaskGrid />
+        <section className={styles.taskPane} aria-label="Task list">
+          <TaskList />
         </section>
         <section className={styles.timelinePane} aria-label="Timeline">
           <Timeline />
         </section>
       </main>
+      <TaskDialogs />
     </div>
   );
 }

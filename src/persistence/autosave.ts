@@ -1,5 +1,5 @@
 import { todayISO } from '../domain/dates';
-import { createSampleProject } from '../domain/sampleProject';
+import { DEFAULT_PROJECT_NAME, createProject } from '../domain/project';
 import type { Project } from '../domain/types';
 import { useProjectStore } from '../store/projectStore';
 import { getLastOpenedId, loadProject, saveProject, setLastOpenedId } from './db';
@@ -7,7 +7,7 @@ import { getLastOpenedId, loadProject, saveProject, setLastOpenedId } from './db
 export const AUTOSAVE_DELAY_MS = 500;
 
 /**
- * Opens the last project the user worked on, or creates the sample project on first launch.
+ * Opens the last project the user worked on, or creates an empty project on first launch.
  * `persistent` is false when IndexedDB is unavailable (e.g. some private-browsing modes).
  */
 export async function loadInitialProject(): Promise<{ project: Project; persistent: boolean }> {
@@ -16,13 +16,13 @@ export async function loadInitialProject(): Promise<{ project: Project; persiste
     const existing = lastId ? await loadProject(lastId) : undefined;
     if (existing) return { project: existing, persistent: true };
 
-    const project = createSampleProject(todayISO());
+    const project = createProject(DEFAULT_PROJECT_NAME, todayISO());
     await saveProject(project);
     await setLastOpenedId(project.id);
     return { project, persistent: true };
   } catch (error) {
     console.warn('Browser storage is unavailable; changes will not be saved.', error);
-    return { project: createSampleProject(todayISO()), persistent: false };
+    return { project: createProject(DEFAULT_PROJECT_NAME, todayISO()), persistent: false };
   }
 }
 

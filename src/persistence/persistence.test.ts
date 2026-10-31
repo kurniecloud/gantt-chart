@@ -3,7 +3,7 @@ import { CURRENT_SCHEMA_VERSION } from '../domain/project';
 import { renameProject } from '../store/commands/projectCommands';
 import { useProjectStore } from '../store/projectStore';
 import { makeProject } from '../test/fixtures';
-import { startAutosave } from './autosave';
+import { loadInitialProject, startAutosave } from './autosave';
 import { getLastOpenedId, listProjects, loadProject, saveProject } from './db';
 import { migrateProject } from './migrations';
 
@@ -23,6 +23,28 @@ describe('migrateProject', () => {
     expect(() => migrateProject(raw)).toThrow(message);
   });
 
+  it('upgrades a v1 project: adds a description, drops durations, marks dates as manual', () => {
+    const v1 = {
+      ...makeProject({ tasks: [{ id: 'A', start: '2026-11-02', finish: '2026-11-04' }] }),
+      schemaVersion: 1,
+    } as Record<string, unknown>;
+    delete v1.description;
+    v1.tasks = { A: { ...(v1.tasks as Record<string, object>).A, mode: 'auto', durationDays: 3 } };
+
+    const upgraded = migrateProject(v1);
+    expect(upgraded.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
+    expect(upgraded.description).toBe('');
+    expect(upgraded.tasks.A).toEqual({
+      id: 'A',
+      parentId: null,
+      name: 'A',
+      mode: 'manual',
+      percentComplete: 0,
+      start: '2026-11-02',
+      finish: '2026-11-04',
+    });
+  });
+
   it('names the invalid fields', () => {
     const broken = { ...makeProject(), startDate: '2026-02-30', taskOrder: {} };
     expect(() => migrateProject(broken)).toThrow(/startDate, taskOrder/);
@@ -31,7 +53,7 @@ describe('migrateProject', () => {
 
 describe('IndexedDB storage', () => {
   it('round-trips a project and lists it', async () => {
-    const project = makeProject({ tasks: [{ id: 'A', duration: 2 }] });
+    const project = makeProject({ tasks: [{ id: 'A', start: '2026-11-02' }] });
     await saveProject(project);
     expect(await loadProject(project.id)).toEqual(project);
     expect(await listProjects()).toContainEqual(
@@ -41,6 +63,18 @@ describe('IndexedDB storage', () => {
 
   it('returns undefined for an unknown id', async () => {
     expect(await loadProject('missing')).toBeUndefined();
+  });
+
+  it('starts with an empty, untitled project and reopens it next time', async () => {
+    const first = await loadInitialProject();
+    expect(first.persistent).toBe(true);
+    expect(first.project).toMatchObject({
+      name: 'Untitled project',
+      description: '',
+      taskOrder: [],
+    });
+    const second = await loadInitialProject();
+    expect(second.project.id).toBe(first.project.id);
   });
 });
 

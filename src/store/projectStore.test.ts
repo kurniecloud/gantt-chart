@@ -1,18 +1,19 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { makeProject } from '../test/fixtures';
-import { addTask, renameProject } from './commands/projectCommands';
+import { renameProject, setProjectDescription } from './commands/projectCommands';
+import { addTask } from './commands/taskCommands';
 import { HISTORY_LIMIT, useProjectStore } from './projectStore';
 
 const store = useProjectStore;
 
 beforeEach(() => {
-  store.getState().loadProject(makeProject({ tasks: [{ id: 'A', duration: 3 }] }));
+  store.getState().loadProject(makeProject({ tasks: [{ id: 'A' }] }));
 });
 
 describe('dispatch / undo / redo', () => {
   it('undo restores the exact previous project and redo reapplies it', () => {
     const before = structuredClone(store.getState().project);
-    store.getState().dispatch(addTask('Build'));
+    store.getState().dispatch(addTask({ name: 'Build' }));
     const after = structuredClone(store.getState().project);
     expect(after.taskOrder).toHaveLength(2);
 
@@ -56,17 +57,39 @@ describe('dispatch / undo / redo', () => {
   });
 });
 
-describe('addTask', () => {
-  it('adds a 1-day task on the project start date', () => {
-    store.getState().dispatch(addTask());
-    const { project } = store.getState();
-    const id = project.taskOrder[1]!;
-    expect(project.tasks[id]).toMatchObject({
-      name: 'New task',
-      parentId: null,
-      start: '2026-11-02',
-      finish: '2026-11-02',
-      durationDays: 1,
-    });
+describe('project commands', () => {
+  it('sets a trimmed description, which may be empty', () => {
+    store.getState().dispatch(setProjectDescription('  Q4 launch plan \n'));
+    expect(store.getState().project.description).toBe('Q4 launch plan');
+    store.getState().dispatch(setProjectDescription(''));
+    expect(store.getState().project.description).toBe('');
+  });
+});
+
+describe('setCollapsed', () => {
+  beforeEach(() => {
+    store.getState().loadProject(makeProject({ tasks: [{ id: 'P' }, { id: 'C', parent: 'P' }] }));
+  });
+
+  it('collapses and expands without touching undo history', () => {
+    store.getState().setCollapsed('P', true);
+    expect(store.getState().project.tasks.P?.collapsed).toBe(true);
+    store.getState().setCollapsed('P', false);
+    expect(store.getState().project.tasks.P).not.toHaveProperty('collapsed');
+    expect(store.getState().past).toHaveLength(0);
+  });
+
+  it('keeps undo working across collapse changes', () => {
+    store.getState().dispatch(renameProject('Renamed'));
+    store.getState().setCollapsed('P', true);
+    store.getState().undo();
+    expect(store.getState().project.name).toBe('Test project');
+    expect(store.getState().project.tasks.P?.collapsed).toBe(true);
+  });
+
+  it('ignores unknown tasks', () => {
+    const project = store.getState().project;
+    store.getState().setCollapsed('missing', true);
+    expect(store.getState().project).toBe(project);
   });
 });

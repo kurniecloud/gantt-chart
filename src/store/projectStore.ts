@@ -1,6 +1,6 @@
-import { applyPatches, enablePatches, produceWithPatches, type Patch } from 'immer';
+import { applyPatches, enablePatches, produce, produceWithPatches, type Patch } from 'immer';
 import { create } from 'zustand';
-import { createProject } from '../domain/project';
+import { DEFAULT_PROJECT_NAME, createProject } from '../domain/project';
 import type { Project } from '../domain/types';
 import type { Command } from './commands/types';
 
@@ -23,10 +23,15 @@ type ProjectState = {
   dispatch: (command: Command) => void;
   undo: () => void;
   redo: () => void;
+  /**
+   * Expands or collapses a task's subtasks. This is view state: it is saved with the project
+   * but deliberately kept out of undo history.
+   */
+  setCollapsed: (taskId: string, collapsed: boolean) => void;
 };
 
 export const useProjectStore = create<ProjectState>()((set, get) => ({
-  project: createProject('Untitled project', '1970-01-01'),
+  project: createProject(DEFAULT_PROJECT_NAME, '1970-01-01'),
   past: [],
   future: [],
 
@@ -63,6 +68,16 @@ export const useProjectStore = create<ProjectState>()((set, get) => ({
       past: [...past, entry],
       future: future.slice(1),
     });
+  },
+
+  setCollapsed: (taskId, collapsed) => {
+    const project = produce(get().project, (draft) => {
+      const task = draft.tasks[taskId];
+      if (!task) return;
+      if (collapsed) task.collapsed = true;
+      else delete task.collapsed;
+    });
+    if (project !== get().project) set({ project });
   },
 }));
 
