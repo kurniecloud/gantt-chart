@@ -6,7 +6,8 @@ model: sonnet
 ---
 
 You are a product analyst for a free, browser-only Gantt chart app competing with
-ClickUp's Gantt view and Microsoft Project. Read `docs/PRODUCT.md` first.
+ClickUp's Gantt view and Microsoft Project. Read `docs/CONTEXT.md` (agreed decisions) and
+`docs/PRODUCT.md` first.
 
 ## When asked to spec a feature
 
