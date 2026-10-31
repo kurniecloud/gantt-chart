@@ -6,7 +6,8 @@ model: sonnet
 ---
 
 You are a test engineer for a browser-only Gantt chart app. Follow
-`.claude/skills/write-tests/SKILL.md` for conventions and fixtures.
+`.claude/skills/write-tests/SKILL.md` for conventions and fixtures, and `docs/CONTEXT.md` §5
+(pin the clock, jsdom shims, timezones).
 
 ## Priorities
 

@@ -8,13 +8,19 @@ description: End-to-end workflow for adding a feature to the Gantt app — spec,
 Follow these steps in order. Skip a step only when it clearly does not apply (e.g. a pure
 styling change has no domain step) and say which steps you skipped.
 
+## 0. Load the context
+
+- Read `docs/CONTEXT.md` (decisions, working agreement, lessons learned, backlog) and the
+  specs for the areas involved. Sync `main` and create a branch (`feat/<slug>`).
+
 ## 1. Pin down the behaviour
 
-- Find the feature row in `docs/PRODUCT.md`. If there is a spec in `docs/specs/`, read it.
-- If the behaviour is non-trivial and unspecified, write a short spec in
-  `docs/specs/<feature-slug>.md` first (the `product-analyst` agent can research competitors).
-  Include worked examples with concrete dates and numbered acceptance criteria.
-- Mark the row 🟨 in `docs/PRODUCT.md`.
+- Analyse the request against existing decisions: list gaps and conflicting requirements.
+- Ask the owner the open questions (question tool, ≤ 4, recommended option first); state the
+  smaller defaults you'll use instead of asking about them.
+- Write `docs/specs/<feature-slug>.md`: dated Decisions table (the owner's actual answers),
+  behaviour, data-model changes, out of scope. Mark superseded decisions in older specs.
+- Add or mark the row 🟨 in `docs/PRODUCT.md`.
 
 ## 2. Domain (`src/domain/`)
 
@@ -45,10 +51,16 @@ styling change has no domain step) and say which steps you skipped.
 
 ## 6. Look at it
 
-Start the dev server and exercise the feature in the browser (light + dark, two zoom
-levels). State what you checked.
+Start the dev server and exercise the feature in the browser (light + dark, daily + weekly,
+phone width). The desktop app's browser pane is often hidden (lagging screenshots, paused
+animations): read state with JS, or screenshot with a temporary `// @ts-nocheck` Playwright
+script with a pinned clock — then delete it. State what you checked and what you couldn't.
 
 ## 7. Close out
 
-- Mark the row ✅ in `docs/PRODUCT.md` (or leave 🟨 and say what remains).
-- Suggest a Conventional Commit message, e.g. `feat(timeline): drag to create dependencies`.
+- Mark the row ✅ in `docs/PRODUCT.md` (or leave 🟨 and say what remains); set the spec's status.
+- **Update `docs/CONTEXT.md`**: snapshot (PR table, schema version, test counts), new decisions,
+  lessons learned from bugs hit, backlog/tech debt.
+- Run every check (`typecheck`, `lint`, `format:check`, unit tests in several timezones,
+  `build`, `test:e2e`), make one signed Conventional Commit, push, and give the owner the
+  compare URL. Summarise plainly: what changed, how verified, what wasn't, trade-offs.

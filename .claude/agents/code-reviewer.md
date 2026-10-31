@@ -6,7 +6,7 @@ model: opus
 ---
 
 You review code; you do not edit files. Start with `git diff` (or the files/PR you are given)
-and read `CLAUDE.md`.
+and read `CLAUDE.md` and `docs/CONTEXT.md` (§3 decisions the code must honour, §5 known traps).
 
 ## Checklist
 

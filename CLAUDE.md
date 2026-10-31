@@ -5,26 +5,42 @@ parity with the ClickUp Gantt view and Microsoft Project. No back end: all data 
 browser (IndexedDB) and in files the user imports/exports. Deployed as a static site to
 GitHub Pages.
 
-- Product scope & feature roadmap: [docs/PRODUCT.md](docs/PRODUCT.md)
-- Architecture & data model: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
-- Scheduling rules (dependency math, calendars, critical path): [.claude/skills/scheduling-engine/SKILL.md](.claude/skills/scheduling-engine/SKILL.md)
+## Start here (every task)
+
+1. **Read [docs/CONTEXT.md](docs/CONTEXT.md)** — current state, every product decision agreed
+   with the owner (including superseded ones), how we work together, lessons learned and the
+   backlog. Then read the spec in `docs/specs/` for the area you're touching.
+2. **Update docs/CONTEXT.md in the same PR** whenever the snapshot, a decision, a lesson or the
+   backlog changes. A task isn't done until the handover is current.
+
+Reference: roadmap [docs/PRODUCT.md](docs/PRODUCT.md) · architecture
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · specs [docs/specs/](docs/specs/) · skills
+`.claude/skills/` (rendering, scheduling, import/export, tests, deploy, add-feature).
+
+## Working with the product owner (summary — details in docs/CONTEXT.md §2)
+
+- Every request: analyse → find gaps/conflicts → ask (question tool, ≤ 4, recommended option
+  first) → state defaults → plan → build → verify → **one signed PR** → owner merges.
+- Don't assume the recommended option was chosen; record every answer in the batch's spec
+  (`docs/specs/<slug>.md`, dated Decisions table) and in docs/CONTEXT.md §3.
+- Report plainly: what changed, how it was verified, what wasn't, trade-offs.
 
 ## Tech stack
 
-| Concern        | Choice                                                                         |
-| -------------- | ------------------------------------------------------------------------------ |
-| Build          | Vite 8, Node 26 LTS (`.nvmrc`)                                                 |
-| Language       | TypeScript 6, `strict: true`, no `any` without a comment saying why            |
-| UI             | React 19 function components + hooks, CSS Modules                              |
-| State          | Zustand + immer patches, command-based undo/redo                               |
-| Timeline       | Custom SVG rendering (no third-party Gantt library)                            |
-| Virtualization | `@tanstack/react-virtual`: rows shared by task list and timeline, date columns |
-| Dates          | `date-fns`; dates are stored as `YYYY-MM-DD` strings                           |
-| Persistence    | IndexedDB via `idb` (autosave), JSON / CSV / MS Project XML import-export      |
-| Unit tests     | Vitest + Testing Library                                                       |
-| E2E tests      | Playwright                                                                     |
-| Lint/format    | ESLint + Prettier                                                              |
-| Deploy         | GitHub Actions → GitHub Pages                                                  |
+| Concern        | Choice                                                                                   |
+| -------------- | ---------------------------------------------------------------------------------------- |
+| Build          | Vite 8, Node 26 LTS (`.nvmrc`)                                                           |
+| Language       | TypeScript 6, `strict: true`, no `any` without a comment saying why                      |
+| UI             | React 19 function components + hooks, CSS Modules                                        |
+| State          | Zustand + immer patches, command-based undo/redo                                         |
+| Timeline       | Custom SVG rendering (no third-party Gantt library)                                      |
+| Virtualization | `@tanstack/react-virtual`: rows shared by task list and timeline, date columns           |
+| Dates          | `date-fns`; dates are stored as `YYYY-MM-DD` strings                                     |
+| Persistence    | IndexedDB via `idb` (autosave), native `.gantt.json` import/export (CSV / MSPDI planned) |
+| Unit tests     | Vitest + Testing Library                                                                 |
+| E2E tests      | Playwright                                                                               |
+| Lint/format    | ESLint + Prettier                                                                        |
+| Deploy         | GitHub Actions → GitHub Pages                                                            |
 
 Do not add a server, database, auth provider or any runtime network dependency. The app must
 work offline once loaded. New runtime dependencies need a one-line justification in the PR
@@ -78,9 +94,10 @@ docs/            Product and architecture docs.
    path, rollups or WBS numbers goes in `src/domain/` as pure functions with unit tests.
    Components never compute schedule dates themselves.
 2. **Dates are calendar days, not instants.** Store task dates as `YYYY-MM-DD` strings and
-   do arithmetic through `src/domain/calendar.ts` helpers. Never use `new Date(string)` on a
-   date-only string (it parses as UTC and shifts by timezone). Never store `Date` objects
-   in state.
+   do arithmetic through `src/domain/dates.ts`, `workweek.ts` (weekday maths — the timeline
+   has no weekends) and `calendar.ts`. Never use `new Date(string)` on a date-only string (it
+   parses as UTC and shifts by timezone). Never store `Date` objects in state. Tests that
+   depend on "today" must pin the clock.
 3. **Durations are working days** against the project/task calendar unless the field says
    otherwise (`elapsed` durations are flagged explicitly).
 4. **All mutations go through commands** in `src/store/commands/` so undo/redo works.
@@ -122,8 +139,13 @@ docs/            Product and architecture docs.
 - `main` is protected by a repository ruleset: **changes only via pull request**, **CodeQL
   code-scanning results required**, **signed commits required**. Never push to `main` directly
   and never force-push it.
-- Work on a branch (`feat/…`, `fix/…`, `chore/…`), push it, open a PR; CI runs on the PR.
-  Merge with **Squash and merge**.
+- Work on a branch (`feat/…`, `fix/…`, `docs/…`), push it, and give the owner the compare URL
+  (`https://github.com/kurniecloud/gantt-chart/compare/main...<branch>?expand=1`; `gh` isn't
+  installed). CI runs on the PR; the owner merges (merge commit or squash both keep the
+  signature requirement satisfied).
 - Commits are SSH-signed via this repo's git config (`gpg.format=ssh`, `commit.gpgsign=true`).
   If signing fails, stop and report it — don't disable signing.
 - After a PR merges: `git switch main && git pull --ff-only`, then delete the merged branch.
+- Known traps (scroll padding, fractional gridline tiles, dialog focus, jsdom shims, hidden
+  browser pane, temporary Playwright scripts…) are listed in docs/CONTEXT.md §5 — read before
+  touching those areas.

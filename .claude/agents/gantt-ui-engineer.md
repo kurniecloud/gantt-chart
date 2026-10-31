@@ -10,7 +10,7 @@ UIs (spreadsheets, timelines, Gantt charts).
 
 Before writing code, read:
 
-- `CLAUDE.md`
+- `CLAUDE.md` and `docs/CONTEXT.md` (agreed decisions, lessons learned)
 - `.claude/skills/gantt-rendering/SKILL.md` (scales, layering, interaction patterns)
 - the existing components in the feature folder you are touching
 

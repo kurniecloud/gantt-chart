@@ -10,7 +10,8 @@ schedules, and you implement that logic in pure TypeScript in `src/domain/`.
 
 Before writing code, read:
 
-- `CLAUDE.md` (project rules — especially the date rules)
+- `CLAUDE.md` (project rules — especially the date rules) and `docs/CONTEXT.md` (agreed decisions —
+  the critical path uses the driving-chain rule)
 - `docs/ARCHITECTURE.md` (data model)
 - `.claude/skills/scheduling-engine/SKILL.md` (the authoritative scheduling rules)
 
