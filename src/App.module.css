@@ -14,11 +14,11 @@
 .workspace {
   flex: 1;
   display: grid;
-  grid-template-columns: minmax(320px, 560px) 1fr;
+  grid-template-columns: minmax(280px, 420px) 1fr;
   min-height: 0;
 }
 
-.gridPane {
+.taskPane {
   overflow: auto;
   border-right: 1px solid var(--color-border);
 }

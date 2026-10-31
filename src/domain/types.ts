@@ -7,17 +7,20 @@ export type ConstraintType = 'ASAP' | 'ALAP' | 'SNET' | 'SNLT' | 'FNET' | 'FNLT'
 
 export type SchedulingMode = 'auto' | 'manual';
 
+export type Priority = 'urgent' | 'high' | 'normal' | 'low';
+
 export type Task = {
   id: string;
   parentId: string | null;
   name: string;
   mode: SchedulingMode;
-  /** Computed by the scheduler for auto tasks; user-set for manual tasks. Inclusive. */
-  start: ISODate;
-  /** Inclusive: a 1-day task has `start === finish`. */
-  finish: ISODate;
-  /** Working days on the task's calendar; 0 = milestone. */
-  durationDays: number;
+  /**
+   * The task's own dates, both optional and inclusive (a 1-day task has `start === finish`).
+   * A task with dated subtasks is drawn spanning them instead — see `taskDates.ts`.
+   */
+  start?: ISODate;
+  finish?: ISODate;
+  priority?: Priority;
   /** 0–100. */
   percentComplete: number;
   constraint?: { type: ConstraintType; date?: ISODate };
@@ -89,6 +92,8 @@ export type Project = {
   schemaVersion: number;
   id: string;
   name: string;
+  /** Subtitle shown under the title; may be empty. */
+  description: string;
   startDate: ISODate;
   defaultCalendarId: string;
   tasks: Record<string, Task>;

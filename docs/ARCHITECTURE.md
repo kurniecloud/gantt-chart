@@ -33,6 +33,7 @@ type Project = {
   schemaVersion: number;
   id: string;
   name: string;
+  description: string; // subtitle under the title
   startDate: ISODate;
   defaultCalendarId: string;
   tasks: Record<string, Task>;
@@ -49,10 +50,10 @@ type Task = {
   id: string;
   parentId: string | null;
   name: string;
-  mode: 'auto' | 'manual';
-  start: ISODate; // computed for auto tasks
-  finish: ISODate; // computed for auto tasks
-  durationDays: number; // working days; 0 = milestone
+  mode: 'auto' | 'manual'; // 'manual' until the scheduler exists: dates are set by the user
+  start?: ISODate; // optional, inclusive; start only = 1-day bar
+  finish?: ISODate; // optional, inclusive; end only = 1-day bar
+  priority?: 'urgent' | 'high' | 'normal' | 'low'; // bar colour
   percentComplete: number; // 0–100
   constraint?: { type: ConstraintType; date?: ISODate };
   deadline?: ISODate;
@@ -72,8 +73,15 @@ type Dependency = {
 };
 ```
 
-Derived values (WBS number, summary rollups, early/late dates, slack, critical flag) are
-**computed, not stored**, and memoized by selectors.
+Derived values (the dates a parent spans — `effectiveSpans()` in `src/domain/taskDates.ts` —
+durations, WBS numbers, early/late dates, slack, critical flag) are **computed, not stored**,
+and memoized by selectors. Hierarchy helpers (visible rows, descendants, insert positions) live
+in `src/domain/tree.ts`; timeline coordinates (weekday index, week starts) in
+`src/domain/workweek.ts`.
+
+UI-only state that must never be saved or undone (which dialog is open) lives in
+`src/store/uiStore.ts`. Expand/collapse is saved with the project (`Task.collapsed`) but applied
+with `setCollapsed()`, outside undo history.
 
 ## Scheduler
 

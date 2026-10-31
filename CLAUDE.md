@@ -57,12 +57,11 @@ src/
                  NO React, NO DOM, NO store imports. 100% unit-testable.
   store/         Zustand stores, commands (for undo/redo), selectors.
   features/
-    grid/        Left-hand task table (WBS, name, dates, duration, % complete, columns).
-    timeline/    Right-hand SVG Gantt: bars, milestones, dependency arrows, today line, zoom.
-    toolbar/     Top toolbar, view switcher, zoom controls.
-    resources/   Resource sheet, assignments, workload view.
-    dialogs/     Task info, project settings, calendar editor.
-  components/    Shared presentational UI (buttons, menus, popovers, split pane).
+    header/      Project title + description (edited in place), undo/redo buttons and shortcuts.
+    tasks/       Left panel: nested task list, expand/collapse, add-subtask / delete row actions.
+    dialogs/     Add / edit task dialog, delete confirmation (opened via store/uiStore.ts).
+    timeline/    Right panel: daily/weekly weekday-only timeline and task bars.
+  components/    Shared UI: Button/IconButton, Dialog (native <dialog>), DatePicker, icons.
   persistence/   IndexedDB autosave, project list, migrations between schema versions.
   io/            Import/export: JSON (native), CSV, MS Project XML, PNG/PDF export.
   utils/         Small generic helpers.

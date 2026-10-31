@@ -4,7 +4,7 @@ import styles from './Timeline.module.css';
 export function Timeline() {
   return (
     <div className={styles.placeholder}>
-      <p>The interactive timeline is coming in the next milestone.</p>
+      <p>Task bars and the daily / weekly timeline are coming in the next update.</p>
     </div>
   );
 }

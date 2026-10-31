@@ -23,20 +23,23 @@ Status legend: ⬜ not started · 🟨 in progress · ✅ done
 
 ## Phase 1 — MVP (usable Gantt)
 
-| #    | Feature                                                                                     | Status |
-| ---- | ------------------------------------------------------------------------------------------- | ------ |
-| 1.1  | Split view: task grid (left) + timeline (right), resizable splitter, synced scrolling       | ⬜     |
-| 1.2  | Create / edit / delete tasks inline in the grid                                             | ⬜     |
-| 1.3  | Hierarchy: indent / outdent, summary tasks with rolled-up dates & progress, collapse/expand | ⬜     |
-| 1.4  | WBS numbering (1, 1.1, 1.1.1)                                                               | ⬜     |
-| 1.5  | Milestones (zero duration, diamond)                                                         | ⬜     |
-| 1.6  | Drag bar to move, drag edges to resize, drag progress handle                                | ⬜     |
-| 1.7  | Finish-to-Start dependencies: draw by dragging between bars, arrows rendered                | ⬜     |
-| 1.8  | Auto-scheduling: successors move when predecessors change                                   | ⬜     |
-| 1.9  | Zoom levels: day / week / month / quarter / year; "today" line; scroll to today             | ⬜     |
-| 1.10 | Undo / redo (Ctrl/Cmd+Z, Shift+Ctrl/Cmd+Z)                                                  | 🟨     |
-| 1.11 | Native JSON import / export                                                                 | ⬜     |
-| 1.12 | Light / dark theme                                                                          | 🟨     |
+Spec: [specs/task-list-and-timeline.md](specs/task-list-and-timeline.md).
+
+| #    | Feature                                                                                | Status |
+| ---- | -------------------------------------------------------------------------------------- | ------ |
+| 1.1  | Project title and description at the top, edited in place                              | ✅     |
+| 1.2  | Nested tasks to any depth, indented per level, expand / collapse                       | ✅     |
+| 1.3  | Add / edit dialog: name, weekday-only start & end pickers, priority                    | ✅     |
+| 1.4  | Add subtask (⊕) and delete with confirmation (✕) on every row                          | ✅     |
+| 1.5  | Timeline: daily / weekly views, weekdays only, scroll past & future, today highlighted | ⬜     |
+| 1.6  | Task bars: colour by priority, parents span subtasks, 1-day bars for single dates      | ⬜     |
+| 1.7  | Native JSON import / export                                                            | ⬜     |
+| 1.8  | Drag bar to move, drag edges to resize                                                 | ⬜     |
+| 1.9  | Finish-to-Start dependencies: draw by dragging between bars, arrows rendered           | ⬜     |
+| 1.10 | Undo / redo (Ctrl/Cmd+Z, Shift+Ctrl/Cmd+Z)                                             | ✅     |
+| 1.11 | Reorder, indent / outdent tasks                                                        | ⬜     |
+| 1.12 | Light / dark theme                                                                     | 🟨     |
+| 1.13 | Milestones (zero duration, diamond)                                                    | ⬜     |
 
 ## Phase 2 — MS Project parity (scheduling)
 
@@ -85,5 +88,4 @@ Status legend: ⬜ not started · 🟨 in progress · ✅ done
 ## Notes on partially done items
 
 - **0.4** — autosave, reload and `listProjects()` work; a UI to switch/create/delete projects is still to do.
-- **1.10** — undo/redo for every store command, toolbar buttons and Ctrl/Cmd+Z, Shift+Ctrl/Cmd+Z, Ctrl+Y; done once all task edits are commands.
 - **1.12** — follows the OS light/dark setting via tokens; a manual toggle (`data-theme`) is still to do.
