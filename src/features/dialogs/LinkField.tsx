@@ -4,21 +4,27 @@ import { ancestorIds } from '../../domain/dependencies';
 import type { Project } from '../../domain/types';
 import styles from './TaskDialog.module.css';
 
-type DependsOnFieldProps = {
+type LinkFieldProps = {
+  /** e.g. "Is blocked by". */
+  label: string;
+  /** One line under the field explaining what the links mean. */
+  hint: string;
   project: Project;
-  /** Tasks that may be chosen (see `dependencyCandidates`). */
+  /** Tasks that may be chosen (see `linkCandidates`). */
   candidateIds: string[];
   selectedIds: string[];
   onChange: (ids: string[]) => void;
 };
 
-/** Chosen predecessors as removable chips, plus a dropdown to add another. */
-export function DependsOnField({
+/** Linked tasks as removable chips, plus a dropdown to add another. */
+export function LinkField({
+  label,
+  hint,
   project,
   candidateIds,
   selectedIds,
   onChange,
-}: DependsOnFieldProps) {
+}: LinkFieldProps) {
   const selectId = useId();
   const hintId = useId();
   const available = useMemo(
@@ -28,7 +34,8 @@ export function DependsOnField({
         .map((id) => ({
           id,
           // Non-breaking spaces keep the nesting visible inside a native <select>.
-          label: '   '.repeat(ancestorIds(project, id).length) + project.tasks[id]!.name,
+          label:
+            '\u00a0\u00a0\u00a0'.repeat(ancestorIds(project, id).length) + project.tasks[id]!.name,
         })),
     [project, candidateIds, selectedIds],
   );
@@ -36,10 +43,10 @@ export function DependsOnField({
   return (
     <div className={styles.field}>
       <label htmlFor={selectId} className={styles.label}>
-        Depends on
+        {label}
       </label>
       {selectedIds.length > 0 && (
-        <ul className={styles.chips} aria-label="Tasks it depends on">
+        <ul className={styles.chips} aria-label={`${label} (chosen)`}>
           {selectedIds.map((id) => {
             const name = project.tasks[id]?.name ?? 'Deleted task';
             return (
@@ -50,7 +57,7 @@ export function DependsOnField({
                 <button
                   type="button"
                   className={styles.chipRemove}
-                  aria-label={`Remove dependency on ${name}`}
+                  aria-label={`Remove ${name} from “${label}”`}
                   onClick={() => onChange(selectedIds.filter((other) => other !== id))}
                 >
                   <CrossIcon />
@@ -70,9 +77,7 @@ export function DependsOnField({
           if (event.target.value) onChange([...selectedIds, event.target.value]);
         }}
       >
-        <option value="">
-          {available.length > 0 ? 'Add a task it depends on…' : 'No other tasks to choose from'}
-        </option>
+        <option value="">{available.length > 0 ? 'Add a task…' : 'No tasks to choose from'}</option>
         {available.map((option) => (
           <option key={option.id} value={option.id}>
             {option.label}
@@ -80,7 +85,7 @@ export function DependsOnField({
         ))}
       </select>
       <p id={hintId} className={styles.hint}>
-        It can only start once these tasks have finished.
+        {hint}
       </p>
     </div>
   );

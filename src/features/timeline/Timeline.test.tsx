@@ -292,3 +292,51 @@ describe('critical path', () => {
     expect(within(timeline()).queryAllByRole('button', { name: /Critical$/ })).toHaveLength(0);
   });
 });
+
+describe('dependency arrows', () => {
+  const plan: Spec = {
+    tasks: [
+      { id: 'P', name: 'Planning' },
+      { id: 'G', name: 'Gather', parent: 'P', start: '2026-11-02', finish: '2026-11-04' },
+      { id: 'B', name: 'Build', start: '2026-11-09', finish: '2026-11-13', deps: [{ from: 'P' }] },
+      { id: 'T', name: 'Test', start: '2026-11-12', finish: '2026-11-16', deps: [{ from: 'B' }] },
+    ],
+  };
+  const arrows = () => screen.queryAllByTestId('dependency-arrow');
+
+  it('draws a grey arrow per link, and dashed amber where the dates break it', () => {
+    setup(plan);
+    expect(arrows().map((a) => a.getAttribute('data-label'))).toEqual([
+      'Planning → Build',
+      'Build → Test\nStarts before the task blocking it has finished.',
+    ]);
+    expect(arrows()[0]).not.toHaveAttribute('data-broken');
+    expect(arrows()[1]).toHaveAttribute('data-broken', 'true');
+    expect(arrows()[1]!.querySelector('title')).toHaveTextContent('Starts before');
+  });
+
+  it('follows collapsed parents and redraws after edits', async () => {
+    const { user } = setup({
+      tasks: [
+        { id: 'P', name: 'Planning' },
+        { id: 'G', name: 'Gather', parent: 'P', start: '2026-11-02', finish: '2026-11-04' },
+        {
+          id: 'B',
+          name: 'Build',
+          start: '2026-11-09',
+          finish: '2026-11-13',
+          deps: [{ from: 'G' }],
+        },
+      ],
+    });
+    expect(arrows()).toHaveLength(1);
+    await user.click(screen.getByRole('button', { name: 'Collapse Planning' }));
+    expect(arrows()).toHaveLength(1); // now from Planning's bar
+    act(() =>
+      useProjectStore
+        .getState()
+        .dispatch(updateTask('B', { name: 'Build', start: '2026-11-09' }, { blockedBy: [] })),
+    );
+    expect(arrows()).toHaveLength(0);
+  });
+});

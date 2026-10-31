@@ -13,6 +13,7 @@ import { TaskList } from '../tasks/TaskList';
 import { TimelineBody } from '../timeline/TimelineBody';
 import { TimelineHeader } from '../timeline/TimelineHeader';
 import { TimelineToolbar } from '../timeline/TimelineToolbar';
+import { dependencyArrows } from '../timeline/arrows';
 import { milestoneMarks } from '../timeline/labels';
 import {
   columnOfDate,
@@ -77,9 +78,11 @@ export function Workspace() {
     () => (showCriticalPath ? criticalPath(project) : null),
     [showCriticalPath, project],
   );
-  const criticalCount = critical
-    ? [...critical.slack.values()].filter((slack) => slack <= 0).length
-    : null;
+  const criticalCount = critical ? critical.leafIds.size : null;
+  const arrows = useMemo(
+    () => dependencyArrows(project, rows, spans, scale, ROW_HEIGHT),
+    [project, rows, spans, scale],
+  );
   const rowsHeight = (rows.length + 1) * ROW_HEIGHT; // + the "+" row
 
   // The project doesn't use the React Compiler, so this hook not being memoizable doesn't matter.
@@ -190,6 +193,8 @@ export function Workspace() {
               todaySlot={todaySlot}
               milestones={milestones}
               criticalIds={critical?.criticalIds ?? null}
+              arrows={arrows}
+              rowHeight={ROW_HEIGHT}
             />
           </div>
         </div>

@@ -2,7 +2,7 @@ import { useId, useMemo, useState, type FormEvent } from 'react';
 import { Button } from '../../components/Button';
 import { DatePicker } from '../../components/DatePicker';
 import { Dialog, DialogActions } from '../../components/Dialog';
-import { dependencyCandidates, predecessorIds } from '../../domain/dependencies';
+import { linkCandidates, predecessorIds, successorIds } from '../../domain/dependencies';
 import { effectiveSpans } from '../../domain/taskDates';
 import {
   PRIORITIES,
@@ -15,7 +15,7 @@ import { addTask, updateTask } from '../../store/commands/taskCommands';
 import { useProjectStore } from '../../store/projectStore';
 import { formatDate } from '../../utils/formatDate';
 import { PRIORITY_LABELS, priorityColorVar } from '../../utils/priority';
-import { DependsOnField } from './DependsOnField';
+import { LinkField } from './LinkField';
 import styles from './TaskDialog.module.css';
 
 type TaskDialogProps =
@@ -39,13 +39,17 @@ export function TaskDialog(props: TaskDialogProps) {
   const [start, setStart] = useState(task?.start);
   const [finish, setFinish] = useState(task?.finish);
   const [priority, setPriority] = useState<Priority | undefined>(task?.priority);
-  const [dependsOn, setDependsOn] = useState<string[]>(() =>
+  const [blockedBy, setBlockedBy] = useState<string[]>(() =>
     editTaskId ? predecessorIds(project, editTaskId) : [],
   );
+  const [blocking, setBlocking] = useState<string[]>(() =>
+    editTaskId ? successorIds(project, editTaskId) : [],
+  );
   const parentId = props.mode === 'add' ? props.parentId : (task?.parentId ?? null);
-  const candidateIds = useMemo(
-    () => dependencyCandidates(project, editTaskId, parentId),
-    [project, editTaskId, parentId],
+  // Each field's choices depend on the other's, so a loop can't be made through the dialog.
+  const candidates = useMemo(
+    () => linkCandidates(project, editTaskId, parentId, { blockedBy, blocking }),
+    [project, editTaskId, parentId, blockedBy, blocking],
   );
   const [openPicker, setOpenPicker] = useState<'start' | 'finish' | null>(null);
   const [errors, setErrors] = useState<TaskInputErrors>({});
@@ -62,8 +66,9 @@ export function TaskDialog(props: TaskDialogProps) {
     setErrors(found);
     if (Object.keys(found).length > 0) return;
     const fields = normalizeTaskInput(input);
-    if (props.mode === 'edit') dispatch(updateTask(props.taskId, fields, dependsOn));
-    else dispatch(addTask(fields, props.parentId, undefined, dependsOn));
+    const links = { blockedBy, blocking };
+    if (props.mode === 'edit') dispatch(updateTask(props.taskId, fields, links));
+    else dispatch(addTask(fields, props.parentId, undefined, links));
     props.onClose();
   };
 
@@ -126,11 +131,21 @@ export function TaskDialog(props: TaskDialogProps) {
           </div>
         )}
 
-        <DependsOnField
+        <LinkField
+          label="Is blocked by"
+          hint="This task can only start once these have finished."
           project={project}
-          candidateIds={candidateIds}
-          selectedIds={dependsOn}
-          onChange={setDependsOn}
+          candidateIds={candidates.blockedBy}
+          selectedIds={blockedBy}
+          onChange={setBlockedBy}
+        />
+        <LinkField
+          label="Is blocking"
+          hint="These tasks can only start once this one has finished."
+          project={project}
+          candidateIds={candidates.blocking}
+          selectedIds={blocking}
+          onChange={setBlocking}
         />
 
         <fieldset className={styles.priority}>

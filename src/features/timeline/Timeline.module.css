@@ -165,14 +165,29 @@
     var(--column-width) 100%;
 }
 
-/* Weekly: a line at each week start plus four thin lines splitting the week into its five days. */
+/* Weekly: a line at each week start plus four thin lines splitting the week into its five days.
+   All four are drawn inside one week-wide tile: a repeating 28.8 px tile gets rounded to whole
+   pixels by the browser and drifts out of line with the weeks (guarded by gridlines.spec.ts). */
 .body[data-mode='weekly'] {
+  --day-line: var(--color-grid-line);
+
   background-image:
     linear-gradient(to right, var(--color-grid-week) 1px, transparent 1px),
-    linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px);
+    linear-gradient(
+      to right,
+      transparent 20%,
+      var(--day-line) 20% calc(20% + 1px),
+      transparent calc(20% + 1px) 40%,
+      var(--day-line) 40% calc(40% + 1px),
+      transparent calc(40% + 1px) 60%,
+      var(--day-line) 60% calc(60% + 1px),
+      transparent calc(60% + 1px) 80%,
+      var(--day-line) 80% calc(80% + 1px),
+      transparent calc(80% + 1px)
+    );
   background-size:
     var(--column-width) 100%,
-    calc(var(--column-width) / 5) 100%;
+    var(--column-width) 100%;
 }
 
 .todayColumn,
@@ -202,6 +217,45 @@
   );
   background-size: 100% var(--row-height);
   pointer-events: none;
+}
+
+/* Blocking links: grey arrows under the bars; dashed amber when the dates break the link. */
+.arrows {
+  position: absolute;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.arrow,
+.arrowBroken {
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.arrow {
+  stroke: var(--color-arrow);
+}
+
+.arrowBroken {
+  stroke: var(--color-arrow-broken);
+  stroke-dasharray: 4 3;
+}
+
+.arrowHead {
+  fill: var(--color-arrow);
+}
+
+.arrowHeadBroken {
+  fill: var(--color-arrow-broken);
+}
+
+/* A wider invisible stroke so the tooltip is easy to hit. */
+.arrowHit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 10;
+  pointer-events: stroke;
 }
 
 .bar,

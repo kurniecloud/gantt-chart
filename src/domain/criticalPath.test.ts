@@ -2,16 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { makeProject } from '../test/fixtures';
 import { criticalPath } from './criticalPath';
 
-const critical = (spec: Parameters<typeof makeProject>[0]) =>
-  [...criticalPath(makeProject(spec)).criticalIds].sort();
+type Spec = Parameters<typeof makeProject>[0];
+const critical = (spec: Spec) => [...criticalPath(makeProject(spec)).criticalIds].sort();
 
 // Dates: 2026-11-02 is a Monday.
-describe('criticalPath', () => {
+describe('criticalPath (driving chain)', () => {
   it('is empty when no task has dates', () => {
     expect(critical({ tasks: [{ id: 'A' }, { id: 'B' }] })).toEqual([]);
   });
 
-  it('without dependencies, only tasks finishing on the last day are critical', () => {
+  it('without links, only tasks finishing on the last day are critical', () => {
     expect(
       critical({
         tasks: [
@@ -23,97 +23,91 @@ describe('criticalPath', () => {
     ).toEqual(['B', 'C']);
   });
 
-  it('follows a back-to-back chain of dependencies to the end', () => {
-    const result = criticalPath(
-      makeProject({
-        tasks: [
-          { id: 'A', start: '2026-11-02', finish: '2026-11-04' }, // Mon–Wed
-          { id: 'B', start: '2026-11-05', finish: '2026-11-09', deps: [{ from: 'A' }] }, // Thu–Mon
-          { id: 'C', start: '2026-11-10', finish: '2026-11-10', deps: [{ from: 'B' }] }, // Tue
-          { id: 'D', start: '2026-11-02', finish: '2026-11-03' }, // floats
-        ],
-      }),
-    );
-    expect([...result.criticalIds].sort()).toEqual(['A', 'B', 'C']);
-    expect(result.slack.get('D')).toBe(5); // Tue 3 → Tue 10: five weekdays to spare
-  });
-
-  it('gives slack to a predecessor that finishes early', () => {
-    const result = criticalPath(
-      makeProject({
-        tasks: [
-          { id: 'A', start: '2026-11-02', finish: '2026-11-03' }, // Mon–Tue, B starts Thu
-          { id: 'B', start: '2026-11-05', finish: '2026-11-06', deps: [{ from: 'A' }] },
-        ],
-      }),
-    );
-    expect(result.slack.get('A')).toBe(1); // could finish Wed
-    expect([...result.criticalIds]).toEqual(['B']);
-  });
-
-  it('picks the longer of two branches into the same task', () => {
+  it('follows the chain back from the last task, spare days and all', () => {
     expect(
       critical({
         tasks: [
-          { id: 'A', start: '2026-11-02', finish: '2026-11-06' }, // 5 days, ends Fri
-          { id: 'B', start: '2026-11-02', finish: '2026-11-03' }, // 2 days
+          { id: 'A', start: '2026-11-02', finish: '2026-11-03' },
+          { id: 'B', start: '2026-11-05', finish: '2026-11-06', deps: [{ from: 'A' }] }, // gap Wed
+          { id: 'C', start: '2026-11-11', finish: '2026-11-12', deps: [{ from: 'B' }] }, // gap Mon–Tue
+          { id: 'D', start: '2026-11-02', finish: '2026-11-04' }, // not linked
+        ],
+      }),
+    ).toEqual(['A', 'B', 'C']);
+  });
+
+  it('takes only the blocker that finishes latest (ties: all of them)', () => {
+    expect(
+      critical({
+        tasks: [
+          { id: 'Long', start: '2026-11-02', finish: '2026-11-06' },
+          { id: 'Short', start: '2026-11-02', finish: '2026-11-03' },
+          { id: 'Twin', start: '2026-11-04', finish: '2026-11-06' },
           {
-            id: 'C',
+            id: 'End',
             start: '2026-11-09',
             finish: '2026-11-10',
-            deps: [{ from: 'A' }, { from: 'B' }],
+            deps: [{ from: 'Long' }, { from: 'Short' }, { from: 'Twin' }],
           },
         ],
       }),
-    ).toEqual(['A', 'C']);
+    ).toEqual(['End', 'Long', 'Twin']);
   });
 
-  it('marks a task critical when it overruns its successor (negative slack)', () => {
+  it('works through links between parent tasks, marking parents and their driving subtasks', () => {
+    // The scenario from the user's screenshot: Planning → Build → Test → Launch, with gaps and a
+    // Test subtask that starts before Build ends.
     const result = criticalPath(
       makeProject({
         tasks: [
-          { id: 'A', start: '2026-11-02', finish: '2026-11-06' },
-          { id: 'B', start: '2026-11-04', finish: '2026-11-13', deps: [{ from: 'A' }] },
-          { id: 'Z', start: '2026-11-02', finish: '2026-11-13' },
+          { id: 'Planning' },
+          { id: 'Gather', parent: 'Planning', start: '2026-10-29', finish: '2026-11-04' },
+          { id: 'Write', parent: 'Planning', start: '2026-11-05', finish: '2026-11-10' },
+          { id: 'Build', deps: [{ from: 'Planning' }] },
+          { id: 'Design', parent: 'Build', start: '2026-11-11', finish: '2026-11-17' },
+          { id: 'Implement', parent: 'Build', start: '2026-11-18', finish: '2026-12-01' },
+          { id: 'Test', deps: [{ from: 'Build' }] },
+          { id: 'Early', parent: 'Test', start: '2026-11-18', finish: '2026-11-18' },
+          { id: 'Late', parent: 'Test', start: '2026-12-04', finish: '2026-12-04' },
+          { id: 'Launch', start: '2026-12-08', finish: '2026-12-08', deps: [{ from: 'Test' }] },
         ],
       }),
     );
-    expect(result.slack.get('A')).toBe(-3);
-    expect(result.criticalIds.has('A')).toBe(true);
+    expect([...result.criticalIds].sort()).toEqual(
+      ['Build', 'Implement', 'Late', 'Launch', 'Planning', 'Test', 'Write'].sort(),
+    );
+    expect([...result.leafIds].sort()).toEqual(['Implement', 'Late', 'Launch', 'Write']);
   });
 
-  it('marks parents of critical subtasks, and expands links to parents', () => {
+  it('looks through undated tasks in the chain', () => {
     expect(
       critical({
         tasks: [
-          { id: 'P' },
-          { id: 'A', parent: 'P', start: '2026-11-02', finish: '2026-11-03' },
-          { id: 'B', parent: 'P', start: '2026-11-02', finish: '2026-11-04' },
-          { id: 'X', start: '2026-11-05', finish: '2026-11-06', deps: [{ from: 'P' }] },
+          { id: 'A', start: '2026-11-02', finish: '2026-11-03' },
+          { id: 'U', deps: [{ from: 'A' }] }, // no dates
+          { id: 'B', start: '2026-11-09', finish: '2026-11-10', deps: [{ from: 'U' }] },
         ],
       }),
-    ).toEqual(['B', 'P', 'X']);
+    ).toEqual(['A', 'B']);
   });
 
-  it('ignores undated tasks in a chain and survives loops in bad data', () => {
+  it('stops on loops in bad data instead of hanging', () => {
     expect(
       critical({
         tasks: [
-          { id: 'A', start: '2026-11-02', finish: '2026-11-03', deps: [{ from: 'B' }] },
-          { id: 'B', start: '2026-11-04', finish: '2026-11-05', deps: [{ from: 'A' }] }, // loop
-          { id: 'U', deps: [{ from: 'B' }] }, // no dates
+          { id: 'A', start: '2026-11-02', finish: '2026-11-06', deps: [{ from: 'B' }] },
+          { id: 'B', start: '2026-11-02', finish: '2026-11-06', deps: [{ from: 'A' }] },
         ],
       }),
-    ).toEqual(['B']);
+    ).toEqual(['A', 'B']);
   });
 
-  it('counts weekdays only across weekends', () => {
-    // A ends Fri, B starts the next Monday: no gap in weekdays.
+  it('treats a weekend finish as the Friday before', () => {
     expect(
       critical({
         tasks: [
-          { id: 'A', start: '2026-11-04', finish: '2026-11-06' },
-          { id: 'B', start: '2026-11-09', finish: '2026-11-10', deps: [{ from: 'A' }] },
+          { id: 'A', start: '2026-11-02', finish: '2026-11-07' }, // ends Sat → Fri
+          { id: 'B', start: '2026-11-04', finish: '2026-11-06' }, // ends Fri
         ],
       }),
     ).toEqual(['A', 'B']);

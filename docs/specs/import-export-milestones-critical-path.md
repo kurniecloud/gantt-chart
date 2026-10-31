@@ -1,6 +1,7 @@
 # Spec: import/export, milestones, dependencies & critical path, timeline polish
 
-Status: done.
+Status: done. The critical-path rule and the link wording were later changed — see
+[dependency-arrows.md](dependency-arrows.md) (driving chain; "Is blocked by" / "Is blocking").
 
 ## Decisions (agreed with the product owner, 2026-11-01)
 

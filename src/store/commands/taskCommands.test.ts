@@ -145,7 +145,7 @@ describe('dependencies', () => {
       .sort();
 
   it('adds a task that depends on others', () => {
-    state().dispatch(addTask({ name: 'Launch' }, null, 'N', ['A2', 'B']));
+    state().dispatch(addTask({ name: 'Launch' }, null, 'N', { blockedBy: ['A2', 'B'] }));
     expect(deps()).toEqual(['A2->N', 'B->A1a', 'B->N']);
     expect(
       Object.values(project().dependencies).every((d) => d.type === 'FS' && d.lagDays === 0),
@@ -154,11 +154,11 @@ describe('dependencies', () => {
 
   it('replaces what a task depends on, keeping unchanged links', () => {
     const kept = Object.keys(project().dependencies)[0];
-    state().dispatch(updateTask('A1a', { name: 'A1a' }, ['B', 'A2']));
+    state().dispatch(updateTask('A1a', { name: 'A1a' }, { blockedBy: ['B', 'A2'] }));
     expect(deps()).toEqual(['A2->A1a', 'B->A1a']);
     expect(project().dependencies[kept!]).toBeDefined();
 
-    state().dispatch(updateTask('A1a', { name: 'A1a' }, []));
+    state().dispatch(updateTask('A1a', { name: 'A1a' }, { blockedBy: [] }));
     expect(deps()).toEqual([]);
   });
 
@@ -166,9 +166,31 @@ describe('dependencies', () => {
     const before = structuredClone(project());
     state().dispatch(updateTask('A1a', { name: 'Renamed' }));
     expect(deps()).toEqual(['B->A1a']);
-    state().dispatch(updateTask('A1a', { name: 'Renamed' }, ['A2']));
+    state().dispatch(updateTask('A1a', { name: 'Renamed' }, { blockedBy: ['A2'] }));
     state().undo();
     state().undo();
     expect(project()).toEqual(before);
+  });
+});
+
+describe('blocking links', () => {
+  const deps = () =>
+    Object.values(project().dependencies)
+      .map((d) => `${d.predecessorId}->${d.successorId}`)
+      .sort();
+
+  it('sets the tasks a task is blocking, alongside what blocks it', () => {
+    state().dispatch(
+      updateTask('B', { name: 'B' }, { blockedBy: ['A2'], blocking: ['A1', 'A1a'] }),
+    );
+    // B already blocked A1a; that link is kept, A1 is added.
+    expect(deps()).toEqual(['A2->B', 'B->A1', 'B->A1a']);
+    state().dispatch(updateTask('B', { name: 'B' }, { blocking: [] }));
+    expect(deps()).toEqual(['A2->B']);
+  });
+
+  it('adds a new task that blocks others', () => {
+    state().dispatch(addTask({ name: 'Prep' }, null, 'N', { blocking: ['A'] }));
+    expect(deps()).toContain('N->A');
   });
 });

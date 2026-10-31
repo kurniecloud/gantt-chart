@@ -79,8 +79,9 @@ durations, WBS numbers, early/late dates, slack, critical flag) are **computed, 
 and memoized by selectors. Hierarchy helpers (visible rows, descendants, insert positions) live
 in `src/domain/tree.ts`; timeline coordinates (weekday index, week starts) in
 `src/domain/workweek.ts`; dependency rules (allowed predecessors, loop checks through parent
-tasks) in `src/domain/dependencies.ts`; the critical path (backward pass over the user's dates
-and finish-to-start links) in `src/domain/criticalPath.ts`.
+tasks, both link directions) in `src/domain/dependencies.ts`; the critical path (driving chain
+back from the last task over the user's dates and finish-to-start links) in
+`src/domain/criticalPath.ts`; arrow routing in `src/features/timeline/arrows.ts`.
 
 UI-only state that must never be saved or undone (which dialog is open) lives in
 `src/store/uiStore.ts`. Expand/collapse is saved with the project (`Task.collapsed`) but applied
