@@ -1,92 +1,81 @@
 ---
 name: gantt-rendering
-description: How the timeline is drawn and interacted with — time scales and zoom levels, bar/milestone/summary geometry, dependency-arrow routing, SVG layering, virtualization and scroll sync with the grid, and drag/resize/link interactions. Use when building or changing anything in src/features/timeline or src/features/grid.
+description: How the task list and timeline are laid out and drawn — the shared sticky scroll area, row/column virtualization, the weekday-only daily/weekly scale, header labels, today highlight, bar geometry and styles, and the patterns for future drag interactions. Use when building or changing anything in src/features/workspace, src/features/timeline or src/features/tasks.
 ---
 
-# Gantt rendering & interaction
+# Gantt rendering
 
-## Scale
+Behaviour is specified in `docs/specs/task-list-and-timeline.md`. This skill is how it's built.
 
-A scale is a pure object built from the zoom level and an origin date:
+## Layout: one scroll area (`features/workspace/Workspace.tsx`)
 
-```ts
-type Zoom = 'day' | 'week' | 'month' | 'quarter' | 'year';
-const PX_PER_DAY: Record<Zoom, number> = { day: 40, week: 18, month: 5, quarter: 1.8, year: 0.6 };
-dateToX(d) = (dayNumber(d) - dayNumber(origin)) * pxPerDay;
-xToDate(x) = fromDayNumber(dayNumber(origin) + Math.floor(x / pxPerDay));
+```
+┌ toolbar row: [spacer = task panel width] [Daily|Weekly] [Today] ┐
+├ scroller (overflow: auto) ──────────────────────────────────────┤
+│ grid: columns [--task-panel-width][--timeline-width]            │
+│       rows    [--header-height][max(--rows-height, rest)]       │
+│ ┌ corner (sticky top+left) ┐┌ TimelineHeader (sticky top) ────┐│
+│ │ "Task name"              ││ month row / day-or-week row      ││
+│ ├ taskColumn (sticky left) ┤├ TimelineBody ───────────────────┤│
+│ │ TaskList (<ul>)          ││ grid lines, today column, bars   ││
+└─┴──────────────────────────┴┴──────────────────────────────────┴┘
 ```
 
-Two-tier header per zoom: day → (month / day), week → (month / week no.), month →
-(year / month), quarter → (year / Q), year → (year / half). Zoom with Ctrl/Cmd + wheel keeps
-the date under the cursor fixed.
+- Rows line up because both sides are in the same scroll container. **Never** add a second
+  scroller or sync scroll positions in JS.
+- Sizes come from TS constants in `Workspace.tsx` (`ROW_HEIGHT` 36, `HEADER_HEIGHT` 56, task
+  panel 320 px, 196 px under 720 px wide) and are passed down as CSS custom properties.
+- `scroll-padding-top/left` on the scroller keep focused rows clear of the pinned header/panel.
 
-## Geometry (row height 32 px, bar height 20 px, centred)
+## Virtualization (`@tanstack/react-virtual`)
 
-- Task bar: `x = dateToX(start)`, `width = (dayNumber(finish) + 1 - dayNumber(start)) * pxPerDay`
-  (finish is inclusive). Minimum visible width 2 px.
-- Progress: inner rect, `width × pct / 100`.
-- Milestone: diamond centred at the **end** of its day (`dateToX(date) + pxPerDay`), 14 px.
-- Summary: thin bar (8 px) with downward end caps spanning rolled-up dates.
-- Critical tasks: use `--color-critical` fill/stroke when "Show critical path" is on.
-- Baseline: thin bar under the main bar when a baseline is shown.
-- Non-working days: shaded columns in the background (only at day/week zoom).
-- Today line: vertical line at the centre of today's column.
+- **Rows:** one vertical virtualizer, `count = rows + 1` (the "+" row), `scrollMargin` and
+  `scrollPaddingStart` = header height. Its items are mapped to `{ index, top }` and passed to
+  _both_ `TaskList` and `TimelineBody`. Rows are absolutely positioned with `translateY(top)`.
+- **Columns:** one horizontal virtualizer over the scale's columns, `scrollMargin` = panel
+  width; only the header renders per-column DOM. Call `measure()` when the scale changes.
+- Body grid lines are CSS gradients sized by `--column-width` (no DOM per column); bars are
+  only drawn for virtual rows.
+- Position the scroller with `scrollTo()` (fires `scroll`, which the virtualizers listen to).
+- Keyboard focus moves by row index: `scrollToIndex()` then focus once the row is drawn.
 
-## Layers (bottom → top), one shared horizontal scroll container
+## Scale (`features/timeline/scale.ts`, pure, unit-tested)
 
-1. Background: weekend/holiday shading, column grid lines.
-2. Rows: bars, milestones, labels (virtualized).
-3. Dependency overlay: a single `<svg>` with `<path>`s for links whose endpoints or span
-   intersect the visible rows.
-4. Interaction overlay: drag ghost, link-drawing rubber band, tooltips.
-5. Today line.
+- The x axis counts **weekdays only** via `weekdayIndex()` (`domain/workweek.ts`). Column 0 is a
+  Monday ~10 years before today; the axis ends ~10 years after.
+- Daily: column = 1 weekday, `DAY_WIDTH` 48 px. Weekly: column = Mon–Fri, `WEEK_WIDTH` 144 px,
+  and `dayWidth` = 144 / 5, so bars keep exact days inside a week.
+- `barGeometry(scale, span)`: `x = (weekdayIndex(start) − origin) × dayWidth`,
+  `width = weekdays in span × dayWidth`; weekend ends are trimmed, weekend-only spans → width 0
+  (CSS `min-width` draws a 4 px marker).
+- `todayColumn()`: null on a weekend in daily view; weekly highlights the week containing today
+  (Mon–Sun). `initialColumn()`: today, or the next Monday on a weekend (daily).
+- Switching views keeps the date at the left edge (`dateAtX` → `columnOfDate`).
 
-## Dependency arrow routing (FS shown; others mirror the anchor sides)
+## Header labels (`features/timeline/labels.ts`)
 
-- Exit from P's right edge (FS/FF) or left edge (SS/SF); enter S's left edge (FS/SS) or right
-  edge (FF/SF), arrowhead pointing into the bar.
-- If there is ≥ 12 px horizontal room: exit → horizontal stub 8 px → vertical to S's row
-  centre → horizontal into S.
-- Otherwise route: exit stub → down to the row boundary between P and S → back left past S's
-  edge − 8 px → down to S's row centre → into S.
-- Highlight connected arrows on bar hover/selection.
+Month row "November 2026" (label sticks beside the task panel); daily cells "Mon 2"; weekly
+cells "28 Sep - 2 Oct". Mondays get a stronger left border in daily view. Today's cell and
+column use `--color-today` / `--color-today-text`.
 
-## Virtualization & sync
+## Bars (`TaskBar.tsx`, `TimelineBody.tsx`)
 
-- Grid and timeline use the same `useVirtualizer` instance (fixed row height) over the
-  **visible** (non-collapsed) task list; vertical scroll is a single shared container.
-- Horizontal virtualization: only render header cells and shading for the visible date range
-  plus one screen of overscan.
+- Span = `effectiveSpans(project)` (`domain/taskDates.ts`): a parent spans its dated subtasks.
+- Leaf bar: 20 px, rounded, `background: var(--bar-color)` where `--bar-color` is
+  `var(--color-priority-<level|none>)`. Parent (has children): 14 px bracket via `clip-path`.
+- `aria-label`/`title` = `barLabel()` ("Design: Mon 2 Nov 2026 – Fri 6 Nov 2026 · High
+  priority"), so colour is never the only signal. Bars are `tabIndex={-1}` buttons — the task
+  list is the keyboard path; clicking a bar opens the edit dialog.
+- Keep `TaskBar` memoized with primitive props.
 
-## Interactions
+## Performance (5,000 tasks, production build)
 
-| Gesture                                  | Result                                                   |
-| ---------------------------------------- | -------------------------------------------------------- |
-| Drag bar body                            | move; snaps to whole days; keeps duration (working days) |
-| Drag left/right edge (6 px hit zone)     | change start / finish                                    |
-| Drag progress handle                     | % complete, snapped to 5 %                               |
-| Drag from end-circle onto another bar    | create link: source end + target side → FS/SS/FF/SF      |
-| Double-click bar                         | open task dialog                                         |
-| Click empty row area (task has no dates) | set dates by drag-to-draw                                |
-| Shift/Cmd click                          | multi-select; drags apply to all selected                |
-| Esc during drag                          | cancel                                                   |
+Measured: ~2 ms per vertical scroll step, ~1 ms horizontal, ~6 ms view switch, ~20–35 ms to
+collapse/expand. `src/features/workspace/performance.test.tsx` guards that only on-screen rows
+are drawn. Never read layout inside scroll handlers; derive everything from the scale.
 
-Implementation pattern:
+## Future: drag interactions
 
-- `pointerdown` → `setPointerCapture`, record origin; keep transient drag state in a ref.
-- `pointermove` → schedule one `requestAnimationFrame` to update the ghost only.
-- `pointerup` → dispatch **one** command (`moveTasks`, `resizeTask`, `linkTasks`…) so a single
-  undo reverts the drag; the scheduler then moves successors.
-- Auto-scroll horizontally/vertically when dragging within 40 px of the viewport edge.
-
-## Keyboard
-
-Grid: arrows move the active cell, Enter edits, Tab/Shift+Tab next/prev cell, Alt+Shift+→/←
-indent/outdent, Insert adds a task, Delete removes, Ctrl/Cmd+Z / Shift+Ctrl/Cmd+Z undo/redo.
-Timeline: with a bar focused, ←/→ moves by one day, Shift+←/→ resizes.
-
-## Performance
-
-- `React.memo` on row and bar components; pass primitives, not task objects created per render.
-- Compute arrow paths in a memoized selector keyed by (task dates, row indices, zoom).
-- Never read layout (`getBoundingClientRect`) inside `pointermove` loops.
+Pointer events + `setPointerCapture`; keep drag state in a ref; preview with rAF; commit **one**
+command on pointer-up (so one undo reverts the drag); snap to whole weekdays via `dateAtX`;
+Esc cancels; auto-scroll within 40 px of the scroller edge.

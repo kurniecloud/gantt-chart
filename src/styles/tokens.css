@@ -26,6 +26,12 @@
   --color-priority-low: #9ca3af;
   --color-priority-none: #475569;
 
+  /* Timeline */
+  --color-today: #e6f6ea;
+  --color-today-text: #1d7a3a;
+  --color-grid-line: #eef0f3;
+  --color-grid-week: #dde1e7;
+
   --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-size-sm: 12px;
   --font-size-md: 13px;
@@ -73,6 +79,10 @@
     --color-priority-normal: #60a5fa;
     --color-priority-low: #6b7280;
     --color-priority-none: #94a3b8;
+    --color-today: #18301f;
+    --color-today-text: #6fd08c;
+    --color-grid-line: #1f242e;
+    --color-grid-week: #2c3240;
   }
 }
 
@@ -101,4 +111,8 @@
   --color-priority-normal: #60a5fa;
   --color-priority-low: #6b7280;
   --color-priority-none: #94a3b8;
+  --color-today: #18301f;
+  --color-today-text: #6fd08c;
+  --color-grid-line: #1f242e;
+  --color-grid-week: #2c3240;
 }

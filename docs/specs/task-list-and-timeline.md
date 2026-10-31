@@ -1,6 +1,6 @@
 # Spec: project header, nested task list and timeline
 
-Status: PR 1 (header, task list, dialogs) done · PR 2 (timeline) not started.
+Status: done — PR 1 (header, task list, dialogs) and PR 2 (timeline).
 
 ## Problem
 
@@ -56,7 +56,7 @@ tasks on the left, and a weekday-only timeline on the right that shows each task
 
 - A new visitor gets an empty project titled "Untitled project" (no sample data).
 
-### Timeline (right panel) — PR 2
+### Timeline (right panel)
 
 - View switch above the timeline: Daily (default) / Weekly. Remembered per browser.
 - Weekdays only. Day column 48 px; week column 144 px (3×). In weekly view a bar still starts

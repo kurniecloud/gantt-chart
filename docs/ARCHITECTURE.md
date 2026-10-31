@@ -96,19 +96,21 @@ Details and edge cases: `.claude/skills/scheduling-engine/SKILL.md`.
 
 ## Timeline rendering
 
-- One `<svg>` per visible row band, rows virtualized with the grid so both sides share
-  scroll position and row heights.
-- X scale is a pure function `dateToX(date, zoom, origin)`; zoom changes swap the scale only.
-- Dependency arrows are drawn in a separate overlay layer, only for visible endpoints
-  (plus edges crossing the viewport).
-- Drag interactions use pointer events + `requestAnimationFrame`; preview locally, commit a
-  single command on pointer-up so undo restores the whole drag.
+- The task list and the timeline share **one scroll container**: the list is pinned left and
+  the date header pinned top with CSS `position: sticky` (`features/workspace/Workspace.tsx`).
+- Rows are virtualized once (`@tanstack/react-virtual`) and the same visible rows feed both
+  sides; date columns are virtualized horizontally.
+- The x axis is weekdays only. `features/timeline/scale.ts` is a pure scale for the daily
+  (48 px/day) and weekly (144 px/week) views, ~10 years either side of today.
+- Bars are coloured by priority; parents are brackets spanning their subtasks.
+- Future drag interactions: pointer events + rAF preview, one command on pointer-up.
 
 Details: `.claude/skills/gantt-rendering/SKILL.md`.
 
 ## Persistence
 
-- IndexedDB database `gantt-chart`, stores `projects` (by id) and `meta` (last opened, prefs).
+- IndexedDB database `gantt-chart`, stores `projects` (by id) and `meta` (last opened project).
+- The daily/weekly choice is a per-browser preference in `localStorage` (`store/viewStore.ts`).
 - Autosave debounced 500 ms after each command; save on `visibilitychange` too.
 - On load, run migrations from the stored `schemaVersion` to the current one.
 

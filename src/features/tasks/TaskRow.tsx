@@ -6,7 +6,11 @@ import styles from './TaskList.module.css';
 type TaskRowProps = {
   id: string;
   name: string;
-  parentId: string | null;
+  /** Position in the visible list (0-based) and how many rows the list has, for screen readers. */
+  index: number;
+  setSize: number;
+  /** Offset from the top of the list, in px (rows are virtualized). */
+  top: number;
   depth: number;
   hasChildren: boolean;
   expanded: boolean;
@@ -26,7 +30,9 @@ function stop(action: () => void) {
 export const TaskRow = memo(function TaskRow({
   id,
   name,
-  parentId,
+  index,
+  setSize,
+  top,
   depth,
   hasChildren,
   expanded,
@@ -39,7 +45,10 @@ export const TaskRow = memo(function TaskRow({
     <li
       className={styles.row}
       aria-level={depth + 1}
-      style={{ '--depth': depth } as CSSProperties}
+      aria-posinset={index + 1}
+      aria-setsize={setSize}
+      data-row-index={index}
+      style={{ '--depth': depth, transform: `translateY(${top}px)` } as CSSProperties}
       onClick={() => onEdit(id)}
     >
       {hasChildren ? (
@@ -59,10 +68,8 @@ export const TaskRow = memo(function TaskRow({
         type="button"
         className={styles.name}
         title={name}
+        data-row-focus=""
         data-task-name={id}
-        data-parent-id={parentId ?? undefined}
-        data-has-children={hasChildren || undefined}
-        data-expanded={expanded || undefined}
         onClick={stop(() => onEdit(id))}
       >
         {name}

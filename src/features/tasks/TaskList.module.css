@@ -1,29 +1,15 @@
-.panel {
-  min-width: 0;
-}
-
-.columnHeader {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  height: var(--row-height);
-  padding: 0 var(--space-3);
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-}
-
 .list {
+  position: relative;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
   gap: 2px;
@@ -114,5 +100,22 @@
 @media (hover: none) {
   .actions {
     opacity: 1;
+  }
+}
+
+/* Phones: a narrower panel, so tighter indentation and smaller controls leave room for names. */
+@media (max-width: 720px) {
+  .list {
+    --indent-per-level: 12px;
+  }
+
+  .toggle,
+  .toggleSpacer {
+    width: 20px;
+  }
+
+  .actions button {
+    width: 24px;
+    height: 24px;
   }
 }
