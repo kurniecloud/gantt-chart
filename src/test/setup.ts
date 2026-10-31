@@ -21,6 +21,19 @@ if (!HTMLDialogElement.prototype.showModal) {
   };
 }
 
+// jsdom does no layout. Give every element a desktop-sized box so virtualized lists render
+// their rows, and make scrollTo() move instantly and fire `scroll` like a browser does.
+Object.defineProperties(HTMLElement.prototype, {
+  clientWidth: { configurable: true, get: () => 1024 },
+  clientHeight: { configurable: true, get: () => 768 },
+});
+Element.prototype.scrollTo = function scrollTo(this: Element, options?: ScrollToOptions | number) {
+  if (typeof options !== 'object') return;
+  if (options.left !== undefined) this.scrollLeft = options.left;
+  if (options.top !== undefined) this.scrollTop = options.top;
+  this.dispatchEvent(new Event('scroll'));
+} as Element['scrollTo'];
+
 afterEach(() => {
   cleanup();
 });

@@ -19,6 +19,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@tanstack/react-virtual": "^3.14.24",
     "date-fns": "^4.4.0",
     "idb": "^8.0.4",
     "immer": "^11.2.9",

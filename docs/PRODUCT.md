@@ -31,8 +31,8 @@ Spec: [specs/task-list-and-timeline.md](specs/task-list-and-timeline.md).
 | 1.2  | Nested tasks to any depth, indented per level, expand / collapse                       | ✅     |
 | 1.3  | Add / edit dialog: name, weekday-only start & end pickers, priority                    | ✅     |
 | 1.4  | Add subtask (⊕) and delete with confirmation (✕) on every row                          | ✅     |
-| 1.5  | Timeline: daily / weekly views, weekdays only, scroll past & future, today highlighted | ⬜     |
-| 1.6  | Task bars: colour by priority, parents span subtasks, 1-day bars for single dates      | ⬜     |
+| 1.5  | Timeline: daily / weekly views, weekdays only, scroll past & future, today highlighted | ✅     |
+| 1.6  | Task bars: colour by priority, parents span subtasks, 1-day bars for single dates      | ✅     |
 | 1.7  | Native JSON import / export                                                            | ⬜     |
 | 1.8  | Drag bar to move, drag edges to resize                                                 | ⬜     |
 | 1.9  | Finish-to-Start dependencies: draw by dragging between bars, arrows rendered           | ⬜     |

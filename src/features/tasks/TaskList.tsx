@@ -1,63 +1,28 @@
-import { useCallback, useMemo, type KeyboardEvent } from 'react';
+import { useCallback, useRef, type CSSProperties, type KeyboardEvent } from 'react';
 import { IconButton } from '../../components/Button';
 import { PlusIcon } from '../../components/icons';
-import { visibleTaskRows } from '../../domain/tree';
+import type { TaskRow as TaskRowData } from '../../domain/tree';
 import { useProjectStore } from '../../store/projectStore';
 import { useUiStore } from '../../store/uiStore';
 import styles from './TaskList.module.css';
 import { TaskRow } from './TaskRow';
 
-const NAME_SELECTOR = '[data-task-name], [data-add-task]';
+type TaskListProps = {
+  rows: TaskRowData[];
+  /** The rows to draw (index into `rows`, or `rows.length` for the "+" row) and their offsets. */
+  virtualRows: { index: number; top: number }[];
+  /** Height of every row plus the "+" row, in px. */
+  totalHeight: number;
+  /** Scrolls so that the row at `index` is visible. */
+  scrollToRow: (index: number) => void;
+};
 
-/**
- * Arrow-key navigation between task names: ↑/↓ move, → expands, ← collapses or moves to the
- * parent. Tab still reaches every button in order.
- */
-function handleListKeyDown(
-  event: KeyboardEvent<HTMLUListElement>,
-  setCollapsed: (id: string, collapsed: boolean) => void,
-) {
-  const target = event.target as HTMLElement;
-  if (!target.matches(NAME_SELECTOR)) return;
-  const names = [...event.currentTarget.querySelectorAll<HTMLElement>(NAME_SELECTOR)];
-  const index = names.indexOf(target);
-  const taskId = target.dataset.taskName;
-
-  switch (event.key) {
-    case 'ArrowDown':
-      names[index + 1]?.focus();
-      break;
-    case 'ArrowUp':
-      names[index - 1]?.focus();
-      break;
-    case 'Home':
-      names[0]?.focus();
-      break;
-    case 'End':
-      names.at(-1)?.focus();
-      break;
-    case 'ArrowRight':
-      if (taskId && target.dataset.hasChildren && !target.dataset.expanded) {
-        setCollapsed(taskId, false);
-      }
-      break;
-    case 'ArrowLeft':
-      if (taskId && target.dataset.expanded) setCollapsed(taskId, true);
-      else if (target.dataset.parentId) {
-        names.find((el) => el.dataset.taskName === target.dataset.parentId)?.focus();
-      }
-      break;
-    default:
-      return;
-  }
-  event.preventDefault();
-}
-
-export function TaskList() {
-  const project = useProjectStore((s) => s.project);
+export function TaskList({ rows, virtualRows, totalHeight, scrollToRow }: TaskListProps) {
+  const tasks = useProjectStore((s) => s.project.tasks);
   const setCollapsed = useProjectStore((s) => s.setCollapsed);
   const openDialog = useUiStore((s) => s.openDialog);
-  const rows = useMemo(() => visibleTaskRows(project), [project]);
+  const listRef = useRef<HTMLUListElement>(null);
+  const setSize = rows.length + 1;
 
   const onToggle = useCallback(
     (id: string, expand: boolean) => setCollapsed(id, !expand),
@@ -77,48 +42,111 @@ export function TaskList() {
   );
   const addTask = () => openDialog({ kind: 'add-task', parentId: null });
 
+  /** Focuses a row's name, scrolling it into view first — it may not be drawn yet. */
+  const focusRow = (index: number) => {
+    scrollToRow(index);
+    const attempt = (triesLeft: number) => {
+      const el = listRef.current?.querySelector<HTMLElement>(
+        `[data-row-index="${index}"] [data-row-focus]`,
+      );
+      if (el) el.focus({ preventScroll: true });
+      else if (triesLeft > 0) requestAnimationFrame(() => attempt(triesLeft - 1));
+    };
+    attempt(5);
+  };
+
+  /** ↑/↓/Home/End move between rows, → expands, ← collapses or moves to the parent. */
+  const onKeyDown = (event: KeyboardEvent<HTMLUListElement>) => {
+    const target = event.target as HTMLElement;
+    if (!target.matches('[data-row-focus]')) return;
+    const index = Number(target.closest<HTMLElement>('[data-row-index]')?.dataset.rowIndex);
+    const row = rows[index];
+
+    switch (event.key) {
+      case 'ArrowDown':
+        if (index < rows.length) focusRow(index + 1);
+        break;
+      case 'ArrowUp':
+        if (index > 0) focusRow(index - 1);
+        break;
+      case 'Home':
+        focusRow(0);
+        break;
+      case 'End':
+        focusRow(rows.length);
+        break;
+      case 'ArrowRight':
+        if (row?.hasChildren && !row.expanded) setCollapsed(row.id, false);
+        break;
+      case 'ArrowLeft': {
+        if (!row) break;
+        if (row.expanded) setCollapsed(row.id, true);
+        else {
+          const parentId = tasks[row.id]?.parentId;
+          const parentIndex = rows.findIndex((r) => r.id === parentId);
+          if (parentIndex >= 0) focusRow(parentIndex);
+        }
+        break;
+      }
+      default:
+        return;
+    }
+    event.preventDefault();
+  };
+
   return (
-    <div className={styles.panel}>
-      <div className={styles.columnHeader} aria-hidden="true">
-        Task name
-      </div>
-      <ul
-        className={styles.list}
-        aria-label="Tasks"
-        onKeyDown={(e) => handleListKeyDown(e, setCollapsed)}
-      >
-        {rows.map((row) => {
-          const task = project.tasks[row.id]!;
+    <ul
+      ref={listRef}
+      className={styles.list}
+      aria-label="Tasks"
+      style={{ height: totalHeight }}
+      onKeyDown={onKeyDown}
+    >
+      {virtualRows.map(({ index, top }) => {
+        const row = rows[index];
+        if (!row) {
           return (
-            <TaskRow
-              key={row.id}
-              id={row.id}
-              name={task.name}
-              parentId={task.parentId}
-              depth={row.depth}
-              hasChildren={row.hasChildren}
-              expanded={row.expanded}
-              onToggle={onToggle}
-              onEdit={onEdit}
-              onAddSubtask={onAddSubtask}
-              onDelete={onDelete}
-            />
+            <li
+              key="add-task"
+              className={`${styles.row} ${styles.addRow}`}
+              aria-posinset={index + 1}
+              aria-setsize={setSize}
+              data-row-index={index}
+              style={{ transform: `translateY(${top}px)` } as CSSProperties}
+              onClick={addTask}
+            >
+              <IconButton
+                label="Add task"
+                className={styles.addButton}
+                data-row-focus=""
+                onClick={(e) => {
+                  e.stopPropagation();
+                  addTask();
+                }}
+              >
+                <PlusIcon />
+              </IconButton>
+            </li>
           );
-        })}
-        <li className={`${styles.row} ${styles.addRow}`} onClick={addTask}>
-          <IconButton
-            label="Add task"
-            className={styles.addButton}
-            data-add-task=""
-            onClick={(e) => {
-              e.stopPropagation();
-              addTask();
-            }}
-          >
-            <PlusIcon />
-          </IconButton>
-        </li>
-      </ul>
-    </div>
+        }
+        return (
+          <TaskRow
+            key={row.id}
+            id={row.id}
+            name={tasks[row.id]?.name ?? ''}
+            index={index}
+            setSize={setSize}
+            top={top}
+            depth={row.depth}
+            hasChildren={row.hasChildren}
+            expanded={row.expanded}
+            onToggle={onToggle}
+            onEdit={onEdit}
+            onAddSubtask={onAddSubtask}
+            onDelete={onDelete}
+          />
+        );
+      })}
+    </ul>
   );
 }

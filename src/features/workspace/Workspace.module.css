@@ -1,0 +1,82 @@
+.workspace {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.toolbarRow {
+  display: grid;
+  grid-template-columns: var(--task-panel-width) 1fr;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface-raised);
+}
+
+.toolbarSpacer {
+  border-right: 1px solid var(--color-border);
+}
+
+.scroller {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  /* Keyboard focus and scrollIntoView keep rows clear of the pinned header and task panel. */
+  scroll-padding-top: var(--header-height);
+  scroll-padding-left: var(--task-panel-width);
+  background: var(--color-bg);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: var(--task-panel-width) var(--timeline-width);
+  grid-template-rows: var(--header-height) minmax(var(--rows-height), 1fr);
+  width: max-content;
+  min-height: 100%;
+}
+
+.corner {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 var(--space-3) 7px;
+  border-right: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.timelineHeader {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+.taskColumn {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  border-right: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.timelineBody {
+  position: relative;
+  z-index: 1;
+}
+
+/* Phones: the task panel is narrow, so the view controls get the full width. */
+@media (max-width: 720px) {
+  .toolbarRow {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbarSpacer {
+    display: none;
+  }
+}

@@ -11,20 +11,20 @@ GitHub Pages.
 
 ## Tech stack
 
-| Concern        | Choice                                                                    |
-| -------------- | ------------------------------------------------------------------------- |
-| Build          | Vite 8, Node 26 LTS (`.nvmrc`)                                            |
-| Language       | TypeScript 6, `strict: true`, no `any` without a comment saying why       |
-| UI             | React 19 function components + hooks, CSS Modules                         |
-| State          | Zustand + immer patches, command-based undo/redo                          |
-| Timeline       | Custom SVG rendering (no third-party Gantt library)                       |
-| Virtualization | `@tanstack/react-virtual` for grid rows and timeline rows                 |
-| Dates          | `date-fns`; dates are stored as `YYYY-MM-DD` strings                      |
-| Persistence    | IndexedDB via `idb` (autosave), JSON / CSV / MS Project XML import-export |
-| Unit tests     | Vitest + Testing Library                                                  |
-| E2E tests      | Playwright                                                                |
-| Lint/format    | ESLint + Prettier                                                         |
-| Deploy         | GitHub Actions → GitHub Pages                                             |
+| Concern        | Choice                                                                         |
+| -------------- | ------------------------------------------------------------------------------ |
+| Build          | Vite 8, Node 26 LTS (`.nvmrc`)                                                 |
+| Language       | TypeScript 6, `strict: true`, no `any` without a comment saying why            |
+| UI             | React 19 function components + hooks, CSS Modules                              |
+| State          | Zustand + immer patches, command-based undo/redo                               |
+| Timeline       | Custom SVG rendering (no third-party Gantt library)                            |
+| Virtualization | `@tanstack/react-virtual`: rows shared by task list and timeline, date columns |
+| Dates          | `date-fns`; dates are stored as `YYYY-MM-DD` strings                           |
+| Persistence    | IndexedDB via `idb` (autosave), JSON / CSV / MS Project XML import-export      |
+| Unit tests     | Vitest + Testing Library                                                       |
+| E2E tests      | Playwright                                                                     |
+| Lint/format    | ESLint + Prettier                                                              |
+| Deploy         | GitHub Actions → GitHub Pages                                                  |
 
 Do not add a server, database, auth provider or any runtime network dependency. The app must
 work offline once loaded. New runtime dependencies need a one-line justification in the PR
@@ -47,7 +47,8 @@ npm run typecheck    # tsc --noEmit
 Before saying a change is done, run
 `npm run typecheck && npm run lint && npm run format:check && npm run test -- --run`.
 For UI changes, also run the app and look at it: `.claude/launch.json` defines the `dev`
-preview server; open `http://localhost:5173/gantt-chart/` and check light, dark and phone width.
+server and a `preview` server for the production build (run `npm run build` first). Open
+`http://localhost:5173/gantt-chart/` and check light, dark and phone width.
 
 ## Source layout
 
@@ -60,7 +61,8 @@ src/
     header/      Project title + description (edited in place), undo/redo buttons and shortcuts.
     tasks/       Left panel: nested task list, expand/collapse, add-subtask / delete row actions.
     dialogs/     Add / edit task dialog, delete confirmation (opened via store/uiStore.ts).
-    timeline/    Right panel: daily/weekly weekday-only timeline and task bars.
+    timeline/    Right panel: weekday-only daily/weekly scale, date header, task bars, view toolbar.
+    workspace/   The shared scroll area: sticky task panel + header, row/column virtualization.
   components/    Shared UI: Button/IconButton, Dialog (native <dialog>), DatePicker, icons.
   persistence/   IndexedDB autosave, project list, migrations between schema versions.
   io/            Import/export: JSON (native), CSV, MS Project XML, PNG/PDF export.
