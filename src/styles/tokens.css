@@ -19,17 +19,27 @@
   --color-backdrop: rgb(15 18 25 / 45%);
   --shadow-dialog: 0 12px 40px rgb(15 18 25 / 22%);
 
-  /* Bar colour by task priority (see docs/specs/task-list-and-timeline.md). */
-  --color-priority-urgent: #dc2626;
-  --color-priority-high: #ea580c;
-  --color-priority-normal: #2563eb;
-  --color-priority-low: #9ca3af;
-  --color-priority-none: #475569;
+  /* Bar colour by task priority — light fills (see docs/specs). */
+  --color-priority-urgent: #fca5a5;
+  --color-priority-high: #fdba74;
+  --color-priority-normal: #93c5fd;
+  --color-priority-low: #d1d5db;
+  --color-priority-none: #b4c0cf;
+  /* The same hues dark enough to read as text (the "(7D)" days label). */
+  --color-priority-urgent-text: #b91c1c;
+  --color-priority-high-text: #c2410c;
+  --color-priority-normal-text: #1d4ed8;
+  --color-priority-low-text: #6b7280;
+  --color-priority-none-text: #475569;
 
   /* Timeline */
-  --color-today: #e6f6ea;
-  --color-today-text: #1d7a3a;
+  --color-today: #fff6c4;
+  --color-today-text: #8a6a00;
+  --color-milestone: #dcf5e1;
+  --color-milestone-marker: #2f9e44;
+  --color-critical-line: #ff1f1f;
   --color-grid-line: #eef0f3;
+  --color-grid-day: #f3f4f6;
   --color-grid-week: #dde1e7;
 
   --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -74,14 +84,23 @@
     --color-focus: #6b9bff;
     --color-backdrop: rgb(0 0 0 / 60%);
     --shadow-dialog: 0 12px 40px rgb(0 0 0 / 50%);
-    --color-priority-urgent: #f87171;
-    --color-priority-high: #fb923c;
-    --color-priority-normal: #60a5fa;
-    --color-priority-low: #6b7280;
-    --color-priority-none: #94a3b8;
-    --color-today: #18301f;
-    --color-today-text: #6fd08c;
+    --color-priority-urgent: #fca5a5;
+    --color-priority-high: #fdba74;
+    --color-priority-normal: #93c5fd;
+    --color-priority-low: #9ca3af;
+    --color-priority-none: #a3b1c2;
+    --color-priority-urgent-text: #fca5a5;
+    --color-priority-high-text: #fdba74;
+    --color-priority-normal-text: #93c5fd;
+    --color-priority-low-text: #9ca3af;
+    --color-priority-none-text: #a3b1c2;
+    --color-today: #3a3415;
+    --color-today-text: #f5d76e;
+    --color-milestone: #173322;
+    --color-milestone-marker: #5fd17a;
+    --color-critical-line: #ff3b3b;
     --color-grid-line: #1f242e;
+    --color-grid-day: #1a1e26;
     --color-grid-week: #2c3240;
   }
 }
@@ -106,13 +125,22 @@
   --color-focus: #6b9bff;
   --color-backdrop: rgb(0 0 0 / 60%);
   --shadow-dialog: 0 12px 40px rgb(0 0 0 / 50%);
-  --color-priority-urgent: #f87171;
-  --color-priority-high: #fb923c;
-  --color-priority-normal: #60a5fa;
-  --color-priority-low: #6b7280;
-  --color-priority-none: #94a3b8;
-  --color-today: #18301f;
-  --color-today-text: #6fd08c;
+  --color-priority-urgent: #fca5a5;
+  --color-priority-high: #fdba74;
+  --color-priority-normal: #93c5fd;
+  --color-priority-low: #9ca3af;
+  --color-priority-none: #a3b1c2;
+  --color-priority-urgent-text: #fca5a5;
+  --color-priority-high-text: #fdba74;
+  --color-priority-normal-text: #93c5fd;
+  --color-priority-low-text: #9ca3af;
+  --color-priority-none-text: #a3b1c2;
+  --color-today: #3a3415;
+  --color-today-text: #f5d76e;
+  --color-milestone: #173322;
+  --color-milestone-marker: #5fd17a;
+  --color-critical-line: #ff3b3b;
   --color-grid-line: #1f242e;
+  --color-grid-day: #1a1e26;
   --color-grid-week: #2c3240;
 }

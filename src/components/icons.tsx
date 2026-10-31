@@ -82,3 +82,45 @@ export function CalendarIcon(props: IconProps) {
     </Icon>
   );
 }
+
+export function UploadIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M8 10.5V2.5M5 5.5l3-3 3 3" />
+      <path d="M2.5 10.5v2a1 1 0 001 1h9a1 1 0 001-1v-2" />
+    </Icon>
+  );
+}
+
+export function DownloadIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M8 2.5v8M5 7.5l3 3 3-3" />
+      <path d="M2.5 10.5v2a1 1 0 001 1h9a1 1 0 001-1v-2" />
+    </Icon>
+  );
+}
+
+export function DiamondIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M8 2.5L13.5 8 8 13.5 2.5 8z" fill="currentColor" stroke="none" />
+    </Icon>
+  );
+}
+
+export function FlagIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M3.5 14V2.5M3.5 3h8l-1.75 2.75L11.5 8.5h-8" />
+    </Icon>
+  );
+}
+
+export function PathIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M2 4.5h5M5 8h6M9 11.5h5" strokeWidth={2.2} />
+    </Icon>
+  );
+}

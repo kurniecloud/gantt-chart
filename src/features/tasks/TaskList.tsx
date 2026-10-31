@@ -1,6 +1,7 @@
 import { useCallback, useRef, type CSSProperties, type KeyboardEvent } from 'react';
 import { IconButton } from '../../components/Button';
 import { PlusIcon } from '../../components/icons';
+import { spanWeekdays, type EffectiveSpan } from '../../domain/taskDates';
 import type { TaskRow as TaskRowData } from '../../domain/tree';
 import { useProjectStore } from '../../store/projectStore';
 import { useUiStore } from '../../store/uiStore';
@@ -9,6 +10,8 @@ import { TaskRow } from './TaskRow';
 
 type TaskListProps = {
   rows: TaskRowData[];
+  /** Each dated task's span (parents span their subtasks), for the "(7D)" label. */
+  spans: Map<string, EffectiveSpan>;
   /** The rows to draw (index into `rows`, or `rows.length` for the "+" row) and their offsets. */
   virtualRows: { index: number; top: number }[];
   /** Height of every row plus the "+" row, in px. */
@@ -17,7 +20,7 @@ type TaskListProps = {
   scrollToRow: (index: number) => void;
 };
 
-export function TaskList({ rows, virtualRows, totalHeight, scrollToRow }: TaskListProps) {
+export function TaskList({ rows, spans, virtualRows, totalHeight, scrollToRow }: TaskListProps) {
   const tasks = useProjectStore((s) => s.project.tasks);
   const setCollapsed = useProjectStore((s) => s.setCollapsed);
   const openDialog = useUiStore((s) => s.openDialog);
@@ -129,11 +132,14 @@ export function TaskList({ rows, virtualRows, totalHeight, scrollToRow }: TaskLi
             </li>
           );
         }
+        const span = spans.get(row.id);
         return (
           <TaskRow
             key={row.id}
             id={row.id}
             name={tasks[row.id]?.name ?? ''}
+            days={span ? spanWeekdays(span) : null}
+            priority={tasks[row.id]?.priority}
             index={index}
             setSize={setSize}
             top={top}

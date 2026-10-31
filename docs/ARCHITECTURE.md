@@ -44,6 +44,7 @@ type Project = {
   assignments: Record<string, Assignment>;
   baselines: Baseline[];
   customFields: CustomFieldDef[];
+  milestones: { id: string; name: string; date: ISODate }[]; // highlighted days on the timeline
 };
 
 type Task = {
@@ -77,7 +78,9 @@ Derived values (the dates a parent spans — `effectiveSpans()` in `src/domain/t
 durations, WBS numbers, early/late dates, slack, critical flag) are **computed, not stored**,
 and memoized by selectors. Hierarchy helpers (visible rows, descendants, insert positions) live
 in `src/domain/tree.ts`; timeline coordinates (weekday index, week starts) in
-`src/domain/workweek.ts`.
+`src/domain/workweek.ts`; dependency rules (allowed predecessors, loop checks through parent
+tasks) in `src/domain/dependencies.ts`; the critical path (backward pass over the user's dates
+and finish-to-start links) in `src/domain/criticalPath.ts`.
 
 UI-only state that must never be saved or undone (which dialog is open) lives in
 `src/store/uiStore.ts`. Expand/collapse is saved with the project (`Task.collapsed`) but applied

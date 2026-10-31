@@ -1,7 +1,9 @@
 import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { App } from '../../App';
+import { criticalPath } from '../../domain/criticalPath';
 import { addDays } from '../../domain/dates';
+import { dependencyCandidates } from '../../domain/dependencies';
 import { effectiveSpans } from '../../domain/taskDates';
 import { visibleTaskRows } from '../../domain/tree';
 import type { Priority } from '../../domain/types';
@@ -25,6 +27,7 @@ function bigProject() {
         start,
         finish: nextWeekday(addDays(start, 4)),
         priority: PRIORITIES[c % PRIORITIES.length],
+        deps: c > 0 ? [{ from: `P${p}-${c - 1}` }] : p > 0 ? [{ from: `P${p - 1}` }] : [],
       });
     }
   }
@@ -43,6 +46,18 @@ describe('5,000 tasks', () => {
     expect(rows).toHaveLength(5000);
     expect(spans.size).toBe(5000);
     expect(elapsed).toBeLessThan(100);
+  });
+
+  it('calculates the critical path and dependency choices quickly', () => {
+    const started = performance.now();
+    const result = criticalPath(project);
+    const candidates = dependencyCandidates(project, 'P250-4', 'P250');
+    const elapsed = performance.now() - started;
+    expect(Object.keys(project.dependencies)).toHaveLength(4499); // 8 per phase + 1 to the previous phase
+    expect(result.criticalIds.size).toBeGreaterThan(0);
+    expect(candidates.length).toBeGreaterThan(0);
+    expect(candidates).not.toContain('P250-5'); // downstream of P250-4
+    expect(elapsed).toBeLessThan(250);
   });
 
   it('only draws the rows and bars on screen', () => {

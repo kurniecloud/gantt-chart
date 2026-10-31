@@ -1,5 +1,6 @@
 import { childrenByParent } from './tree';
 import type { ISODate, Project, Task } from './types';
+import { nextWeekday, previousWeekday, weekdayIndex } from './workweek';
 
 export type DateSpan = { start: ISODate; finish: ISODate };
 
@@ -52,4 +53,11 @@ function union(a: DateSpan, b: DateSpan): DateSpan {
     start: a.start < b.start ? a.start : b.start,
     finish: a.finish > b.finish ? a.finish : b.finish,
   };
+}
+
+/** Weekdays (Mon–Fri) a span covers, counting both ends. */
+export function spanWeekdays(span: DateSpan): number {
+  const first = weekdayIndex(nextWeekday(span.start));
+  const last = weekdayIndex(previousWeekday(span.finish));
+  return Math.max(last - first + 1, 0);
 }

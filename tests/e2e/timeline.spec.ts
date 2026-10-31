@@ -101,3 +101,19 @@ test('task list and timeline scroll together vertically', async ({ page }) => {
   expect(row.y).toBeGreaterThan(header.y + header.height - 1); // not hidden under the header
   await expect(page.getByText('Task name', { exact: true })).toBeInViewport(); // header stays pinned
 });
+
+test('adding and editing tasks does not move the timeline sideways', async ({ page }) => {
+  await page.goto('./');
+  const before = await scroller(page).evaluate((el) => el.scrollLeft);
+  for (const name of ['One', 'Two', 'Three']) {
+    await page.getByRole('button', { name: 'Add task', exact: true }).click();
+    await dialog(page).getByRole('textbox', { name: 'Task name' }).fill(name);
+    await dialog(page).getByRole('button', { name: 'Add', exact: true }).click();
+    await expect(dialog(page)).toBeHidden();
+  }
+  await page.getByRole('button', { name: 'Two', exact: true }).click();
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('ArrowDown'); // keyboard navigation in the pinned panel
+  expect(await scroller(page).evaluate((el) => el.scrollLeft)).toBe(before);
+  await expect(todayHeader(page)).toBeInViewport();
+});

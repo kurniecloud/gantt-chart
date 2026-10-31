@@ -2,6 +2,7 @@ import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from '../../App';
+import { updateTask } from '../../store/commands/taskCommands';
 import { useProjectStore } from '../../store/projectStore';
 import { useUiStore } from '../../store/uiStore';
 import { useViewStore } from '../../store/viewStore';
@@ -30,7 +31,7 @@ const todayHeader = (container: HTMLElement) => container.querySelector('[data-t
 
 beforeEach(() => {
   localStorage.clear();
-  useViewStore.setState({ mode: 'daily' });
+  useViewStore.setState({ mode: 'daily', showCriticalPath: false });
 });
 
 afterEach(() => {
@@ -43,7 +44,7 @@ describe('daily view', () => {
     const daily = createScale('daily', '2026-11-04');
     expect(scroller().scrollLeft).toBe(columnOfDate(daily, '2026-11-04') * DAY_WIDTH);
     expect(todayHeader(container)).toHaveTextContent('Wed 4');
-    expect(screen.getByTestId('today-column')).toHaveStyle({ width: `${DAY_WIDTH}px` });
+    expect(screen.getByTestId('today-highlight')).toHaveStyle({ width: `${DAY_WIDTH}px` });
     expect(screen.getByRole('radio', { name: 'Daily' })).toBeChecked();
   });
 
@@ -61,7 +62,7 @@ describe('daily view', () => {
     const daily = createScale('daily', '2026-10-31');
     expect(scroller().scrollLeft).toBe(columnOfDate(daily, '2026-11-02') * DAY_WIDTH);
     expect(todayHeader(container)).toBeNull();
-    expect(screen.queryByTestId('today-column')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('today-highlight')).not.toBeInTheDocument();
   });
 });
 
@@ -143,7 +144,13 @@ describe('weekly view', () => {
 
     expect(screen.getByRole('radio', { name: 'Weekly' })).toBeChecked();
     expect(todayHeader(container)).toHaveTextContent('2 Nov - 6 Nov');
-    expect(screen.getByTestId('today-column')).toHaveStyle({ width: `${WEEK_WIDTH}px` });
+    // Today (Wednesday) is highlighted as its own fifth of the week, not the whole week.
+    const highlight = screen.getByTestId('today-highlight');
+    const weekly = createScale('weekly', '2026-11-04');
+    expect(parseFloat(highlight.style.width)).toBeCloseTo(WEEK_WIDTH / 5);
+    expect(parseFloat(highlight.style.left)).toBeCloseTo(
+      columnOfDate(weekly, '2026-11-04') * WEEK_WIDTH + 2 * (WEEK_WIDTH / 5),
+    );
     const design = bar(/^Design:/);
     expect(parseFloat(design.style.width)).toBeCloseTo((2 * WEEK_WIDTH) / 5);
   });
@@ -189,5 +196,99 @@ describe('scrolling', () => {
       columnOfDate(createScale('daily', '2026-11-04'), '2026-11-04') * DAY_WIDTH,
     );
     expect(todayHeader(container)).toHaveTextContent('Wed 4');
+  });
+});
+
+describe('days label', () => {
+  it('shows each dated task’s weekdays in its priority’s text colour', () => {
+    setup({
+      tasks: [
+        { id: 'P', name: 'Website' },
+        {
+          id: 'A',
+          name: 'Design',
+          parent: 'P',
+          start: '2026-11-05',
+          finish: '2026-11-10',
+          priority: 'urgent',
+        },
+        { id: 'B', name: 'Someday' },
+      ],
+    });
+    const list = screen.getByRole('list', { name: 'Tasks' });
+    const row = (name: string) =>
+      within(list)
+        .getAllByRole('listitem')
+        .find((li) => li.textContent?.startsWith(name))!;
+    const days = within(row('Design')).getByText('(4D)'); // Thu–Tue across a weekend
+    expect(days.parentElement!.style.color).toBe('var(--color-priority-urgent-text)');
+    expect(within(row('Website')).getByText('(4D)')).toBeInTheDocument(); // parent spans it
+    expect(row('Someday').textContent).not.toMatch(/\(\d+D\)/);
+  });
+});
+
+describe('milestones on the timeline', () => {
+  const spec: Spec = {
+    milestones: [
+      { name: 'Design sign-off', date: '2026-11-06' },
+      { name: 'Board review', date: '2026-11-06' },
+      { name: 'Weekend thing', date: '2026-11-07' }, // can't be shown
+    ],
+  };
+
+  it('highlights milestone days with a named marker', () => {
+    setup(spec);
+    const daily = createScale('daily', '2026-11-04');
+    const days = screen.getAllByTestId('milestone-day');
+    expect(days).toHaveLength(1); // both share Fri 6; the Saturday one is skipped
+    expect(days[0]).toHaveStyle({
+      left: `${columnOfDate(daily, '2026-11-06') * DAY_WIDTH}px`,
+      width: `${DAY_WIDTH}px`,
+    });
+    expect(
+      screen.getByRole('img', {
+        name: 'Milestones: Design sign-off, Board review — Fri 6 Nov 2026',
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it('highlights only the milestone’s day within the week in weekly view', async () => {
+    const { user } = setup(spec);
+    await user.click(screen.getByText('Weekly'));
+    expect(parseFloat(screen.getByTestId('milestone-day').style.width)).toBeCloseTo(WEEK_WIDTH / 5);
+  });
+});
+
+describe('critical path', () => {
+  const spec: Spec = {
+    tasks: [
+      { id: 'A', name: 'Design', start: '2026-11-02', finish: '2026-11-04' },
+      { id: 'B', name: 'Build', start: '2026-11-05', finish: '2026-11-06', deps: [{ from: 'A' }] },
+      { id: 'C', name: 'Docs', start: '2026-11-02', finish: '2026-11-03' },
+    ],
+  };
+
+  it('toggles red lines on the critical tasks and stays up to date', async () => {
+    const { user } = setup(spec);
+    const toggle = screen.getByRole('button', { name: 'Critical path' });
+    expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    expect(within(timeline()).queryAllByRole('button', { name: /Critical$/ })).toHaveLength(0);
+
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText('2 critical tasks')).toBeInTheDocument();
+    expect(bar(/^Design:.*Critical$/)).toHaveAttribute('data-critical', 'true');
+    expect(bar(/^Build:.*Critical$/)).toBeInTheDocument();
+    expect(bar(/^Docs:/)).not.toHaveAttribute('data-critical');
+
+    // Pushing Docs to the last day makes it critical too — recalculated without clicking again.
+    act(() =>
+      useProjectStore.getState().dispatch(updateTask('C', { name: 'Docs', start: '2026-11-06' })),
+    );
+    expect(bar(/^Docs:.*Critical$/)).toBeInTheDocument();
+    expect(screen.getByText('3 critical tasks')).toBeInTheDocument();
+
+    await user.click(toggle);
+    expect(within(timeline()).queryAllByRole('button', { name: /Critical$/ })).toHaveLength(0);
   });
 });

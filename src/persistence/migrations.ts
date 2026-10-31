@@ -22,6 +22,8 @@ const MIGRATIONS: Record<number, (project: RawProject) => RawProject> = {
       }),
     ),
   }),
+  // v3: project milestones.
+  2: (project) => ({ ...project, milestones: [] }),
 };
 
 function isRecord(value: unknown): value is RawProject {
@@ -63,7 +65,7 @@ function assertProjectShape(data: RawProject): asserts data is Project {
   for (const key of ['tasks', 'dependencies', 'calendars', 'resources', 'assignments']) {
     if (!isRecord(data[key])) problems.push(key);
   }
-  for (const key of ['taskOrder', 'baselines', 'customFields']) {
+  for (const key of ['taskOrder', 'baselines', 'customFields', 'milestones']) {
     if (!Array.isArray(data[key])) problems.push(key);
   }
   if (problems.length > 0) {

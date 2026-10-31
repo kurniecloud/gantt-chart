@@ -2,6 +2,7 @@ import { useId, useMemo, useState, type FormEvent } from 'react';
 import { Button } from '../../components/Button';
 import { DatePicker } from '../../components/DatePicker';
 import { Dialog, DialogActions } from '../../components/Dialog';
+import { dependencyCandidates, predecessorIds } from '../../domain/dependencies';
 import { effectiveSpans } from '../../domain/taskDates';
 import {
   PRIORITIES,
@@ -14,6 +15,7 @@ import { addTask, updateTask } from '../../store/commands/taskCommands';
 import { useProjectStore } from '../../store/projectStore';
 import { formatDate } from '../../utils/formatDate';
 import { PRIORITY_LABELS, priorityColorVar } from '../../utils/priority';
+import { DependsOnField } from './DependsOnField';
 import styles from './TaskDialog.module.css';
 
 type TaskDialogProps =
@@ -37,6 +39,14 @@ export function TaskDialog(props: TaskDialogProps) {
   const [start, setStart] = useState(task?.start);
   const [finish, setFinish] = useState(task?.finish);
   const [priority, setPriority] = useState<Priority | undefined>(task?.priority);
+  const [dependsOn, setDependsOn] = useState<string[]>(() =>
+    editTaskId ? predecessorIds(project, editTaskId) : [],
+  );
+  const parentId = props.mode === 'add' ? props.parentId : (task?.parentId ?? null);
+  const candidateIds = useMemo(
+    () => dependencyCandidates(project, editTaskId, parentId),
+    [project, editTaskId, parentId],
+  );
   const [openPicker, setOpenPicker] = useState<'start' | 'finish' | null>(null);
   const [errors, setErrors] = useState<TaskInputErrors>({});
   const nameId = useId();
@@ -52,8 +62,8 @@ export function TaskDialog(props: TaskDialogProps) {
     setErrors(found);
     if (Object.keys(found).length > 0) return;
     const fields = normalizeTaskInput(input);
-    if (props.mode === 'edit') dispatch(updateTask(props.taskId, fields));
-    else dispatch(addTask(fields, props.parentId));
+    if (props.mode === 'edit') dispatch(updateTask(props.taskId, fields, dependsOn));
+    else dispatch(addTask(fields, props.parentId, undefined, dependsOn));
     props.onClose();
   };
 
@@ -115,6 +125,13 @@ export function TaskDialog(props: TaskDialogProps) {
             />
           </div>
         )}
+
+        <DependsOnField
+          project={project}
+          candidateIds={candidateIds}
+          selectedIds={dependsOn}
+          onChange={setDependsOn}
+        />
 
         <fieldset className={styles.priority}>
           <legend className={styles.label}>Priority</legend>

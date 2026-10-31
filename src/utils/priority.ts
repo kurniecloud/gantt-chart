@@ -11,3 +11,8 @@ export const PRIORITY_LABELS: Record<Priority, string> = {
 export function priorityColorVar(priority: Priority | undefined): string {
   return `var(--color-priority-${priority ?? 'none'})`;
 }
+
+/** CSS custom property holding a readable text colour in the priority's hue. */
+export function priorityTextColorVar(priority: Priority | undefined): string {
+  return `var(--color-priority-${priority ?? 'none'}-text)`;
+}

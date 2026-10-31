@@ -73,6 +73,15 @@
   font-weight: 500;
 }
 
+.days {
+  flex: none;
+  padding: 0 var(--space-1);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .actions {
   display: flex;
   flex: none;

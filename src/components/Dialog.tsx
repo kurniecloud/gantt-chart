@@ -7,6 +7,8 @@ type DialogProps = {
   onClose: () => void;
   /** Overrides what Esc does, e.g. closing an open date picker first. */
   onEscape?: () => void;
+  /** `wide` for dialogs holding a table. */
+  size?: 'default' | 'wide';
   children: ReactNode;
 };
 
@@ -15,7 +17,7 @@ type DialogProps = {
  * restores focus when it closes. Render it only while it should be open. Mark the element that
  * should receive focus with `data-autofocus` (React's `autoFocus` fires before the dialog opens).
  */
-export function Dialog({ title, onClose, onEscape, children }: DialogProps) {
+export function Dialog({ title, onClose, onEscape, size = 'default', children }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
 
@@ -30,7 +32,7 @@ export function Dialog({ title, onClose, onEscape, children }: DialogProps) {
   return (
     <dialog
       ref={ref}
-      className={styles.dialog}
+      className={size === 'wide' ? `${styles.dialog} ${styles.wide}` : styles.dialog}
       aria-labelledby={titleId}
       onCancel={(event) => {
         event.preventDefault();
