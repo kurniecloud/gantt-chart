@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { makeProject } from '../../test/fixtures';
 import { useProjectStore } from '../projectStore';
-import { addTask, deleteTask, updateTask } from './taskCommands';
+import { addTask, deleteTask, moveTask, shiftTaskDates, updateTask } from './taskCommands';
 
 const store = useProjectStore;
 const state = () => store.getState();
@@ -192,5 +192,70 @@ describe('blocking links', () => {
   it('adds a new task that blocks others', () => {
     state().dispatch(addTask({ name: 'Prep' }, null, 'N', { blocking: ['A'] }));
     expect(deps()).toContain('N->A');
+  });
+});
+
+describe('moveTask', () => {
+  it('moves a subtree in one undoable step and expands the new parent', () => {
+    const before = structuredClone(project());
+    state().dispatch(moveTask('A1', { kind: 'last-child', targetId: 'A2' }));
+    expect(project().taskOrder).toEqual(['A', 'A2', 'A1', 'A1a', 'B']);
+    expect(project().tasks.A1?.parentId).toBe('A2');
+    expect(project().tasks.A2).not.toHaveProperty('collapsed'); // was collapsed
+    state().undo();
+    expect(project()).toEqual(before);
+  });
+
+  it('does nothing (and records nothing) for refused or no-op moves', () => {
+    state().dispatch(moveTask('A', { kind: 'last-child', targetId: 'A1a' }));
+    state().dispatch(moveTask('B', { kind: 'end' })); // already last
+    expect(state().past).toHaveLength(0);
+  });
+});
+
+describe('shiftTaskDates', () => {
+  beforeEach(() => {
+    state().loadProject(
+      makeProject({ tasks: [{ id: 'A', start: '2026-11-02', finish: '2026-11-06' }] }),
+    );
+  });
+
+  it('moves a task by weekdays, keeping its length, in one undoable step', () => {
+    state().dispatch(shiftTaskDates('A', 'move', 2)); // Mon 2–Fri 6 → Wed 4–Tue 10
+    expect(project().tasks.A).toMatchObject({ start: '2026-11-04', finish: '2026-11-10' });
+    state().undo();
+    expect(project().tasks.A).toMatchObject({ start: '2026-11-02', finish: '2026-11-06' });
+  });
+
+  it('resizes from either end', () => {
+    state().dispatch(shiftTaskDates('A', 'end', -2));
+    expect(project().tasks.A).toMatchObject({ start: '2026-11-02', finish: '2026-11-04' });
+    state().dispatch(shiftTaskDates('A', 'start', 1));
+    expect(project().tasks.A).toMatchObject({ start: '2026-11-03', finish: '2026-11-04' });
+  });
+
+  it('keeps a start-only task start-only when moved, and fills in the end when resized', () => {
+    state().loadProject(makeProject({ tasks: [{ id: 'S', start: '2026-11-02' }] }));
+    state().dispatch(shiftTaskDates('S', 'move', 1));
+    expect(project().tasks.S).toEqual(expect.objectContaining({ start: '2026-11-03' }));
+    expect(project().tasks.S).not.toHaveProperty('finish');
+    state().dispatch(shiftTaskDates('S', 'end', 2));
+    expect(project().tasks.S).toMatchObject({ start: '2026-11-03', finish: '2026-11-05' });
+  });
+
+  it('leaves parents, undated tasks and zero moves alone', () => {
+    state().loadProject(
+      makeProject({
+        tasks: [
+          { id: 'P', start: '2026-11-02' },
+          { id: 'C', parent: 'P', start: '2026-11-03' },
+          { id: 'U' },
+        ],
+      }),
+    );
+    state().dispatch(shiftTaskDates('P', 'move', 3));
+    state().dispatch(shiftTaskDates('U', 'move', 3));
+    state().dispatch(shiftTaskDates('C', 'move', 0));
+    expect(state().past).toHaveLength(0);
   });
 });

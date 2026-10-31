@@ -20,6 +20,9 @@ export type Task = {
    */
   start?: ISODate;
   finish?: ISODate;
+  /** When the work actually started / finished (optional, inclusive). Planned dates stay above. */
+  actualStart?: ISODate;
+  actualFinish?: ISODate;
   priority?: Priority;
   /** 0–100. */
   percentComplete: number;

@@ -3,7 +3,7 @@ import { newId } from './ids';
 import type { Calendar, ISODate, Project, Task } from './types';
 
 /** Bump together with a migration in `src/persistence/migrations.ts`. */
-export const CURRENT_SCHEMA_VERSION = 3;
+export const CURRENT_SCHEMA_VERSION = 4;
 
 export const DEFAULT_PROJECT_NAME = 'Untitled project';
 
@@ -35,7 +35,10 @@ export function calendarFor(project: Project, task?: Task): Calendar {
   );
 }
 
-export type TaskFields = Pick<Task, 'name' | 'start' | 'finish' | 'priority'>;
+export type TaskFields = Pick<
+  Task,
+  'name' | 'start' | 'finish' | 'actualStart' | 'actualFinish' | 'priority'
+>;
 
 /** A new task with the given fields. Absent dates/priority are left off the object entirely. */
 export function createTask(
@@ -46,6 +49,8 @@ export function createTask(
   const task: Task = { id, parentId, name: fields.name, mode: 'manual', percentComplete: 0 };
   if (fields.start) task.start = fields.start;
   if (fields.finish) task.finish = fields.finish;
+  if (fields.actualStart) task.actualStart = fields.actualStart;
+  if (fields.actualFinish) task.actualFinish = fields.actualFinish;
   if (fields.priority) task.priority = fields.priority;
   return task;
 }

@@ -18,13 +18,13 @@ async function addDatedTask(page: Page, name: string, startDay: number, endDay: 
   await page.getByRole('button', { name: 'Add task', exact: true }).click();
   await dialog(page).getByRole('textbox', { name: 'Task name' }).fill(name);
   await dialog(page)
-    .getByRole('button', { name: /^Start date/ })
+    .getByRole('button', { name: /^Planned Start date/ })
     .click();
   await dialog(page)
     .locator(`[data-day="2026-11-${String(startDay).padStart(2, '0')}"] button`)
     .click();
   await dialog(page)
-    .getByRole('button', { name: /^End date/ })
+    .getByRole('button', { name: /^Planned End date/ })
     .click();
   await dialog(page)
     .locator(`[data-day="2026-11-${String(endDay).padStart(2, '0')}"] button`)

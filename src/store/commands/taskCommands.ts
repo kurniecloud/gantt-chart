@@ -1,8 +1,11 @@
 import type { Draft } from 'immer';
 import { newId } from '../../domain/ids';
+import { planMove, type DropPlacement } from '../../domain/move';
 import { createTask, type TaskFields } from '../../domain/project';
-import { descendantIds, insertionIndexForChild } from '../../domain/tree';
+import { ownSpan, shiftSpan, type DragMode } from '../../domain/taskDates';
+import { childrenByParent, descendantIds, insertionIndexForChild } from '../../domain/tree';
 import type { Project } from '../../domain/types';
+import { fromWeekdayIndex, weekdayIndex } from '../../domain/workweek';
 import type { Command } from './types';
 
 /** A task's blocking links: tasks it is blocked by, and tasks it is blocking. */
@@ -74,6 +77,10 @@ export function updateTask(id: string, fields: TaskFields, links: TaskLinks = {}
       else delete task.start;
       if (fields.finish) task.finish = fields.finish;
       else delete task.finish;
+      if (fields.actualStart) task.actualStart = fields.actualStart;
+      else delete task.actualStart;
+      if (fields.actualFinish) task.actualFinish = fields.actualFinish;
+      else delete task.actualFinish;
       if (fields.priority) task.priority = fields.priority;
       else delete task.priority;
     },
@@ -96,6 +103,50 @@ export function deleteTask(id: string): Command {
       }
       for (const [assignmentId, assignment] of Object.entries(project.assignments)) {
         if (doomed.has(assignment.taskId)) delete project.assignments[assignmentId];
+      }
+    },
+  };
+}
+
+/**
+ * Moves a task (with its subtasks) to a new place in the list — see `planMove`. Refused moves do
+ * nothing. The new parent is expanded so the task stays visible.
+ */
+export function moveTask(taskId: string, placement: DropPlacement): Command {
+  return {
+    label: 'Move task',
+    apply: (project) => {
+      const plan = planMove(project, taskId, placement);
+      if (!plan.ok) return;
+      project.tasks[taskId]!.parentId = plan.parentId;
+      if (plan.taskOrder.some((id, i) => project.taskOrder[i] !== id)) {
+        project.taskOrder = plan.taskOrder;
+      }
+      if (plan.parentId) delete project.tasks[plan.parentId]!.collapsed;
+    },
+  };
+}
+
+/**
+ * Applies a bar drag to a task's planned dates: `move` shifts the dates it has by `delta`
+ * weekdays, `start`/`end` resize (never below one day). Tasks with subtasks are left alone —
+ * their dates come from the subtasks.
+ */
+export function shiftTaskDates(id: string, mode: DragMode, delta: number): Command {
+  return {
+    label: mode === 'move' ? 'Move task dates' : 'Change task dates',
+    apply: (project) => {
+      const task = project.tasks[id];
+      const span = task && ownSpan(task);
+      if (!task || !span || delta === 0 || childrenByParent(project).has(id)) return;
+      if (mode === 'move') {
+        const shift = (date: string) => fromWeekdayIndex(weekdayIndex(date) + delta);
+        if (task.start) task.start = shift(task.start);
+        if (task.finish) task.finish = shift(task.finish);
+      } else {
+        const next = shiftSpan(span, mode, delta);
+        task.start = next.start;
+        task.finish = next.finish;
       }
     },
   };

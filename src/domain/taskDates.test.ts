@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { makeProject } from '../test/fixtures';
-import { effectiveSpans, ownSpan, spanWeekdays } from './taskDates';
+import { effectiveSpans, ownActualSpan, ownSpan, shiftSpan, spanWeekdays } from './taskDates';
 
 describe('ownSpan', () => {
   it.each([
@@ -83,5 +83,89 @@ describe('spanWeekdays', () => {
     ['2026-10-31', '2026-11-01', 0], // weekend only
   ])('%s → %s = %i', (start, finish, expected) => {
     expect(spanWeekdays({ start, finish })).toBe(expected);
+  });
+});
+
+describe('actual spans', () => {
+  it('uses actual dates, and parents span their subtasks’ actual dates', () => {
+    const project = makeProject({
+      tasks: [
+        { id: 'P' },
+        {
+          id: 'A',
+          parent: 'P',
+          start: '2026-11-02',
+          actualStart: '2026-11-03',
+          actualFinish: '2026-11-05',
+        },
+        { id: 'B', parent: 'P', actualStart: '2026-11-09' }, // in progress
+        { id: 'C', start: '2026-11-02', finish: '2026-11-04' }, // no actuals
+      ],
+    });
+    const actual = effectiveSpans(project, 'actual');
+    expect(actual.get('A')).toEqual({
+      start: '2026-11-03',
+      finish: '2026-11-05',
+      fromSubtasks: false,
+    });
+    expect(actual.get('B')).toEqual({
+      start: '2026-11-09',
+      finish: '2026-11-09',
+      fromSubtasks: false,
+    });
+    expect(actual.get('P')).toEqual({
+      start: '2026-11-03',
+      finish: '2026-11-09',
+      fromSubtasks: true,
+    });
+    expect(actual.has('C')).toBe(false);
+    expect(effectiveSpans(project).get('A')).toMatchObject({ start: '2026-11-02' }); // planned untouched
+  });
+});
+
+describe('in-progress actuals', () => {
+  it('runs a started task up to today (Friday on weekends), or one day if it starts later', () => {
+    expect(ownActualSpan({ actualStart: '2026-11-02' }, '2026-11-04')).toEqual({
+      start: '2026-11-02',
+      finish: '2026-11-04',
+    });
+    expect(ownActualSpan({ actualStart: '2026-11-02' }, '2026-11-08')).toEqual({
+      start: '2026-11-02',
+      finish: '2026-11-06', // Sunday → Friday
+    });
+    expect(ownActualSpan({ actualStart: '2026-11-10' }, '2026-11-04')).toEqual({
+      start: '2026-11-10',
+      finish: '2026-11-10',
+    });
+    expect(
+      ownActualSpan({ actualStart: '2026-11-02', actualFinish: '2026-11-03' }, '2026-11-20'),
+    ).toEqual({
+      start: '2026-11-02',
+      finish: '2026-11-03',
+    });
+  });
+
+  it('carries into parents', () => {
+    const project = makeProject({
+      tasks: [{ id: 'P' }, { id: 'A', parent: 'P', actualStart: '2026-11-02' }],
+    });
+    expect(effectiveSpans(project, 'actual', '2026-11-05').get('P')).toMatchObject({
+      start: '2026-11-02',
+      finish: '2026-11-05',
+    });
+  });
+});
+
+describe('shiftSpan', () => {
+  const span = { start: '2026-11-04', finish: '2026-11-06' }; // Wed–Fri
+  it.each([
+    ['move', 1, '2026-11-05', '2026-11-09'], // Thu–Mon, keeps 3 weekdays
+    ['move', -3, '2026-10-30', '2026-11-03'], // three weekdays back: Fri–Tue
+    ['start', -2, '2026-11-02', '2026-11-06'], // longer
+    ['start', 5, '2026-11-06', '2026-11-06'], // never past the end: 1 day
+    ['end', 2, '2026-11-04', '2026-11-10'], // over the weekend
+    ['end', -9, '2026-11-04', '2026-11-04'], // never before the start
+  ] as const)('%s by %i → %s – %s', (mode, delta, start, finish) => {
+    expect(shiftSpan(span, mode, delta)).toEqual({ start, finish });
   });
 });

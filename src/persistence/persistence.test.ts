@@ -50,7 +50,15 @@ describe('migrateProject', () => {
   it('upgrades a v2 project by adding an empty milestone list', () => {
     const v2 = { ...makeProject(), schemaVersion: 2 } as Record<string, unknown>;
     delete v2.milestones;
-    expect(migrateProject(v2)).toMatchObject({ schemaVersion: 3, milestones: [] });
+    expect(migrateProject(v2)).toMatchObject({
+      schemaVersion: CURRENT_SCHEMA_VERSION,
+      milestones: [],
+    });
+  });
+
+  it('upgrades a v3 project unchanged apart from the version', () => {
+    const v3 = { ...makeProject({ tasks: [{ id: 'A', start: '2026-11-02' }] }), schemaVersion: 3 };
+    expect(migrateProject(structuredClone(v3))).toEqual({ ...v3, schemaVersion: 4 });
   });
 
   it('names the invalid fields', () => {

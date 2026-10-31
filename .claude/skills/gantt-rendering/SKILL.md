@@ -99,8 +99,26 @@ are drawn. Never read layout inside scroll handlers; derive everything from the 
   bars; grey `--color-arrow`, dashed amber `--color-arrow-broken`; each arrow has a 10 px
   invisible hit stroke with a `<title>` tooltip ("Build → Test").
 
-## Future: drag interactions
+## Dragging
 
-Pointer events + `setPointerCapture`; keep drag state in a ref; preview with rAF; commit **one**
-command on pointer-up (so one undo reverts the drag); snap to whole weekdays via `dateAtX`;
-Esc cancels; auto-scroll within 40 px of the scroller edge.
+- **Rows** (`tasks/useRowDrag.ts`): grip → window pointer listeners (rows are virtualized, so
+  never rely on the grip staying mounted). Zones: top ¼ before, bottom ¼ after (expanded parent:
+  first child), middle last child, "+" row end. Every hovered placement is checked with
+  `planMove()` (`domain/move.ts`: own-subtree and link clashes) and shown red with the reason.
+  Auto-scroll near the scroller's top/bottom; Esc cancels; drop dispatches **one** `moveTask`.
+  Keyboard equivalent: Alt+Shift+arrows on a task name.
+- **Bars** (`timeline/useBarDrag.ts`): body = move, 6 px edge handles = resize; tasks with
+  subtasks aren't draggable. Delta = round(dx / `scale.dayWidth`) weekdays; the preview uses
+  `shiftSpan()` and a floating date label; pointer-up dispatches **one** `shiftTaskDates`; the
+  following click is suppressed (`wasDrag()`); Esc cancels. Planned dates only.
+
+## Actual dates line
+
+`effectiveSpans(project, 'actual', today)` (in-progress tasks run to today); drawn as a 4 px
+`--color-actual` line 2 px under the bar, with a "Actual: …" label.
+
+## Critical-path refresh
+
+`criticalPath/useCriticalPath.ts` recalculates in a `setTimeout` after every project change
+while the toggle is on, setting `viewStore.recalculating` meanwhile; `BusyOverlay` blocks clicks
+and keys and only becomes visible after 0.2 s (CSS animation delay).

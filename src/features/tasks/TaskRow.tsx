@@ -1,6 +1,6 @@
-import { memo, type CSSProperties, type MouseEvent } from 'react';
+import { memo, type CSSProperties, type MouseEvent, type PointerEvent } from 'react';
 import { IconButton } from '../../components/Button';
-import { ChevronRightIcon, CirclePlusIcon, CrossIcon } from '../../components/icons';
+import { ChevronRightIcon, CirclePlusIcon, CrossIcon, GripIcon } from '../../components/icons';
 import type { Priority } from '../../domain/types';
 import { priorityTextColorVar } from '../../utils/priority';
 import styles from './TaskList.module.css';
@@ -23,6 +23,10 @@ type TaskRowProps = {
   onEdit: (id: string) => void;
   onAddSubtask: (id: string) => void;
   onDelete: (id: string) => void;
+  /** Starts dragging this row by its grip. */
+  onGripPointerDown: (id: string, event: PointerEvent) => void;
+  /** This row is the one being dragged. */
+  dragging: boolean;
 };
 
 function stop(action: () => void) {
@@ -47,6 +51,8 @@ export const TaskRow = memo(function TaskRow({
   onEdit,
   onAddSubtask,
   onDelete,
+  onGripPointerDown,
+  dragging,
 }: TaskRowProps) {
   return (
     <li
@@ -55,9 +61,22 @@ export const TaskRow = memo(function TaskRow({
       aria-posinset={index + 1}
       aria-setsize={setSize}
       data-row-index={index}
+      data-dragging={dragging || undefined}
       style={{ '--depth': depth, transform: `translateY(${top}px)` } as CSSProperties}
       onClick={() => onEdit(id)}
     >
+      <button
+        type="button"
+        // Keyboard users move tasks with Alt+Shift+arrow keys on the name instead.
+        tabIndex={-1}
+        className={styles.grip}
+        aria-label={`Move ${name}`}
+        title="Drag to move"
+        onPointerDown={(event) => onGripPointerDown(id, event)}
+        onClick={(event) => event.stopPropagation()}
+      >
+        <GripIcon />
+      </button>
       {hasChildren ? (
         <button
           type="button"
@@ -77,6 +96,7 @@ export const TaskRow = memo(function TaskRow({
         title={name}
         data-row-focus=""
         data-task-name={id}
+        aria-keyshortcuts="Alt+Shift+ArrowUp Alt+Shift+ArrowDown Alt+Shift+ArrowLeft Alt+Shift+ArrowRight"
         onClick={stop(() => onEdit(id))}
       >
         {name}

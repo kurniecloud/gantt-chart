@@ -126,3 +126,22 @@ describe('import', () => {
     expect(() => parseProjectFile(envelope(project))).toThrow(message);
   });
 });
+
+describe('actual dates in files', () => {
+  it('round-trips actual dates and rejects damaged ones', () => {
+    const project = sample();
+    project.tasks.A = {
+      ...project.tasks.A!,
+      actualStart: '2026-11-03',
+      actualFinish: '2026-11-05',
+    };
+    expect(parseProjectFile(serializeProject(project, '2026-11-01')).tasks.A).toMatchObject({
+      actualStart: '2026-11-03',
+      actualFinish: '2026-11-05',
+    });
+    project.tasks.A.actualFinish = 'next week';
+    expect(() => parseProjectFile(envelope(project))).toThrow(
+      /“Design” has an invalid actual end date/,
+    );
+  });
+});

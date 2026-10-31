@@ -34,13 +34,14 @@ Spec: [specs/task-list-and-timeline.md](specs/task-list-and-timeline.md).
 | 1.5  | Timeline: daily / weekly views, weekdays only, scroll past & future, today highlighted                         | ✅     |
 | 1.6  | Task bars: colour by priority, parents span subtasks, 1-day bars for single dates                              | ✅     |
 | 1.7  | Native JSON import / export                                                                                    | ✅     |
-| 1.8  | Drag bar to move, drag edges to resize                                                                         | ⬜     |
+| 1.8  | Drag bar to move, drag edges to resize (tasks without subtasks)                                                | ✅     |
 | 1.9  | Finish-to-start links: "Is blocked by" / "Is blocking" ✅, grey arrows (amber when broken) ✅, drag-to-link ⬜ | 🟨     |
 | 1.10 | Undo / redo (Ctrl/Cmd+Z, Shift+Ctrl/Cmd+Z)                                                                     | ✅     |
-| 1.11 | Reorder, indent / outdent tasks                                                                                | ⬜     |
+| 1.11 | Reorder / nest tasks by dragging the grip, or Alt+Shift+arrow keys                                             | ✅     |
 | 1.12 | Light / dark theme                                                                                             | 🟨     |
 | 1.13 | Project milestones: managed in a dialog, highlighted green with a ◆ marker                                     | ✅     |
 | 1.14 | Weekday count "(7D)" per task in its priority colour                                                           | ✅     |
+| 1.15 | Planned vs actual dates: two boxes in the dialog, blue actual line under the bar                               | ✅     |
 
 ## Phase 2 — MS Project parity (scheduling)
 

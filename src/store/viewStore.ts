@@ -20,6 +20,9 @@ type ViewState = {
   /** Whether critical-path lines are drawn (recalculated live while on). Not remembered. */
   showCriticalPath: boolean;
   toggleCriticalPath: () => void;
+  /** The critical path is being recalculated; input is blocked meanwhile. */
+  recalculating: boolean;
+  setRecalculating: (recalculating: boolean) => void;
 };
 
 export const useViewStore = create<ViewState>()((set) => ({
@@ -34,4 +37,6 @@ export const useViewStore = create<ViewState>()((set) => ({
   },
   showCriticalPath: false,
   toggleCriticalPath: () => set((state) => ({ showCriticalPath: !state.showCriticalPath })),
+  recalculating: false,
+  setRecalculating: (recalculating) => set({ recalculating }),
 }));

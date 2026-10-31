@@ -16,9 +16,16 @@ type DatePickerProps = {
   onOpenChange: (open: boolean) => void;
   /** Days before this are disabled (e.g. the start date, for an end-date picker). */
   minDate?: ISODate;
+  /** Month the calendar opens on when there's no value or minimum (default: today's). */
+  openMonth?: ISODate;
   error?: string;
   /** Keep the label for screen readers only (e.g. inside a table with a column header). */
   hideLabel?: boolean;
+  /**
+   * Group the field belongs to (e.g. "Planned"), prepended to its accessible name so two
+   * "Start date" fields can be told apart.
+   */
+  context?: string;
 };
 
 const WEEKENDS: Matcher = { dayOfWeek: [0, 6] };
@@ -31,9 +38,12 @@ export function DatePicker({
   open,
   onOpenChange,
   minDate,
+  openMonth,
   error,
   hideLabel = false,
+  context,
 }: DatePickerProps) {
+  const contextId = useId();
   const labelId = useId();
   const buttonId = useId();
   const errorId = useId();
@@ -44,6 +54,11 @@ export function DatePicker({
 
   return (
     <div className={styles.field}>
+      {context && (
+        <span id={contextId} className="visually-hidden">
+          {context}
+        </span>
+      )}
       <span id={labelId} className={hideLabel ? 'visually-hidden' : styles.label}>
         {label}
       </span>
@@ -52,7 +67,7 @@ export function DatePicker({
           id={buttonId}
           type="button"
           className={styles.trigger}
-          aria-labelledby={`${labelId} ${buttonId}`}
+          aria-labelledby={`${context ? `${contextId} ` : ''}${labelId} ${buttonId}`}
           aria-expanded={open}
           aria-controls={open ? calendarId : undefined}
           aria-invalid={error ? true : undefined}
@@ -68,7 +83,7 @@ export function DatePicker({
           <button
             type="button"
             className={styles.clear}
-            aria-label={`Clear ${label.toLowerCase()}`}
+            aria-label={`Clear ${context ? `${context.toLowerCase()} ` : ''}${label.toLowerCase()}`}
             onClick={() => {
               onChange(undefined);
               onOpenChange(false);
@@ -91,7 +106,7 @@ export function DatePicker({
             weekStartsOn={1}
             showOutsideDays
             selected={value ? isoToLocalDate(value) : undefined}
-            defaultMonth={isoToLocalDate(value ?? minDate ?? todayISO())}
+            defaultMonth={isoToLocalDate(value ?? minDate ?? openMonth ?? todayISO())}
             disabled={disabled}
             onSelect={(date) => {
               if (date) onChange(localDateToISO(date));

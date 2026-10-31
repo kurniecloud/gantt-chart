@@ -81,9 +81,15 @@ function contentProblems(project: Project): string[] {
     if (value.parentId !== null && (typeof value.parentId !== 'string' || !tasks[value.parentId])) {
       problems.push(`${label} has an unknown parent`);
     }
-    for (const field of ['start', 'finish'] as const) {
+    const dateFields = {
+      start: 'start',
+      finish: 'end',
+      actualStart: 'actual start',
+      actualFinish: 'actual end',
+    } as const;
+    for (const [field, name] of Object.entries(dateFields)) {
       if (value[field] !== undefined && !isISODate(value[field])) {
-        problems.push(`${label} has an invalid ${field === 'start' ? 'start' : 'end'} date`);
+        problems.push(`${label} has an invalid ${name} date`);
       }
     }
     if (value.priority !== undefined && !PRIORITIES.includes(value.priority as never)) {
