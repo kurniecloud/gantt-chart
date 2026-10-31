@@ -61,7 +61,9 @@ Behaviour is specified in `docs/specs/task-list-and-timeline.md`. This skill is 
 
 Month row "November 2026", centred over the month and kept on screen with `position: sticky`
 (left = task panel, right = edge). Daily cells "Mon 2"; weekly cells "28 Sep - 2 Oct". Mondays
-get a stronger line in daily view; weekly columns get four thin day lines (CSS gradients).
+get a stronger line in daily view; weekly columns get four thin day lines (CSS gradients). Draw
+the day lines inside one week-wide tile at 20/40/60/80% — never a repeating 28.8 px tile, which
+the browser rounds and drifts off the week lines (`tests/e2e/gridlines.spec.ts` checks pixels).
 Today: `--color-today` slot behind the header cells and in the body. Milestones
 (`milestoneMarks()`): `--color-milestone` slot plus a ◆ marker (`role="img"`, name in
 `aria-label`/`title`) pinned to the header's bottom edge.
@@ -84,6 +86,18 @@ Today: `--color-today` slot behind the header cells and in the body. Milestones
 Measured: ~2 ms per vertical scroll step, ~1 ms horizontal, ~6 ms view switch, ~20–35 ms to
 collapse/expand. `src/features/workspace/performance.test.tsx` guards that only on-screen rows
 are drawn. Never read layout inside scroll handlers; derive everything from the scale.
+
+## Dependency arrows (`arrows.ts`, `DependencyArrows.tsx`)
+
+- `dependencyArrows()` (memoized in `Workspace`) maps each link to visible rows (a task hidden
+  in a collapsed parent uses the parent's row), skips same-row links, merges duplicates, and
+  flags **broken** links (blocked task starts on/before its blocker's finish day).
+- `arrowPath()`: from the blocking bar's end to the blocked bar's start. With room: out 8 px,
+  vertical, in. Without: out 8 px, vertical to the row boundary **next to the target**, back
+  past the target's start, in — keeps long verticals beside the source bar.
+- One SVG sized to the arrows touching the drawn rows (never the full 250k px width), under the
+  bars; grey `--color-arrow`, dashed amber `--color-arrow-broken`; each arrow has a 10 px
+  invisible hit stroke with a `<title>` tooltip ("Build → Test").
 
 ## Future: drag interactions
 

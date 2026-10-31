@@ -22,14 +22,14 @@
   /* Bar colour by task priority — light fills (see docs/specs). */
   --color-priority-urgent: #fca5a5;
   --color-priority-high: #fdba74;
-  --color-priority-normal: #93c5fd;
-  --color-priority-low: #d1d5db;
+  --color-priority-normal: #5eead4;
+  --color-priority-low: #93c5fd;
   --color-priority-none: #b4c0cf;
   /* The same hues dark enough to read as text (the "(7D)" days label). */
   --color-priority-urgent-text: #b91c1c;
   --color-priority-high-text: #c2410c;
-  --color-priority-normal-text: #1d4ed8;
-  --color-priority-low-text: #6b7280;
+  --color-priority-normal-text: #0f766e;
+  --color-priority-low-text: #1d4ed8;
   --color-priority-none-text: #475569;
 
   /* Timeline */
@@ -38,6 +38,8 @@
   --color-milestone: #dcf5e1;
   --color-milestone-marker: #2f9e44;
   --color-critical-line: #ff1f1f;
+  --color-arrow: #8b95a3;
+  --color-arrow-broken: #d97706;
   --color-grid-line: #eef0f3;
   --color-grid-day: #f3f4f6;
   --color-grid-week: #dde1e7;
@@ -86,19 +88,21 @@
     --shadow-dialog: 0 12px 40px rgb(0 0 0 / 50%);
     --color-priority-urgent: #fca5a5;
     --color-priority-high: #fdba74;
-    --color-priority-normal: #93c5fd;
-    --color-priority-low: #9ca3af;
+    --color-priority-normal: #5eead4;
+    --color-priority-low: #93c5fd;
     --color-priority-none: #a3b1c2;
     --color-priority-urgent-text: #fca5a5;
     --color-priority-high-text: #fdba74;
-    --color-priority-normal-text: #93c5fd;
-    --color-priority-low-text: #9ca3af;
+    --color-priority-normal-text: #5eead4;
+    --color-priority-low-text: #93c5fd;
     --color-priority-none-text: #a3b1c2;
     --color-today: #3a3415;
     --color-today-text: #f5d76e;
     --color-milestone: #173322;
     --color-milestone-marker: #5fd17a;
     --color-critical-line: #ff3b3b;
+    --color-arrow: #7b8597;
+    --color-arrow-broken: #f59e0b;
     --color-grid-line: #1f242e;
     --color-grid-day: #1a1e26;
     --color-grid-week: #2c3240;
@@ -127,19 +131,21 @@
   --shadow-dialog: 0 12px 40px rgb(0 0 0 / 50%);
   --color-priority-urgent: #fca5a5;
   --color-priority-high: #fdba74;
-  --color-priority-normal: #93c5fd;
-  --color-priority-low: #9ca3af;
+  --color-priority-normal: #5eead4;
+  --color-priority-low: #93c5fd;
   --color-priority-none: #a3b1c2;
   --color-priority-urgent-text: #fca5a5;
   --color-priority-high-text: #fdba74;
-  --color-priority-normal-text: #93c5fd;
-  --color-priority-low-text: #9ca3af;
+  --color-priority-normal-text: #5eead4;
+  --color-priority-low-text: #93c5fd;
   --color-priority-none-text: #a3b1c2;
   --color-today: #3a3415;
   --color-today-text: #f5d76e;
   --color-milestone: #173322;
   --color-milestone-marker: #5fd17a;
   --color-critical-line: #ff3b3b;
+  --color-arrow: #7b8597;
+  --color-arrow-broken: #f59e0b;
   --color-grid-line: #1f242e;
   --color-grid-day: #1a1e26;
   --color-grid-week: #2c3240;

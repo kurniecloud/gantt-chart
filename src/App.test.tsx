@@ -299,39 +299,69 @@ describe('expand / collapse', () => {
   });
 });
 
-describe('depends on', () => {
-  it('picks tasks a new task depends on, and edits them later', async () => {
+describe('blocking links', () => {
+  const links = () =>
+    Object.values(useProjectStore.getState().project.dependencies)
+      .map((d) => {
+        const tasks = useProjectStore.getState().project.tasks;
+        return `${tasks[d.predecessorId]!.name} → ${tasks[d.successorId]!.name}`;
+      })
+      .sort();
+  const field = (label: string) => within(dialog()).getByRole('combobox', { name: label });
+  const chips = (label: string) =>
+    within(within(dialog()).getByRole('list', { name: `${label} (chosen)` }))
+      .getAllByRole('listitem')
+      .map((li) => li.textContent);
+
+  it('sets what a new task is blocked by and what it is blocking', async () => {
+    const user = setup({
+      tasks: [
+        { id: 'A', name: 'Design' },
+        { id: 'B', name: 'Build' },
+        { id: 'C', name: 'Launch' },
+      ],
+    });
+    await user.click(screen.getByRole('button', { name: 'Add task' }));
+    await user.type(within(dialog()).getByRole('textbox', { name: 'Task name' }), 'Review');
+    await user.selectOptions(field('Is blocked by'), 'Design');
+    await user.selectOptions(field('Is blocked by'), 'Build');
+    await user.click(
+      within(dialog()).getByRole('button', { name: 'Remove Build from “Is blocked by”' }),
+    );
+    await user.selectOptions(field('Is blocking'), 'Launch');
+    expect(chips('Is blocked by')).toEqual(['Design']);
+    expect(chips('Is blocking')).toEqual(['Launch']);
+    await user.click(within(dialog()).getByRole('button', { name: 'Add' }));
+
+    expect(links()).toEqual(['Design → Review', 'Review → Launch']);
+  });
+
+  it('shows both directions when editing, and never offers a loop', async () => {
     const user = setup({
       tasks: [
         { id: 'A', name: 'Design' },
         { id: 'B', name: 'Build', deps: [{ from: 'A' }] },
+        { id: 'C', name: 'Launch', deps: [{ from: 'B' }] },
       ],
     });
-    await user.click(screen.getByRole('button', { name: 'Add task' }));
-    await user.type(within(dialog()).getByRole('textbox', { name: 'Task name' }), 'Launch');
-    const dependsOn = within(dialog()).getByRole('combobox', { name: 'Depends on' });
-    await user.selectOptions(dependsOn, 'Build');
-    await user.selectOptions(dependsOn, 'Design');
-    expect(
-      within(within(dialog()).getByRole('list', { name: 'Tasks it depends on' })).getAllByRole(
-        'listitem',
-      ),
-    ).toHaveLength(2);
-    await user.click(within(dialog()).getByRole('button', { name: 'Remove dependency on Design' }));
-    await user.click(within(dialog()).getByRole('button', { name: 'Add' }));
+    await user.click(screen.getByRole('button', { name: 'Build' }));
+    expect(chips('Is blocked by')).toEqual(['Design']);
+    expect(chips('Is blocking')).toEqual(['Launch']);
 
-    const launchId = useProjectStore.getState().project.taskOrder[2]!;
-    const links = () =>
-      Object.values(useProjectStore.getState().project.dependencies)
-        .filter((d) => d.successorId === launchId)
-        .map((d) => d.predecessorId);
-    expect(links()).toEqual(['B']);
+    // Design is upstream and Launch downstream: neither may appear on the other side.
+    const options = (label: string) =>
+      within(field(label))
+        .getAllByRole('option')
+        .map((o) => o.textContent);
+    expect(options('Is blocked by')).toEqual(['No tasks to choose from']);
+    expect(options('Is blocking')).toEqual(['No tasks to choose from']);
 
-    // Design can't depend on Launch or Build: they already wait for it.
-    await user.click(screen.getByRole('button', { name: 'Design' }));
-    const options = within(
-      within(dialog()).getByRole('combobox', { name: 'Depends on' }),
-    ).getAllByRole('option');
-    expect(options.map((o) => o.textContent)).toEqual(['No other tasks to choose from']);
+    // Dropping the link to Launch frees it up for the other side — and vice versa.
+    await user.click(
+      within(dialog()).getByRole('button', { name: 'Remove Launch from “Is blocking”' }),
+    );
+    expect(options('Is blocked by')).toContain('Launch');
+    await user.click(within(dialog()).getByRole('button', { name: 'Save' }));
+    expect(links()).toEqual(['Design → Build']);
   });
 });

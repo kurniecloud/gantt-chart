@@ -2,86 +2,73 @@ import { ancestorIds, leafSuccessors } from './dependencies';
 import { ownSpan } from './taskDates';
 import { childrenByParent } from './tree';
 import type { Project } from './types';
-import { nextWeekday, previousWeekday, weekdayIndex } from './workweek';
+import { previousWeekday, weekdayIndex } from './workweek';
 
 export type CriticalPathResult = {
-  /** Critical tasks: leaves with no slack, plus every parent containing one. */
+  /** Every critical task: the subtasks on the chain plus all of their parents. */
   criticalIds: Set<string>;
-  /** Total slack in weekdays for each dated leaf task (negative = a dependency is violated). */
-  slack: Map<string, number>;
+  /** Just the subtasks (leaf tasks) on the chain. */
+  leafIds: Set<string>;
 };
 
 /**
- * Critical path from the tasks' own dates and their finish-to-start dependencies (the dates are
- * fixed; nothing is rescheduled). Works in weekdays:
+ * The critical path as a **driving chain** over the tasks' own dates and "blocked by" links:
  *
- * - project finish = the latest finish of any dated leaf task;
- * - backward pass: late finish = min(project finish, each successor's late start − 1);
- * - total slack = late finish − finish; critical ⇔ slack ≤ 0.
+ * 1. Start from the task(s) that finish on the project's last day.
+ * 2. Step back to the blocker(s) that finish latest — the one(s) holding this task up. Ties all
+ *    count. Repeat until a task has no blockers.
  *
- * Undated tasks are ignored. Loops (only possible in bad imported data) are treated as if the
- * links weren't there.
+ * Spare days between tasks don't break the chain. Links to/from parents count for all their
+ * subtasks. Undated tasks are passed through (if B waits for undated U, which waits for A, then
+ * A drives B). Nothing is rescheduled.
  */
 export function criticalPath(project: Project): CriticalPathResult {
   const children = childrenByParent(project);
-  const dated = new Map<string, { start: number; finish: number }>();
+  const finishes = new Map<string, number>();
   for (const id of project.taskOrder) {
     const task = project.tasks[id];
     if (!task || children.has(id)) continue;
     const span = ownSpan(task);
-    if (!span) continue;
-    const start = weekdayIndex(nextWeekday(span.start));
-    const finish = Math.max(start, weekdayIndex(previousWeekday(span.finish)));
-    dated.set(id, { start, finish });
+    if (span) finishes.set(id, weekdayIndex(previousWeekday(span.finish)));
   }
-  if (dated.size === 0) return { criticalIds: new Set(), slack: new Map() };
+  const empty = { criticalIds: new Set<string>(), leafIds: new Set<string>() };
+  if (finishes.size === 0) return empty;
 
-  const projectFinish = Math.max(...[...dated.values()].map((d) => d.finish));
-  const successors = new Map<string, string[]>();
-  for (const [from, to] of leafSuccessors(project)) {
-    if (!dated.has(from)) continue;
-    successors.set(
-      from,
-      [...to].filter((id) => dated.has(id)),
-    );
+  // Leaf → the leaves blocking it.
+  const blockers = new Map<string, string[]>();
+  for (const [from, tos] of leafSuccessors(project)) {
+    for (const to of tos) blockers.set(to, [...(blockers.get(to) ?? []), from]);
   }
 
-  // Topological order (Kahn). Tasks left over are part of a loop.
-  const indegree = new Map([...dated.keys()].map((id) => [id, 0]));
-  for (const list of successors.values()) {
-    for (const s of list) indegree.set(s, indegree.get(s)! + 1);
-  }
-  const order: string[] = [];
-  const ready = [...dated.keys()].filter((id) => indegree.get(id) === 0);
-  while (ready.length > 0) {
-    const id = ready.pop()!;
-    order.push(id);
-    for (const s of successors.get(id) ?? []) {
-      indegree.set(s, indegree.get(s)! - 1);
-      if (indegree.get(s) === 0) ready.push(s);
+  /** Dated blockers of a leaf, looking through undated ones. */
+  const datedBlockers = (id: string): string[] => {
+    const found = new Set<string>();
+    const seen = new Set<string>([id]);
+    const queue = [...(blockers.get(id) ?? [])];
+    while (queue.length > 0) {
+      const next = queue.pop()!;
+      if (seen.has(next)) continue;
+      seen.add(next);
+      if (finishes.has(next)) found.add(next);
+      else queue.push(...(blockers.get(next) ?? []));
     }
+    return [...found];
+  };
+
+  const projectFinish = Math.max(...finishes.values());
+  const leafIds = new Set<string>();
+  const queue = [...finishes].filter(([, finish]) => finish === projectFinish).map(([id]) => id);
+  while (queue.length > 0) {
+    const id = queue.pop()!;
+    if (leafIds.has(id)) continue; // also stops loops in bad data
+    leafIds.add(id);
+    const candidates = datedBlockers(id);
+    if (candidates.length === 0) continue;
+    const latest = Math.max(...candidates.map((c) => finishes.get(c)!));
+    queue.push(...candidates.filter((c) => finishes.get(c) === latest));
   }
 
-  const lateFinish = new Map<string, number>();
-  for (const id of order.reverse()) {
-    let latest = projectFinish;
-    for (const s of successors.get(id) ?? []) {
-      const next = dated.get(s)!;
-      const nextLateStart = lateFinish.get(s)! - (next.finish - next.start);
-      latest = Math.min(latest, nextLateStart - 1);
-    }
-    lateFinish.set(id, latest);
-  }
-
-  const slack = new Map<string, number>();
-  const criticalIds = new Set<string>();
-  for (const [id, { finish }] of dated) {
-    const value = (lateFinish.get(id) ?? projectFinish) - finish;
-    slack.set(id, value);
-    if (value <= 0) {
-      criticalIds.add(id);
-      ancestorIds(project, id).forEach((ancestor) => criticalIds.add(ancestor));
-    }
-  }
-  return { criticalIds, slack };
+  const criticalIds = new Set(leafIds);
+  for (const id of leafIds) ancestorIds(project, id).forEach((a) => criticalIds.add(a));
+  return { criticalIds, leafIds };
 }

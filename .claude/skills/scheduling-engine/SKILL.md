@@ -8,6 +8,12 @@ description: Authoritative rules for how the app computes task dates — calenda
 Semantics follow Microsoft Project (auto-scheduled tasks, "tasks honour constraint dates"
 off for SNLT/FNLT conflicts → shown as negative slack) at **day granularity**.
 
+> **Status:** sections 3–6 describe the future auto-scheduler. Today tasks are manually dated
+> (`mode: 'manual'`), links are finish-to-start with no lag, and the critical-path toggle uses the
+> agreed **driving chain** rule (`src/domain/criticalPath.ts`, spec
+> `docs/specs/dependency-arrows.md`), not zero total slack. Keep that rule unless the product
+> owner changes it.
+
 ## 1. Date representation
 
 - A date is a calendar day `'YYYY-MM-DD'` (`ISODate`). Never an instant.

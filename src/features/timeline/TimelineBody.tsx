@@ -3,6 +3,8 @@ import type { EffectiveSpan } from '../../domain/taskDates';
 import type { TaskRow } from '../../domain/tree';
 import type { Task } from '../../domain/types';
 import { useUiStore } from '../../store/uiStore';
+import type { DependencyArrow } from './arrows';
+import { DependencyArrows } from './DependencyArrows';
 import { barLabel, type MilestoneMark } from './labels';
 import { barGeometry, type TimelineScale } from './scale';
 import { TaskBar } from './TaskBar';
@@ -23,6 +25,9 @@ type TimelineBodyProps = {
   milestones: MilestoneMark[];
   /** Tasks on the critical path, or null when the critical path is hidden. */
   criticalIds: Set<string> | null;
+  /** Blocking links between visible bars. */
+  arrows: DependencyArrow[];
+  rowHeight: number;
 };
 
 export function TimelineBody({
@@ -35,6 +40,8 @@ export function TimelineBody({
   todaySlot,
   milestones,
   criticalIds,
+  arrows,
+  rowHeight,
 }: TimelineBodyProps) {
   const openDialog = useUiStore((s) => s.openDialog);
   const onEdit = useCallback(
@@ -67,6 +74,12 @@ export function TimelineBody({
         />
       )}
       <div className={styles.rowLines} style={{ height: rowsHeight }} />
+      <DependencyArrows
+        arrows={arrows}
+        firstRow={virtualRows[0]?.index ?? 0}
+        lastRow={virtualRows.at(-1)?.index ?? 0}
+        rowHeight={rowHeight}
+      />
       {virtualRows.map(({ index, top }) => {
         const row = rows[index];
         const span = row && spans.get(row.id);

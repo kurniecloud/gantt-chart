@@ -3,12 +3,14 @@ import { describe, expect, it } from 'vitest';
 import { App } from '../../App';
 import { criticalPath } from '../../domain/criticalPath';
 import { addDays } from '../../domain/dates';
-import { dependencyCandidates } from '../../domain/dependencies';
+import { linkCandidates, predecessorIds, successorIds } from '../../domain/dependencies';
 import { effectiveSpans } from '../../domain/taskDates';
 import { visibleTaskRows } from '../../domain/tree';
 import type { Priority } from '../../domain/types';
 import { nextWeekday } from '../../domain/workweek';
 import { useProjectStore } from '../../store/projectStore';
+import { dependencyArrows } from '../timeline/arrows';
+import { createScale } from '../timeline/scale';
 import { makeProject } from '../../test/fixtures';
 
 const PRIORITIES: (Priority | undefined)[] = ['urgent', 'high', 'normal', 'low', undefined];
@@ -51,13 +53,26 @@ describe('5,000 tasks', () => {
   it('calculates the critical path and dependency choices quickly', () => {
     const started = performance.now();
     const result = criticalPath(project);
-    const candidates = dependencyCandidates(project, 'P250-4', 'P250');
+    const draft = {
+      blockedBy: predecessorIds(project, 'P250-4'),
+      blocking: successorIds(project, 'P250-4'),
+    };
+    const candidates = linkCandidates(project, 'P250-4', 'P250', draft).blockedBy;
     const elapsed = performance.now() - started;
     expect(Object.keys(project.dependencies)).toHaveLength(4499); // 8 per phase + 1 to the previous phase
     expect(result.criticalIds.size).toBeGreaterThan(0);
     expect(candidates.length).toBeGreaterThan(0);
     expect(candidates).not.toContain('P250-5'); // downstream of P250-4
     expect(elapsed).toBeLessThan(250);
+  });
+
+  it('routes every dependency arrow quickly', () => {
+    const rows = visibleTaskRows(project);
+    const spans = effectiveSpans(project);
+    const started = performance.now();
+    const arrows = dependencyArrows(project, rows, spans, createScale('daily', '2026-11-02'), 36);
+    expect(performance.now() - started).toBeLessThan(150);
+    expect(arrows.length).toBeGreaterThan(4000);
   });
 
   it('only draws the rows and bars on screen', () => {
