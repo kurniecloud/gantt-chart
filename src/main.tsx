@@ -4,6 +4,9 @@ import { App } from './App';
 import { loadInitialProject, startAutosave } from './persistence/autosave';
 import { useProjectStore } from './store/projectStore';
 import './styles/global.css';
+import { trackInputModality } from './utils/inputModality';
+
+trackInputModality();
 
 async function bootstrap() {
   const { project, persistent } = await loadInitialProject();

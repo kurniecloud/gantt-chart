@@ -30,7 +30,8 @@ Behaviour is specified in `docs/specs/task-list-and-timeline.md`. This skill is 
   the date header because a milestone's ◆ hangs 6 px below the header; once its day scrolls
   behind the panel, the panel must cover it (e2e-guarded).
 - The corner is two halves level with the header's month and day rows: `ProjectTotals`
-  ("4 tasks · Planned 45D · Actual 30D", from `domain/summary.ts`) on top, "Task name" below.
+  ("5 tasks · Planned 45D · Actual 30D" — top-level tasks; hover: main / edge counts — from
+  `domain/summary.ts`) on top, "Task name" below.
   At phone width it drops the dots and line sample, shows "Plan" (the full word stays for screen
   readers, visually hidden) and wraps to two tight lines rather than clipping.
 - Both toolbars wrap: at 375 px the timeline toolbar doesn't fit on one line.

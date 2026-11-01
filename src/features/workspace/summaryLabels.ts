@@ -5,12 +5,9 @@ function plural(count: number, noun: string): string {
   return `${count} ${noun}${count === 1 ? '' : 's'}`;
 }
 
-/** Tooltip for the task count, e.g. "4 tasks without subtasks (2 parent tasks not counted)". */
-export function taskCountTitle(summary: ProjectSummary): string {
-  const counted = `${plural(summary.taskCount, 'task')} without subtasks`;
-  return summary.parentCount === 0
-    ? counted
-    : `${counted} (${plural(summary.parentCount, 'parent task')} not counted)`;
+/** Tooltip for the task count, e.g. "5 main tasks, 10 edge tasks (without subtasks)". */
+export function taskCountTitle({ mainTaskCount, edgeTaskCount }: ProjectSummary): string {
+  return `${plural(mainTaskCount, 'main task')}, ${plural(edgeTaskCount, 'edge task')} (without subtasks)`;
 }
 
 /** The figure shown for a length, e.g. "45D", or "—" when there are no dates. */

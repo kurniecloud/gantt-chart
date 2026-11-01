@@ -82,7 +82,8 @@
   background: var(--color-accent-soft);
 }
 
-.priorityOption:has(input:focus-visible) {
+/* Not after a mouse press: see the input-modality rule in global.css. */
+:global(:root:not([data-input='pointer'])) .priorityOption:has(input:focus-visible) {
   outline: 2px solid var(--color-focus);
   outline-offset: 1px;
 }

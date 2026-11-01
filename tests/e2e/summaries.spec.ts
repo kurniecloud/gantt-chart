@@ -26,7 +26,7 @@ async function addTask(page: Page, name: string, dates: [string, string]) {
   await expect(dialog(page)).toBeHidden();
 }
 
-test('totals above "Task name" count tasks and measure planned and actual weekdays', async ({
+test('totals above "Task name" count top-level tasks and measure planned and actual weekdays', async ({
   page,
 }) => {
   await expect(totals(page)).toHaveText('0 tasks · Planned — · Actual —', { useInnerText: true });
@@ -36,6 +36,10 @@ test('totals above "Task name" count tasks and measure planned and actual weekda
   await expect(totals(page)).toHaveText('2 tasks · Planned 10D · Actual —', {
     useInnerText: true,
   });
+  await expect(totals(page).getByTitle(/main task/)).toHaveAttribute(
+    'title',
+    '2 main tasks, 2 edge tasks (without subtasks)',
+  );
 
   // Design started on Tuesday and is still going: today is Wednesday → 2 weekdays.
   await timeline(page)
@@ -129,6 +133,35 @@ test('the "Actual dates" button hides the blue lines and is remembered', async (
 
   await toggle.click();
   await expect(line).toHaveCount(1);
+});
+
+test('a clicked toolbar button shows no focus ring after Shift or ⌘, but Tab does', async ({
+  page,
+}) => {
+  // The owner's screenshot: "Actual dates" turned off by a click, then a screenshot shortcut
+  // (⌘⇧4) made Chrome draw the blue keyboard-focus ring, which looks like the "on" border.
+  const toggle = page.getByRole('button', { name: 'Actual dates' });
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+  await page.keyboard.press('Shift');
+  await page.keyboard.press('Meta+Shift');
+  await expect(toggle).toBeFocused();
+  // Chrome itself now treats the button as keyboard-focused…
+  expect(await toggle.evaluate((el) => el.matches(':focus-visible'))).toBe(true);
+  // …but no ring is drawn.
+  await expect(toggle).toHaveCSS('outline-style', 'none');
+
+  // The same for the Daily / Weekly control.
+  await page.getByText('Weekly', { exact: true }).click();
+  await page.keyboard.press('Shift');
+  await expect(page.locator('label', { hasText: 'Weekly' })).toHaveCSS('outline-style', 'none');
+
+  // Real keyboard use still shows the ring.
+  await toggle.click();
+  await page.keyboard.press('Tab');
+  const critical = page.getByRole('button', { name: 'Critical path' });
+  await expect(critical).toBeFocused();
+  await expect(critical).toHaveCSS('outline-style', 'solid');
 });
 
 test.describe('at phone width', () => {

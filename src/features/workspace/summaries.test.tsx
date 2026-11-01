@@ -57,12 +57,12 @@ describe('project totals above "Task name"', () => {
     ],
   };
 
-  it('counts tasks without subtasks and measures planned and actual length in weekdays', () => {
+  it('counts top-level tasks and measures planned and actual length in weekdays', () => {
     setup(spec);
     // Mon 2 → Fri 20 Nov = 15 weekdays; actual Tue 3 → today (Wed 4) = 2, still in progress.
-    expect(spokenTotals()).toBe('3 tasks Planned 15D Actual 2D');
-    expect(totals()).toHaveTextContent(/^3 tasks · Planned\s?Plan 15D · Actual 2D$/);
-    expect(screen.getByTitle('3 tasks without subtasks (1 parent task not counted)')).toBeVisible();
+    expect(spokenTotals()).toBe('2 tasks Planned 15D Actual 2D');
+    expect(totals()).toHaveTextContent(/^2 tasks · Planned\s?Plan 15D · Actual 2D$/);
+    expect(screen.getByTitle('2 main tasks, 3 edge tasks (without subtasks)')).toBeVisible();
     expect(
       screen.getByTitle('Planned: Mon 2 Nov 2026 – Fri 20 Nov 2026 (15 weekdays)'),
     ).toBeVisible();

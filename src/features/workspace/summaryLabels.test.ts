@@ -8,9 +8,9 @@ import {
   taskCountTitle,
 } from './summaryLabels';
 
-const summary = (taskCount: number, parentCount: number): ProjectSummary => ({
-  taskCount,
-  parentCount,
+const summary = (mainTaskCount: number, edgeTaskCount: number): ProjectSummary => ({
+  mainTaskCount,
+  edgeTaskCount,
   planned: null,
   actual: null,
   inProgress: false,
@@ -18,9 +18,9 @@ const summary = (taskCount: number, parentCount: number): ProjectSummary => ({
 
 describe('task count tooltip', () => {
   it.each([
-    [summary(4, 2), '4 tasks without subtasks (2 parent tasks not counted)'],
-    [summary(1, 1), '1 task without subtasks (1 parent task not counted)'],
-    [summary(3, 0), '3 tasks without subtasks'],
+    [summary(5, 10), '5 main tasks, 10 edge tasks (without subtasks)'],
+    [summary(1, 1), '1 main task, 1 edge task (without subtasks)'],
+    [summary(0, 0), '0 main tasks, 0 edge tasks (without subtasks)'],
   ])('%j → %s', (input, expected) => {
     expect(taskCountTitle(input)).toBe(expected);
   });

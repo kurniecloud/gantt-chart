@@ -13,15 +13,15 @@ function summarise(project: Project, today = TODAY) {
 describe('projectSummary', () => {
   it('is empty for a project without tasks', () => {
     expect(summarise(makeProject())).toEqual({
-      taskCount: 0,
-      parentCount: 0,
+      mainTaskCount: 0,
+      edgeTaskCount: 0,
       planned: null,
       actual: null,
       inProgress: false,
     });
   });
 
-  it('counts only tasks without subtasks, including ones inside collapsed parents', () => {
+  it('counts top-level (main) tasks and tasks without subtasks (edge), whatever is collapsed', () => {
     const project = makeProject({
       tasks: [
         { id: 'Phase 1', collapsed: true },
@@ -34,8 +34,8 @@ describe('projectSummary', () => {
       ],
     });
     const summary = summarise(project);
-    expect(summary.taskCount).toBe(4);
-    expect(summary.parentCount).toBe(3);
+    expect(summary.mainTaskCount).toBe(3); // Phase 1, Phase 2, Launch
+    expect(summary.edgeTaskCount).toBe(4); // Design, Build, Test, Launch
   });
 
   it('measures the planned length from the earliest start to the latest finish', () => {
