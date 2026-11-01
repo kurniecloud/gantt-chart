@@ -10,7 +10,7 @@ Behaviour is specified in `docs/specs/task-list-and-timeline.md`. This skill is 
 ## Layout: one scroll area (`features/workspace/Workspace.tsx`)
 
 ```
-┌ toolbar: [Milestones] n │ [Daily|Weekly][Today][☑ Actual][Crit] ┐
+┌ toolbar: [Milestones] n │ [Daily|Weekly][Today][Actual][Crit]   ┐
 ├ scroller (overflow: auto) ──────────────────────────────────────┤
 │ grid: columns [--task-panel-width][--timeline-width]            │
 │       rows    [--header-height][max(--rows-height, rest)]       │
@@ -124,9 +124,11 @@ are drawn. Never read layout inside scroll handlers; derive everything from the 
 ## Actual dates line
 
 `effectiveSpans(project, 'actual', today)` (in-progress tasks run to today); drawn as a 4 px
-`--color-actual` line 2 px under the bar, with a "Actual: …" label. The "Actual dates" checkbox
-(`viewStore.showActualDates`, remembered in `localStorage`) hides the lines: `Workspace` passes
-`actualSpans={null}` to `TimelineBody`. Text in the actual blue uses `--color-actual-text`
+`--color-actual` line 2 px under the bar, with a "Actual: …" label. The "Actual dates" toggle
+button (`viewStore.showActualDates`, remembered in `localStorage`) hides the lines: `Workspace` passes
+`actualSpans={null}` to `TimelineBody`. Toolbar view toggles are
+`Button`s with an icon, `aria-pressed` and an "on" class (`actualOn`, `criticalOn`) — not
+checkboxes. Text in the actual blue uses `--color-actual-text`
 (`--color-actual` is too light for small text on the light theme).
 
 ## Critical-path refresh

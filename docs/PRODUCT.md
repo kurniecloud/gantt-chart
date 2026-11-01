@@ -45,7 +45,7 @@ Spec: [specs/task-list-and-timeline.md](specs/task-list-and-timeline.md); 1.16�
 | 1.15 | Planned vs actual dates: two boxes in the dialog, blue actual line under the bar                               | ✅     |
 | 1.16 | Project totals above "Task name": tasks (without subtasks), planned and actual length in weekdays              | ✅     |
 | 1.17 | Milestone count beside the Milestones button ("5 milestones · 3 upcoming")                                     | ✅     |
-| 1.18 | "Actual dates" checkbox to show / hide the blue actual lines (remembered per browser)                          | ✅     |
+| 1.18 | "Actual dates" toggle button to show / hide the blue actual lines (remembered per browser)                     | ✅     |
 
 ## Phase 2 — MS Project parity (scheduling)
 

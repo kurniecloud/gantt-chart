@@ -107,7 +107,7 @@ describe('milestone summary beside the Milestones button', () => {
   });
 });
 
-describe('"Actual dates" checkbox', () => {
+describe('"Actual dates" toggle button', () => {
   const spec: Spec = {
     tasks: [
       {
@@ -120,28 +120,28 @@ describe('"Actual dates" checkbox', () => {
       },
     ],
   };
-  const checkbox = () => screen.getByRole('checkbox', { name: 'Actual dates' });
+  const toggle = () => screen.getByRole('button', { name: 'Actual dates' });
 
-  it('is ticked by default and hides the actual lines when unticked', async () => {
+  it('is on by default and hides the actual lines when turned off', async () => {
     const { user } = setup(spec);
-    expect(checkbox()).toBeChecked();
+    expect(toggle()).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getAllByTestId('actual-line')).toHaveLength(1);
 
-    await user.click(checkbox());
-    expect(checkbox()).not.toBeChecked();
+    await user.click(toggle());
+    expect(toggle()).toHaveAttribute('aria-pressed', 'false');
     expect(screen.queryByTestId('actual-line')).not.toBeInTheDocument();
     // Only the lines are hidden: the totals still include the actual dates.
     expect(spokenTotals()).toContain('Actual 3D');
     expect(localStorage.getItem('gantt-chart:show-actual-dates')).toBe('hidden');
 
-    await user.click(checkbox());
+    await user.click(toggle());
+    expect(toggle()).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getAllByTestId('actual-line')).toHaveLength(1);
     expect(localStorage.getItem('gantt-chart:show-actual-dates')).toBe('shown');
   });
 
   it('sits just left of the Critical path button', () => {
     setup(spec);
-    const label = checkbox().closest('label')!;
-    expect(label.nextElementSibling).toBe(screen.getByRole('button', { name: 'Critical path' }));
+    expect(toggle().nextElementSibling).toBe(screen.getByRole('button', { name: 'Critical path' }));
   });
 });

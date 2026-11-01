@@ -2,15 +2,15 @@
 
 Status: done.
 
-## Decisions (agreed with the product owner, 2026-11-01)
+## Decisions (agreed with the product owner, 2026-11-01; toggle style 2026-11-02)
 
-| Topic               | Decision                                                                                                                                                                                   |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Total days          | **Project length**: weekdays from the earliest start to the latest finish (the same rule as a parent row's "(nD)"). Overlapping tasks don't add up. Planned and actual are measured alike. |
-| Task count          | **Only tasks without subtasks** (the work items; parents are groups) — the same rule as the "n critical tasks" count. Rows inside collapsed parents still count.                           |
-| Summary layout      | **Two lines in the "Task name" corner: totals on top** (level with the month row), **"Task name" underneath** (level with the day row, right above the task names).                        |
-| Milestone summary   | **Text beside the Milestones button**, in the style of the critical-path count: "5 milestones · 3 upcoming".                                                                               |
-| Actual-dates toggle | Default (not asked): a checkbox **"Actual dates"** with a blue line sample, **ticked by default**, remembered **per browser** (like Daily/Weekly), placed **just left of Critical path**.  |
+| Topic               | Decision                                                                                                                                                                                                                                               |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Total days          | **Project length**: weekdays from the earliest start to the latest finish (the same rule as a parent row's "(nD)"). Overlapping tasks don't add up. Planned and actual are measured alike.                                                             |
+| Task count          | **Only tasks without subtasks** (the work items; parents are groups) — the same rule as the "n critical tasks" count. Rows inside collapsed parents still count.                                                                                       |
+| Summary layout      | **Two lines in the "Task name" corner: totals on top** (level with the month row), **"Task name" underneath** (level with the day row, right above the task names).                                                                                    |
+| Milestone summary   | **Text beside the Milestones button**, in the style of the critical-path count: "5 milestones · 3 upcoming".                                                                                                                                           |
+| Actual-dates toggle | ~~A checkbox "Actual dates"~~ (first build, superseded 2026-11-02). **A toggle button like Critical path** (icon + "Actual dates", `aria-pressed`), **just left of Critical path**, **on by default**, remembered **per browser** (like Daily/Weekly). |
 
 ## Project summary (top-left corner)
 
@@ -40,12 +40,15 @@ Status: done.
 
 ## Show / hide actual dates (timeline toolbar)
 
-- `[Daily | Weekly] [Today] [☑ ━ Actual dates] [Critical path] 3 critical tasks` — left of
+- `[Daily | Weekly] [Today] [▭ Actual dates] [Critical path] 3 critical tasks` — left of
   Critical path so the critical count stays beside its own button and nothing moves when the
   critical path is toggled.
+- Same kind of control as Critical path, for a consistent toolbar: a button with an icon (a bar
+  with the blue actual line under it, which doubles as a legend) and `aria-pressed`. On: blue
+  border and light blue fill, blue text. Off: a plain button.
 - The toolbar wraps onto a second line when it doesn't fit (it already only just fitted at
-  375 px before the checkbox).
-- Unticked: the blue actual lines aren't drawn. Nothing else changes — actual dates stay in the
+  375 px before this button).
+- Off: the blue actual lines aren't drawn. Nothing else changes — actual dates stay in the
   task dialog, the file and the summary. Not part of undo (a view setting, not an edit).
 
 ## Fixed along the way

@@ -125,6 +125,16 @@ export function PathIcon(props: IconProps) {
   );
 }
 
+/** A bar with the blue actual-dates line under it — also a legend for that line. */
+export function ActualDatesIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <rect x="2" y="2.75" width="12" height="5.5" rx="1.5" />
+      <path d="M2 12.5h8.5" strokeWidth={2.4} style={{ stroke: 'var(--color-actual)' }} />
+    </Icon>
+  );
+}
+
 export function GripIcon(props: IconProps) {
   return (
     <Icon {...props}>

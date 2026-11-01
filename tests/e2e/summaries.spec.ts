@@ -92,7 +92,7 @@ test('the milestone summary sits beside the Milestones button', async ({ page })
   expect(Math.abs(text.y + text.height / 2 - (button.y + button.height / 2))).toBeLessThan(2);
 });
 
-test('the "Actual dates" checkbox hides the blue lines and is remembered', async ({ page }) => {
+test('the "Actual dates" button hides the blue lines and is remembered', async ({ page }) => {
   await addTask(page, 'Design', ['2026-11-02', '2026-11-06']);
   await timeline(page)
     .getByRole('button', { name: /^Design:/ })
@@ -103,22 +103,31 @@ test('the "Actual dates" checkbox hides the blue lines and is remembered', async
   await day(page, '2026-11-02').click();
   await dialog(page).getByRole('button', { name: 'Save' }).click();
 
-  const checkbox = page.getByRole('checkbox', { name: 'Actual dates' });
+  const toggle = page.getByRole('button', { name: 'Actual dates' });
+  const critical = page.getByRole('button', { name: 'Critical path' });
   const line = page.getByTestId('actual-line');
-  await expect(checkbox).toBeChecked();
+  await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+  await expect(toggle).toHaveCSS('border-color', 'rgb(10, 132, 255)'); // "on": actual blue
   await expect(line).toHaveCount(1);
+  // The same kind of button as Critical path, right next to it.
+  const [toggleBox, criticalBox] = [(await toggle.boundingBox())!, (await critical.boundingBox())!];
+  expect(toggleBox.height).toBe(criticalBox.height);
+  expect(toggleBox.y).toBe(criticalBox.y);
+  expect(criticalBox.x - (toggleBox.x + toggleBox.width)).toBeCloseTo(8, 0);
 
-  await checkbox.uncheck();
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+  await expect(toggle).toHaveCSS('border-color', 'rgb(226, 229, 234)'); // plain, like Critical path off
   await expect(line).toHaveCount(0);
   await expect(totals(page)).toContainText('Actual 3D'); // only the lines are hidden
 
   await page.waitForTimeout(800); // autosave is debounced
   await page.reload();
   await expect(page.getByRole('button', { name: /^Design:/ })).toBeVisible();
-  await expect(checkbox).not.toBeChecked();
+  await expect(toggle).toHaveAttribute('aria-pressed', 'false');
   await expect(line).toHaveCount(0);
 
-  await checkbox.check();
+  await toggle.click();
   await expect(line).toHaveCount(1);
 });
 

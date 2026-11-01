@@ -28,7 +28,7 @@ type ViewState = {
   setMode: (mode: ViewMode) => void;
   /** Whether the blue actual-dates lines are drawn. Remembered per browser; on by default. */
   showActualDates: boolean;
-  setShowActualDates: (show: boolean) => void;
+  toggleActualDates: () => void;
   /** Whether critical-path lines are drawn (recalculated live while on). Not remembered. */
   showCriticalPath: boolean;
   toggleCriticalPath: () => void;
@@ -44,10 +44,12 @@ export const useViewStore = create<ViewState>()((set) => ({
     set({ mode });
   },
   showActualDates: readSetting(ACTUAL_DATES_KEY) !== 'hidden',
-  setShowActualDates: (show) => {
-    writeSetting(ACTUAL_DATES_KEY, show ? 'shown' : 'hidden');
-    set({ showActualDates: show });
-  },
+  toggleActualDates: () =>
+    set((state) => {
+      const showActualDates = !state.showActualDates;
+      writeSetting(ACTUAL_DATES_KEY, showActualDates ? 'shown' : 'hidden');
+      return { showActualDates };
+    }),
   showCriticalPath: false,
   toggleCriticalPath: () => set((state) => ({ showCriticalPath: !state.showCriticalPath })),
   recalculating: false,
