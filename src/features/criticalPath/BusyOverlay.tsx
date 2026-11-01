@@ -25,7 +25,7 @@ export function BusyOverlay() {
     <div className={styles.overlay} data-testid="busy-overlay" aria-busy="true">
       <div className={styles.panel} role="status">
         <span className={styles.spinner} aria-hidden="true" />
-        Recalculating critical path…
+        Recalculating Critical Path…
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import type { Command } from './types';
 /** Blank names are ignored, so the project always has a title. */
 export function renameProject(name: string): Command {
   return {
-    label: 'Rename project',
+    label: 'Rename Project',
     apply: (project) => {
       const trimmed = name.trim();
       if (trimmed) project.name = trimmed;
@@ -14,7 +14,7 @@ export function renameProject(name: string): Command {
 
 export function setProjectDescription(description: string): Command {
   return {
-    label: 'Edit description',
+    label: 'Edit Description',
     apply: (project) => {
       project.description = description.trim();
     },
@@ -28,7 +28,7 @@ export function setProjectDescription(description: string): Command {
  */
 export function importProject(imported: Project): Command {
   return {
-    label: 'Import project',
+    label: 'Import Project',
     apply: (project) => {
       const { id, schemaVersion, ...content } = imported;
       Object.assign(project, structuredClone(content));

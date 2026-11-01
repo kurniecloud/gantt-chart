@@ -5,7 +5,7 @@ import type { Calendar, ISODate, Project, Task } from './types';
 /** Bump together with a migration in `src/persistence/migrations.ts`. */
 export const CURRENT_SCHEMA_VERSION = 4;
 
-export const DEFAULT_PROJECT_NAME = 'Untitled project';
+export const DEFAULT_PROJECT_NAME = 'Untitled Project';
 
 export function createProject(name: string, startDate: ISODate): Project {
   const calendar = createStandardCalendar();

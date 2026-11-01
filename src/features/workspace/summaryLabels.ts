@@ -5,9 +5,9 @@ function plural(count: number, noun: string): string {
   return `${count} ${noun}${count === 1 ? '' : 's'}`;
 }
 
-/** Tooltip for the task count, e.g. "5 main tasks, 10 edge tasks (without subtasks)". */
+/** Tooltip for the task count, e.g. "5 Main Tasks, 10 Edge Tasks (Without Subtasks)". */
 export function taskCountTitle({ mainTaskCount, edgeTaskCount }: ProjectSummary): string {
-  return `${plural(mainTaskCount, 'main task')}, ${plural(edgeTaskCount, 'edge task')} (without subtasks)`;
+  return `${plural(mainTaskCount, 'Main Task')}, ${plural(edgeTaskCount, 'Edge Task')} (Without Subtasks)`;
 }
 
 /** The figure shown for a length, e.g. "45D", or "—" when there are no dates. */
@@ -15,24 +15,24 @@ export function lengthLabel(length: ProjectLength | null): string {
   return length ? `${length.days}D` : '—';
 }
 
-/** Tooltip, e.g. "Planned: Mon 2 Nov 2026 – Fri 1 Jan 2027 (45 weekdays)". */
+/** Tooltip, e.g. "Planned: Mon 2 Nov 2026 – Fri 1 Jan 2027 (45 Weekdays)". */
 export function lengthTitle(
   kind: 'Planned' | 'Actual',
   length: ProjectLength | null,
   inProgress = false,
 ): string {
-  if (!length) return `${kind}: no ${kind === 'Actual' ? 'actual ' : ''}dates yet`;
+  if (!length) return `${kind}: No ${kind === 'Actual' ? 'Actual ' : ''}Dates Yet`;
   const dates =
     length.start === length.finish
       ? formatDate(length.start)
       : `${formatDate(length.start)} – ${formatDate(length.finish)}`;
-  return `${kind}: ${dates} (${plural(length.days, 'weekday')}${inProgress ? ', in progress' : ''})`;
+  return `${kind}: ${dates} (${plural(length.days, 'Weekday')}${inProgress ? ', In Progress' : ''})`;
 }
 
-/** e.g. "5 milestones · 3 upcoming", "3 milestones · all passed", "No milestones". */
+/** e.g. "5 Milestones · 3 Upcoming", "3 Milestones · All Passed", "No Milestones". */
 export function milestoneSummaryLabel({ total, upcoming }: MilestoneSummary): string {
-  if (total === 0) return 'No milestones';
-  return `${plural(total, 'milestone')} · ${upcoming === 0 ? 'all passed' : `${upcoming} upcoming`}`;
+  if (total === 0) return 'No Milestones';
+  return `${plural(total, 'Milestone')} · ${upcoming === 0 ? 'All Passed' : `${upcoming} Upcoming`}`;
 }
 
 /** Tooltip naming the next milestone, e.g. "Next: Beta — Thu 12 Nov 2026". */

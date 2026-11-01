@@ -7,7 +7,7 @@ type ProjectTotalsProps = {
 };
 
 /**
- * "5 tasks · Planned 45D · Actual 30D" above "Task name" — the count is top-level tasks; tooltips
+ * "5 Tasks · Planned 45D · Actual 30D" above "Task Name" — the count is top-level tasks; tooltips
  * give the edge-task count and the dates.
  */
 export function ProjectTotals({ summary }: ProjectTotalsProps) {
@@ -17,7 +17,7 @@ export function ProjectTotals({ summary }: ProjectTotalsProps) {
   return (
     <p className={styles.totals} data-testid="project-totals">
       <span className={styles.total} title={taskCountTitle(summary)}>
-        <strong>{mainTaskCount}</strong> {mainTaskCount === 1 ? 'task' : 'tasks'}
+        <strong>{mainTaskCount}</strong> {mainTaskCount === 1 ? 'Task' : 'Tasks'}
       </span>{' '}
       <span className={styles.separator} aria-hidden="true">
         ·

@@ -5,7 +5,7 @@ import type { Project } from '../../domain/types';
 import styles from './TaskDialog.module.css';
 
 type LinkFieldProps = {
-  /** e.g. "Is blocked by". */
+  /** e.g. "Is Blocked By". */
   label: string;
   /** One line under the field explaining what the links mean. */
   hint: string;
@@ -46,9 +46,9 @@ export function LinkField({
         {label}
       </label>
       {selectedIds.length > 0 && (
-        <ul className={styles.chips} aria-label={`${label} (chosen)`}>
+        <ul className={styles.chips} aria-label={`${label} (Chosen)`}>
           {selectedIds.map((id) => {
-            const name = project.tasks[id]?.name ?? 'Deleted task';
+            const name = project.tasks[id]?.name ?? 'Deleted Task';
             return (
               <li key={id} className={styles.chip}>
                 <span className={styles.chipName} title={name}>
@@ -77,7 +77,7 @@ export function LinkField({
           if (event.target.value) onChange([...selectedIds, event.target.value]);
         }}
       >
-        <option value="">{available.length > 0 ? 'Add a task…' : 'No tasks to choose from'}</option>
+        <option value="">{available.length > 0 ? 'Add a Task…' : 'No Tasks to Choose From'}</option>
         {available.map((option) => (
           <option key={option.id} value={option.id}>
             {option.label}

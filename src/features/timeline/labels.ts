@@ -25,7 +25,7 @@ export function monthKey(date: ISODate): string {
   return date.slice(0, 7);
 }
 
-/** Tooltip and accessible name for a bar, e.g. "Design: Mon 2 Nov 2026 – Fri 6 Nov 2026 · High priority". */
+/** Tooltip and accessible name for a bar, e.g. "Design: Mon 2 Nov 2026 – Fri 6 Nov 2026 · High Priority". */
 export function barLabel(
   name: string,
   span: DateSpan,
@@ -36,7 +36,7 @@ export function barLabel(
     span.start === span.finish
       ? formatDate(span.start)
       : `${formatDate(span.start)} – ${formatDate(span.finish)}`;
-  const level = priority ? `${PRIORITY_LABELS[priority]} priority` : 'No priority';
+  const level = priority ? `${PRIORITY_LABELS[priority]} Priority` : 'No Priority';
   return `${name}: ${dates} · ${level}${critical ? ' · Critical' : ''}`;
 }
 
@@ -64,11 +64,11 @@ export function milestoneMarks(scale: TimelineScale, milestones: Milestone[]): M
   return marks;
 }
 
-/** Tooltip for the actual-dates line, e.g. "Actual: Mon 2 Nov 2026 – Wed 4 Nov 2026 (in progress)". */
+/** Tooltip for the actual-dates line, e.g. "Actual: Mon 2 Nov 2026 – Wed 4 Nov 2026 (In Progress)". */
 export function actualLabel(span: DateSpan, inProgress: boolean): string {
   const dates =
     span.start === span.finish
       ? formatDate(span.start)
       : `${formatDate(span.start)} – ${formatDate(span.finish)}`;
-  return `Actual: ${dates}${inProgress ? ' (in progress)' : ''}`;
+  return `Actual: ${dates}${inProgress ? ' (In Progress)' : ''}`;
 }

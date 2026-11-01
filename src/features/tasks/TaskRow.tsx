@@ -71,7 +71,7 @@ export const TaskRow = memo(function TaskRow({
         tabIndex={-1}
         className={styles.grip}
         aria-label={`Move ${name}`}
-        title="Drag to move"
+        title="Drag to Move"
         onPointerDown={(event) => onGripPointerDown(id, event)}
         onClick={(event) => event.stopPropagation()}
       >
@@ -110,7 +110,7 @@ export const TaskRow = memo(function TaskRow({
         </span>
       )}
       <span className={styles.actions}>
-        <IconButton label={`Add subtask to ${name}`} onClick={stop(() => onAddSubtask(id))}>
+        <IconButton label={`Add Subtask to ${name}`} onClick={stop(() => onAddSubtask(id))}>
           <CirclePlusIcon />
         </IconButton>
         <IconButton label={`Delete ${name}`} tone="danger" onClick={stop(() => onDelete(id))}>

@@ -85,11 +85,11 @@ describe('task bars', () => {
 
   it('draws dated tasks with their dates, priority colour and width', () => {
     setup(spec);
-    const design = bar(/^Design: Mon 2 Nov 2026 – Fri 6 Nov 2026 · High priority$/);
+    const design = bar(/^Design: Mon 2 Nov 2026 – Fri 6 Nov 2026 · High Priority$/);
     expect(design).toHaveStyle({ width: `${5 * DAY_WIDTH}px` });
     expect(design.style.getPropertyValue('--bar-color')).toBe('var(--color-priority-high)');
 
-    const review = bar(/^Review: Mon 9 Nov 2026 · No priority$/); // 1-day bar
+    const review = bar(/^Review: Mon 9 Nov 2026 · No Priority$/); // 1-day bar
     expect(review).toHaveStyle({ width: `${DAY_WIDTH}px` });
     expect(review.style.getPropertyValue('--bar-color')).toBe('var(--color-priority-none)');
   });
@@ -109,9 +109,9 @@ describe('task bars', () => {
   it('opens the edit dialog when a bar is clicked', async () => {
     const { user } = setup(spec);
     await user.click(bar(/^Design:/));
-    expect(screen.getByRole('dialog')).toHaveAccessibleName('Edit task');
+    expect(screen.getByRole('dialog')).toHaveAccessibleName('Edit Task');
     expect(
-      within(screen.getByRole('dialog')).getByRole('textbox', { name: 'Task name' }),
+      within(screen.getByRole('dialog')).getByRole('textbox', { name: 'Task Name' }),
     ).toHaveValue('Design');
   });
 
@@ -127,7 +127,7 @@ describe('task bars', () => {
     await user.click(bar(/^Design:/));
     await user.click(within(screen.getByRole('dialog')).getByText('Low'));
     await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Save' }));
-    expect(bar(/^Design:.*Low priority$/).style.getPropertyValue('--bar-color')).toBe(
+    expect(bar(/^Design:.*Low Priority$/).style.getPropertyValue('--bar-color')).toBe(
       'var(--color-priority-low)',
     );
   });
@@ -230,7 +230,7 @@ describe('days label', () => {
 describe('milestones on the timeline', () => {
   const spec: Spec = {
     milestones: [
-      { name: 'Design sign-off', date: '2026-11-06' },
+      { name: 'Design Sign-Off', date: '2026-11-06' },
       { name: 'Board review', date: '2026-11-06' },
       { name: 'Weekend thing', date: '2026-11-07' }, // can't be shown
     ],
@@ -247,7 +247,7 @@ describe('milestones on the timeline', () => {
     });
     expect(
       screen.getByRole('img', {
-        name: 'Milestones: Design sign-off, Board review — Fri 6 Nov 2026',
+        name: 'Milestones: Design Sign-Off, Board review — Fri 6 Nov 2026',
       }),
     ).toBeInTheDocument();
   });
@@ -270,13 +270,13 @@ describe('critical path', () => {
 
   it('toggles red lines on the critical tasks and stays up to date', async () => {
     const { user } = setup(spec);
-    const toggle = screen.getByRole('button', { name: 'Critical path' });
+    const toggle = screen.getByRole('button', { name: 'Critical Path' });
     expect(toggle).toHaveAttribute('aria-pressed', 'false');
     expect(within(timeline()).queryAllByRole('button', { name: /Critical$/ })).toHaveLength(0);
 
     await user.click(toggle);
     expect(toggle).toHaveAttribute('aria-pressed', 'true');
-    expect(await screen.findByText('2 critical tasks')).toBeInTheDocument();
+    expect(await screen.findByText('2 Critical Tasks')).toBeInTheDocument();
     expect(bar(/^Design:.*Critical$/)).toHaveAttribute('data-critical', 'true');
     expect(bar(/^Build:.*Critical$/)).toBeInTheDocument();
     expect(bar(/^Docs:/)).not.toHaveAttribute('data-critical');
@@ -288,7 +288,7 @@ describe('critical path', () => {
       useProjectStore.getState().dispatch(updateTask('C', { name: 'Docs', start: '2026-11-06' })),
     );
     expect(screen.getByTestId('busy-overlay')).toBeInTheDocument();
-    expect(await screen.findByText('3 critical tasks')).toBeInTheDocument();
+    expect(await screen.findByText('3 Critical Tasks')).toBeInTheDocument();
     expect(bar(/^Docs:.*Critical$/)).toBeInTheDocument();
     expect(screen.queryByTestId('busy-overlay')).not.toBeInTheDocument();
 
@@ -386,7 +386,7 @@ describe('dragging bars', () => {
     fireEvent.pointerUp(window);
     expect(dates()).toEqual(['2026-11-04', '2026-11-06']);
     await user.click(bar(/^Design:/));
-    expect(screen.getByRole('dialog')).toHaveAccessibleName('Edit task');
+    expect(screen.getByRole('dialog')).toHaveAccessibleName('Edit Task');
   });
 
   it('does not drag parent bars', () => {
@@ -423,7 +423,7 @@ describe('actual dates line', () => {
     const lines = screen.getAllByTestId('actual-line');
     expect(lines.map((l) => l.getAttribute('aria-label'))).toEqual([
       'Design: Actual: Tue 3 Nov 2026 – Thu 5 Nov 2026',
-      'Build: Actual: Mon 2 Nov 2026 – Wed 4 Nov 2026 (in progress)', // today is Wed 4
+      'Build: Actual: Mon 2 Nov 2026 – Wed 4 Nov 2026 (In Progress)', // today is Wed 4
     ]);
     expect(lines[0]).toHaveStyle({ width: `${3 * DAY_WIDTH}px` });
   });

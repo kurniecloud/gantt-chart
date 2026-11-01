@@ -24,25 +24,25 @@ const dialog = () => screen.getByRole('dialog', { name: 'Milestones' });
 const milestones = () => useProjectStore.getState().project.milestones;
 
 describe('milestones dialog', () => {
-  it('opens from the button above “Task name” with an empty table', async () => {
+  it('opens from the button above “Task Name” with an empty table', async () => {
     const user = setup();
     await user.click(screen.getByRole('button', { name: 'Milestones' }));
     expect(
-      within(dialog()).getByRole('columnheader', { name: 'Milestone name' }),
+      within(dialog()).getByRole('columnheader', { name: 'Milestone Name' }),
     ).toBeInTheDocument();
     expect(
-      within(dialog()).getByRole('columnheader', { name: 'Milestone date' }),
+      within(dialog()).getByRole('columnheader', { name: 'Milestone Date' }),
     ).toBeInTheDocument();
     expect(dialog()).toHaveTextContent('No milestones yet.');
-    expect(within(dialog()).getByRole('button', { name: 'Add milestone' })).toHaveFocus();
+    expect(within(dialog()).getByRole('button', { name: 'Add Milestone' })).toHaveFocus();
   });
 
   it('adds milestones, refusing missing names and dates, and saves them sorted by date', async () => {
     const user = setup();
     await user.click(screen.getByRole('button', { name: 'Milestones' }));
 
-    await user.click(within(dialog()).getByRole('button', { name: 'Add milestone' }));
-    const first = within(dialog()).getByRole('textbox', { name: 'Milestone name, row 1' });
+    await user.click(within(dialog()).getByRole('button', { name: 'Add Milestone' }));
+    const first = within(dialog()).getByRole('textbox', { name: 'Milestone Name, Row 1' });
     expect(first).toHaveFocus();
     await user.click(within(dialog()).getByRole('button', { name: 'Save' }));
     expect(dialog()).toHaveTextContent('Enter a name');
@@ -52,9 +52,9 @@ describe('milestones dialog', () => {
     await user.click(within(dialog()).getByRole('button', { name: /^Date for Launch/ }));
     await user.click(within(dialog()).getByRole('button', { name: /Friday, November 20th, 2026/ }));
 
-    await user.click(within(dialog()).getByRole('button', { name: 'Add milestone' }));
+    await user.click(within(dialog()).getByRole('button', { name: 'Add Milestone' }));
     await user.type(
-      within(dialog()).getByRole('textbox', { name: 'Milestone name, row 2' }),
+      within(dialog()).getByRole('textbox', { name: 'Milestone Name, Row 2' }),
       'Kick-off',
     );
     await user.click(within(dialog()).getByRole('button', { name: /^Date for Kick-off/ }));
@@ -79,10 +79,10 @@ describe('milestones dialog', () => {
       ],
     });
     await user.click(screen.getByRole('button', { name: 'Milestones' }));
-    const name = within(dialog()).getByRole('textbox', { name: 'Milestone name, row 2' });
+    const name = within(dialog()).getByRole('textbox', { name: 'Milestone Name, Row 2' });
     await user.clear(name);
     await user.type(name, 'Go live');
-    await user.click(within(dialog()).getByRole('button', { name: 'Delete milestone Kick-off' }));
+    await user.click(within(dialog()).getByRole('button', { name: 'Delete Milestone Kick-off' }));
     await user.click(within(dialog()).getByRole('button', { name: 'Save' }));
     expect(milestones().map((m) => m.name)).toEqual(['Go live']);
 
@@ -93,7 +93,7 @@ describe('milestones dialog', () => {
   it('discards changes on Cancel', async () => {
     const user = setup({ milestones: [{ name: 'Launch', date: '2026-11-20' }] });
     await user.click(screen.getByRole('button', { name: 'Milestones' }));
-    await user.click(within(dialog()).getByRole('button', { name: 'Delete milestone Launch' }));
+    await user.click(within(dialog()).getByRole('button', { name: 'Delete Milestone Launch' }));
     await user.click(within(dialog()).getByRole('button', { name: 'Cancel' }));
     expect(milestones().map((m) => m.name)).toEqual(['Launch']);
     expect(useProjectStore.getState().past).toHaveLength(0);

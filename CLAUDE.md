@@ -120,6 +120,12 @@ docs/            Product and architecture docs.
 - Props types are declared as `type XProps = {...}` directly above the component.
 - Keep comments for _why_, not _what_. No commented-out code.
 - CSS: CSS Modules (`*.module.css`) with design tokens from `src/styles/tokens.css`.
+- UI text: **Title Case for labels** — buttons, headings, dialog titles, field / box / column
+  labels, placeholders, options, icon-button names and short counts ("Add Task", "Is Blocked
+  By", "5 Milestones · 3 Upcoming"). Articles, conjunctions and prepositions of up to three
+  letters (a, an, the, and, or, to, of, by, for, in, on…) stay lowercase unless first or last
+  ("Add a Description", "Add Subtask to …"). Sentences — help text, warnings, errors,
+  validation messages, explanatory tooltips — stay in sentence case. User data is never changed.
 
 ## Working in this repo with Claude Code
 

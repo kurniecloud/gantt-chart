@@ -164,7 +164,7 @@ export function Workspace() {
             <ProjectTotals summary={summary} />
             {/* The list has its own accessible name; this is the visible column heading. */}
             <div className={styles.cornerTitle} aria-hidden="true">
-              Task name
+              Task Name
             </div>
           </div>
           <div className={styles.timelineHeader}>

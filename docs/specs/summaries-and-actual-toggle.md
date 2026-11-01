@@ -2,15 +2,16 @@
 
 Status: done.
 
-## Decisions (agreed with the product owner, 2026-11-01; toggle style 2026-11-02)
+## Decisions (agreed with the product owner, 2026-11-01; toggle style, count and text case 2026-11-02)
 
-| Topic               | Decision                                                                                                                                                                                                                                               |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Total days          | **Project length**: weekdays from the earliest start to the latest finish (the same rule as a parent row's "(nD)"). Overlapping tasks don't add up. Planned and actual are measured alike.                                                             |
-| Task count          | **Top-level (main) tasks**, with or without subtasks; hover shows "5 main tasks, 10 edge tasks (without subtasks)" (2026-11-02). ~~Only tasks without subtasks~~ (first build, superseded). Rows inside collapsed parents still count.                 |
-| Summary layout      | **Two lines in the "Task name" corner: totals on top** (level with the month row), **"Task name" underneath** (level with the day row, right above the task names).                                                                                    |
-| Milestone summary   | **Text beside the Milestones button**, in the style of the critical-path count: "5 milestones · 3 upcoming".                                                                                                                                           |
-| Actual-dates toggle | ~~A checkbox "Actual dates"~~ (first build, superseded 2026-11-02). **A toggle button like Critical path** (icon + "Actual dates", `aria-pressed`), **just left of Critical path**, **on by default**, remembered **per browser** (like Daily/Weekly). |
+| Topic               | Decision                                                                                                                                                                                                                                                           |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Total days          | **Project length**: weekdays from the earliest start to the latest finish (the same rule as a parent row's "(nD)"). Overlapping tasks don't add up. Planned and actual are measured alike.                                                                         |
+| Task count          | **Top-level (main) tasks**, with or without subtasks; hover shows "5 main tasks, 10 edge tasks (without subtasks)" (2026-11-02). ~~Only tasks without subtasks~~ (first build, superseded). Rows inside collapsed parents still count.                             |
+| Summary layout      | **Two lines in the "Task name" corner: totals on top** (level with the month row), **"Task name" underneath** (level with the day row, right above the task names).                                                                                                |
+| Milestone summary   | **Text beside the Milestones button**, in the style of the critical-path count: "5 milestones · 3 upcoming".                                                                                                                                                       |
+| Actual-dates toggle | ~~A checkbox "Actual dates"~~ (first build, superseded 2026-11-02). **A toggle button like Critical path** (icon + "Actual dates", `aria-pressed`), **just left of Critical path**, **on by default**, remembered **per browser** (like Daily/Weekly).             |
+| Text case           | (2026-11-02) **Title Case for every label** app-wide; small words lowercase unless first/last; sentences unchanged. So the strings below read "5 Tasks · Planned 45D", "5 Milestones · 3 Upcoming", "No Milestones", "Actual Dates", "Critical Path", "Task Name". |
 
 ## Project summary (top-left corner)
 

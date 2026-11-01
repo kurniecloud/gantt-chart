@@ -15,16 +15,16 @@ const taskPanelRight = async (page: Page) =>
 
 /** Adds a task with dates picked from the calendar (both in November 2026). */
 async function addDatedTask(page: Page, name: string, startDay: number, endDay: number) {
-  await page.getByRole('button', { name: 'Add task', exact: true }).click();
-  await dialog(page).getByRole('textbox', { name: 'Task name' }).fill(name);
+  await page.getByRole('button', { name: 'Add Task', exact: true }).click();
+  await dialog(page).getByRole('textbox', { name: 'Task Name' }).fill(name);
   await dialog(page)
-    .getByRole('button', { name: /^Planned Start date/ })
+    .getByRole('button', { name: /^Planned Start Date/ })
     .click();
   await dialog(page)
     .locator(`[data-day="2026-11-${String(startDay).padStart(2, '0')}"] button`)
     .click();
   await dialog(page)
-    .getByRole('button', { name: /^Planned End date/ })
+    .getByRole('button', { name: /^Planned End Date/ })
     .click();
   await dialog(page)
     .locator(`[data-day="2026-11-${String(endDay).padStart(2, '0')}"] button`)
@@ -58,7 +58,7 @@ test('a dated task gets a bar that lines up with its dates', async ({ page }) =>
   expect(Math.round(barBox.width)).toBe(3 * 48);
 
   await bar.click();
-  await expect(dialog(page)).toHaveAccessibleName('Edit task');
+  await expect(dialog(page)).toHaveAccessibleName('Edit Task');
 });
 
 test('weekly view, Today, and scrolling into the past', async ({ page }) => {
@@ -91,23 +91,23 @@ test('weekly view, Today, and scrolling into the past', async ({ page }) => {
 test('task list and timeline scroll together vertically', async ({ page }) => {
   await page.goto('./');
   for (let i = 1; i <= 30; i++) {
-    await page.getByRole('button', { name: 'Add task', exact: true }).click();
-    await dialog(page).getByRole('textbox', { name: 'Task name' }).fill(`Task ${i}`);
-    await dialog(page).getByRole('textbox', { name: 'Task name' }).press('Enter');
+    await page.getByRole('button', { name: 'Add Task', exact: true }).click();
+    await dialog(page).getByRole('textbox', { name: 'Task Name' }).fill(`Task ${i}`);
+    await dialog(page).getByRole('textbox', { name: 'Task Name' }).press('Enter');
   }
   await page.getByRole('button', { name: 'Task 30', exact: true }).scrollIntoViewIfNeeded();
   const row = (await page.getByRole('button', { name: 'Task 30', exact: true }).boundingBox())!;
-  const header = (await page.getByText('Task name', { exact: true }).boundingBox())!;
+  const header = (await page.getByText('Task Name', { exact: true }).boundingBox())!;
   expect(row.y).toBeGreaterThan(header.y + header.height - 1); // not hidden under the header
-  await expect(page.getByText('Task name', { exact: true })).toBeInViewport(); // header stays pinned
+  await expect(page.getByText('Task Name', { exact: true })).toBeInViewport(); // header stays pinned
 });
 
 test('adding and editing tasks does not move the timeline sideways', async ({ page }) => {
   await page.goto('./');
   const before = await scroller(page).evaluate((el) => el.scrollLeft);
   for (const name of ['One', 'Two', 'Three']) {
-    await page.getByRole('button', { name: 'Add task', exact: true }).click();
-    await dialog(page).getByRole('textbox', { name: 'Task name' }).fill(name);
+    await page.getByRole('button', { name: 'Add Task', exact: true }).click();
+    await dialog(page).getByRole('textbox', { name: 'Task Name' }).fill(name);
     await dialog(page).getByRole('button', { name: 'Add', exact: true }).click();
     await expect(dialog(page)).toBeHidden();
   }

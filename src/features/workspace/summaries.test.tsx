@@ -40,7 +40,7 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe('project totals above "Task name"', () => {
+describe('project totals above "Task Name"', () => {
   const spec: Spec = {
     tasks: [
       { id: 'P', name: 'Website', collapsed: true },
@@ -59,21 +59,21 @@ describe('project totals above "Task name"', () => {
 
   it('counts top-level tasks and measures planned and actual length in weekdays', () => {
     setup(spec);
-    // Mon 2 → Fri 20 Nov = 15 weekdays; actual Tue 3 → today (Wed 4) = 2, still in progress.
-    expect(spokenTotals()).toBe('2 tasks Planned 15D Actual 2D');
-    expect(totals()).toHaveTextContent(/^2 tasks · Planned\s?Plan 15D · Actual 2D$/);
-    expect(screen.getByTitle('2 main tasks, 3 edge tasks (without subtasks)')).toBeVisible();
+    // Mon 2 → Fri 20 Nov = 15 Weekdays; actual Tue 3 → today (Wed 4) = 2, still in progress.
+    expect(spokenTotals()).toBe('2 Tasks Planned 15D Actual 2D');
+    expect(totals()).toHaveTextContent(/^2 Tasks · Planned\s?Plan 15D · Actual 2D$/);
+    expect(screen.getByTitle('2 Main Tasks, 3 Edge Tasks (Without Subtasks)')).toBeVisible();
     expect(
-      screen.getByTitle('Planned: Mon 2 Nov 2026 – Fri 20 Nov 2026 (15 weekdays)'),
+      screen.getByTitle('Planned: Mon 2 Nov 2026 – Fri 20 Nov 2026 (15 Weekdays)'),
     ).toBeVisible();
     expect(
-      screen.getByTitle('Actual: Tue 3 Nov 2026 – Wed 4 Nov 2026 (2 weekdays, in progress)'),
+      screen.getByTitle('Actual: Tue 3 Nov 2026 – Wed 4 Nov 2026 (2 Weekdays, In Progress)'),
     ).toBeVisible();
   });
 
   it('shows dashes when nothing is dated', () => {
     setup({ tasks: [{ id: 'A', name: 'Design' }] });
-    expect(spokenTotals()).toBe('1 task Planned — Actual —');
+    expect(spokenTotals()).toBe('1 Task Planned — Actual —');
   });
 
   it('updates after a change and after undo', () => {
@@ -97,17 +97,17 @@ describe('milestone summary beside the Milestones button', () => {
       ],
     });
     const summary = screen.getByTestId('milestone-summary');
-    expect(summary).toHaveTextContent('3 milestones · 2 upcoming');
+    expect(summary).toHaveTextContent('3 Milestones · 2 Upcoming');
     expect(summary).toHaveAttribute('title', 'Next: Beta — Thu 12 Nov 2026');
   });
 
   it('says when there are none', () => {
     setup();
-    expect(screen.getByTestId('milestone-summary')).toHaveTextContent('No milestones');
+    expect(screen.getByTestId('milestone-summary')).toHaveTextContent('No Milestones');
   });
 });
 
-describe('"Actual dates" toggle button', () => {
+describe('"Actual Dates" toggle button', () => {
   const spec: Spec = {
     tasks: [
       {
@@ -120,7 +120,7 @@ describe('"Actual dates" toggle button', () => {
       },
     ],
   };
-  const toggle = () => screen.getByRole('button', { name: 'Actual dates' });
+  const toggle = () => screen.getByRole('button', { name: 'Actual Dates' });
 
   it('is on by default and hides the actual lines when turned off', async () => {
     const { user } = setup(spec);
@@ -140,8 +140,8 @@ describe('"Actual dates" toggle button', () => {
     expect(localStorage.getItem('gantt-chart:show-actual-dates')).toBe('shown');
   });
 
-  it('sits just left of the Critical path button', () => {
+  it('sits just left of the Critical Path button', () => {
     setup(spec);
-    expect(toggle().nextElementSibling).toBe(screen.getByRole('button', { name: 'Critical path' }));
+    expect(toggle().nextElementSibling).toBe(screen.getByRole('button', { name: 'Critical Path' }));
   });
 });

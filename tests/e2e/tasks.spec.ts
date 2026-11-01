@@ -7,28 +7,28 @@ const dialog = (page: Page) => page.getByRole('dialog');
 
 async function addTask(page: Page, name: string, parent?: string) {
   await page
-    .getByRole('button', { name: parent ? `Add subtask to ${parent}` : 'Add task', exact: true })
+    .getByRole('button', { name: parent ? `Add Subtask to ${parent}` : 'Add Task', exact: true })
     .click();
-  await dialog(page).getByRole('textbox', { name: 'Task name' }).fill(name);
+  await dialog(page).getByRole('textbox', { name: 'Task Name' }).fill(name);
   await dialog(page).getByRole('button', { name: 'Add', exact: true }).click();
   await expect(dialog(page)).toBeHidden();
 }
 
 test('first launch shows an empty, untitled project', async ({ page }) => {
   await page.goto('./');
-  await expect(page.getByRole('textbox', { name: 'Project title' })).toHaveValue(
-    'Untitled project',
+  await expect(page.getByRole('textbox', { name: 'Project Title' })).toHaveValue(
+    'Untitled Project',
   );
-  await expect(page.getByRole('textbox', { name: 'Project description' })).toHaveValue('');
+  await expect(page.getByRole('textbox', { name: 'Project Description' })).toHaveValue('');
   await expect(tasks(page).getByRole('listitem')).toHaveCount(1);
-  await expect(page.getByRole('button', { name: 'Add task' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Add Task' })).toBeVisible();
 });
 
 test('builds a nested plan that survives a reload', async ({ page }) => {
   await page.goto('./');
-  await page.getByRole('textbox', { name: 'Project title' }).fill('Website relaunch');
-  await page.getByRole('textbox', { name: 'Project description' }).fill('Q4 marketing site');
-  await page.getByRole('textbox', { name: 'Project description' }).press('Enter');
+  await page.getByRole('textbox', { name: 'Project Title' }).fill('Website relaunch');
+  await page.getByRole('textbox', { name: 'Project Description' }).fill('Q4 marketing site');
+  await page.getByRole('textbox', { name: 'Project Description' }).press('Enter');
 
   await addTask(page, 'Website');
   await addTask(page, 'Design', 'Website');
@@ -44,10 +44,10 @@ test('builds a nested plan that survives a reload', async ({ page }) => {
 
   await page.waitForTimeout(800); // autosave is debounced
   await page.reload();
-  await expect(page.getByRole('textbox', { name: 'Project title' })).toHaveValue(
+  await expect(page.getByRole('textbox', { name: 'Project Title' })).toHaveValue(
     'Website relaunch',
   );
-  await expect(page.getByRole('textbox', { name: 'Project description' })).toHaveValue(
+  await expect(page.getByRole('textbox', { name: 'Project Description' })).toHaveValue(
     'Q4 marketing site',
   );
   await expect(taskName(page, 'Design')).toBeVisible();
@@ -73,10 +73,10 @@ test('weekends cannot be picked, and edits are saved', async ({ page }) => {
   await page.goto('./');
   await addTask(page, 'Build');
   await taskName(page, 'Build').click();
-  await expect(dialog(page)).toHaveAccessibleName('Edit task');
+  await expect(dialog(page)).toHaveAccessibleName('Edit Task');
 
   await dialog(page)
-    .getByRole('button', { name: /^Planned Start date/ })
+    .getByRole('button', { name: /^Planned Start Date/ })
     .click();
   const disabledDays = dialog(page).locator('[data-day][data-disabled]');
   expect(await disabledDays.count()).toBeGreaterThanOrEqual(8); // every Sat & Sun shown
@@ -85,8 +85,8 @@ test('weekends cannot be picked, and edits are saved', async ({ page }) => {
     expect([0, 6]).toContain(weekday);
   }
   await dialog(page).locator('[data-day]:not([data-disabled]) button').first().click();
-  await expect(dialog(page).getByRole('button', { name: /^Planned Start date/ })).not.toContainText(
-    'No date',
+  await expect(dialog(page).getByRole('button', { name: /^Planned Start Date/ })).not.toContainText(
+    'No Date',
   );
 
   await dialog(page).getByText('Urgent').click();

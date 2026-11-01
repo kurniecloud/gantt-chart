@@ -32,8 +32,8 @@ function TitleField({ value, onCommit }: TitleFieldProps) {
   return (
     <input
       className={styles.title}
-      aria-label="Project title"
-      placeholder="Untitled project"
+      aria-label="Project Title"
+      placeholder="Untitled Project"
       value={draft}
       onChange={(e) => setDraft(e.target.value)}
       onBlur={commit}
@@ -64,8 +64,8 @@ function DescriptionField({ value, onCommit }: TitleFieldProps) {
     <textarea
       ref={ref}
       className={styles.description}
-      aria-label="Project description"
-      placeholder="Add a description"
+      aria-label="Project Description"
+      placeholder="Add a Description"
       rows={1}
       value={draft}
       onChange={(e) => setDraft(e.target.value)}
@@ -115,7 +115,7 @@ export function ProjectHeader() {
         <span className={styles.divider} aria-hidden="true" />
         <IconButton
           label="Undo"
-          title={undoLabel ? `Undo ${undoLabel.toLowerCase()} (${mod}Z)` : 'Nothing to undo'}
+          title={undoLabel ? `Undo ${undoLabel} (${mod}Z)` : 'Nothing to Undo'}
           aria-keyshortcuts="Control+Z Meta+Z"
           disabled={!canUndo}
           onClick={undo}
@@ -124,7 +124,7 @@ export function ProjectHeader() {
         </IconButton>
         <IconButton
           label="Redo"
-          title={redoLabel ? `Redo ${redoLabel.toLowerCase()} (${mod}Shift+Z)` : 'Nothing to redo'}
+          title={redoLabel ? `Redo ${redoLabel} (${mod}Shift+Z)` : 'Nothing to Redo'}
           aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z"
           disabled={!canRedo}
           onClick={redo}

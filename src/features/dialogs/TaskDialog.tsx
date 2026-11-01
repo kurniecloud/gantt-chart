@@ -65,7 +65,7 @@ export function TaskDialog(props: TaskDialogProps) {
   const nameErrorId = useId();
 
   const title =
-    props.mode === 'edit' ? 'Edit task' : parent ? `Add subtask to “${parent.name}”` : 'Add task';
+    props.mode === 'edit' ? 'Edit Task' : parent ? `Add Subtask to “${parent.name}”` : 'Add Task';
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
@@ -90,7 +90,7 @@ export function TaskDialog(props: TaskDialogProps) {
       <form className={styles.form} onSubmit={submit} noValidate>
         <div className={styles.field}>
           <label htmlFor={nameId} className={styles.label}>
-            Task name
+            Task Name
           </label>
           <input
             id={nameId}
@@ -116,13 +116,13 @@ export function TaskDialog(props: TaskDialogProps) {
             {derivedSpan ? (
               <p className={styles.derived}>
                 {formatDate(derivedSpan.start)} – {formatDate(derivedSpan.finish)}
-                <span className={styles.hint}>Calculated from subtasks</span>
+                <span className={styles.hint}>Calculated from Subtasks</span>
               </p>
             ) : (
               <div className={styles.dates}>
                 <DatePicker
                   context="Planned"
-                  label="Start date"
+                  label="Start Date"
                   value={start}
                   error={errors.start}
                   open={openPicker === 'start'}
@@ -131,7 +131,7 @@ export function TaskDialog(props: TaskDialogProps) {
                 />
                 <DatePicker
                   context="Planned"
-                  label="End date"
+                  label="End Date"
                   value={finish}
                   minDate={start}
                   error={errors.finish}
@@ -148,13 +148,13 @@ export function TaskDialog(props: TaskDialogProps) {
             {derivedActual ? (
               <p className={styles.derived}>
                 {formatDate(derivedActual.start)} – {formatDate(derivedActual.finish)}
-                <span className={styles.hint}>Calculated from subtasks</span>
+                <span className={styles.hint}>Calculated from Subtasks</span>
               </p>
             ) : (
               <div className={styles.dates}>
                 <DatePicker
                   context="Actual"
-                  label="Start date"
+                  label="Start Date"
                   value={actualStart}
                   openMonth={start}
                   error={errors.actualStart}
@@ -168,7 +168,7 @@ export function TaskDialog(props: TaskDialogProps) {
                 />
                 <DatePicker
                   context="Actual"
-                  label="End date"
+                  label="End Date"
                   value={actualFinish}
                   minDate={actualStart}
                   openMonth={finish ?? start}
@@ -186,7 +186,7 @@ export function TaskDialog(props: TaskDialogProps) {
         </div>
 
         <LinkField
-          label="Is blocked by"
+          label="Is Blocked By"
           hint="This task can only start once these have finished."
           project={project}
           candidateIds={candidates.blockedBy}
@@ -194,7 +194,7 @@ export function TaskDialog(props: TaskDialogProps) {
           onChange={setBlockedBy}
         />
         <LinkField
-          label="Is blocking"
+          label="Is Blocking"
           hint="These tasks can only start once this one has finished."
           project={project}
           candidateIds={candidates.blocking}

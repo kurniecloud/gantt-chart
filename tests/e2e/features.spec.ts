@@ -12,21 +12,21 @@ const timeline = (page: Page) => page.getByRole('group', { name: 'Timeline' });
 const day = (page: Page, iso: string) => dialog(page).locator(`[data-day="${iso}"] button`);
 
 async function addTask(page: Page, name: string, dates?: [string, string], blockedBy?: string) {
-  await page.getByRole('button', { name: 'Add task', exact: true }).click();
-  await dialog(page).getByRole('textbox', { name: 'Task name' }).fill(name);
+  await page.getByRole('button', { name: 'Add Task', exact: true }).click();
+  await dialog(page).getByRole('textbox', { name: 'Task Name' }).fill(name);
   if (dates) {
     await dialog(page)
-      .getByRole('button', { name: /^Planned Start date/ })
+      .getByRole('button', { name: /^Planned Start Date/ })
       .click();
     await day(page, dates[0]).click();
     await dialog(page)
-      .getByRole('button', { name: /^Planned End date/ })
+      .getByRole('button', { name: /^Planned End Date/ })
       .click();
     await day(page, dates[1]).click();
   }
   if (blockedBy) {
     await dialog(page)
-      .getByRole('combobox', { name: 'Is blocked by' })
+      .getByRole('combobox', { name: 'Is Blocked By' })
       .selectOption({ label: blockedBy });
   }
   await dialog(page).getByRole('button', { name: 'Add', exact: true }).click();
@@ -34,8 +34,8 @@ async function addTask(page: Page, name: string, dates?: [string, string], block
 }
 
 test('export downloads the project and import brings it back', async ({ page }) => {
-  await page.getByRole('textbox', { name: 'Project title' }).fill('Website relaunch');
-  await page.getByRole('textbox', { name: 'Project title' }).press('Enter');
+  await page.getByRole('textbox', { name: 'Project Title' }).fill('Website relaunch');
+  await page.getByRole('textbox', { name: 'Project Title' }).press('Enter');
   await addTask(page, 'Design', ['2026-11-04', '2026-11-06']);
 
   const [download] = await Promise.all([
@@ -48,15 +48,15 @@ test('export downloads the project and import brings it back', async ({ page }) 
   expect(file.project.name).toBe('Website relaunch');
 
   // Change everything, then import the saved file over it.
-  await page.getByRole('textbox', { name: 'Project title' }).fill('Something else');
-  await page.getByRole('textbox', { name: 'Project title' }).press('Enter');
+  await page.getByRole('textbox', { name: 'Project Title' }).fill('Something else');
+  await page.getByRole('textbox', { name: 'Project Title' }).press('Enter');
   await page.getByRole('button', { name: 'Delete Design' }).click();
   await dialog(page).getByRole('button', { name: 'Delete' }).click();
 
-  await page.getByLabel('Project file to import').setInputFiles(path);
+  await page.getByLabel('Project File to Import').setInputFiles(path);
   await expect(dialog(page)).toHaveAccessibleName(/^Import “.*”\?$/);
   await dialog(page).getByRole('button', { name: 'Import' }).click();
-  await expect(page.getByRole('textbox', { name: 'Project title' })).toHaveValue(
+  await expect(page.getByRole('textbox', { name: 'Project Title' })).toHaveValue(
     'Website relaunch',
   );
   await expect(page.getByRole('button', { name: 'Design', exact: true })).toBeVisible();
@@ -65,8 +65,8 @@ test('export downloads the project and import brings it back', async ({ page }) 
 
 test('milestones are managed in a dialog and shown in green', async ({ page }) => {
   await page.getByRole('button', { name: 'Milestones' }).click();
-  await dialog(page).getByRole('button', { name: 'Add milestone' }).click();
-  await dialog(page).getByRole('textbox', { name: 'Milestone name, row 1' }).fill('Sign-off');
+  await dialog(page).getByRole('button', { name: 'Add Milestone' }).click();
+  await dialog(page).getByRole('textbox', { name: 'Milestone Name, Row 1' }).fill('Sign-off');
   await dialog(page)
     .getByRole('button', { name: /^Date for Sign-off/ })
     .click();
@@ -86,8 +86,8 @@ test('milestones are managed in a dialog and shown in green', async ({ page }) =
 
 test('a milestone scrolled behind the task panel does not show over it', async ({ page }) => {
   await page.getByRole('button', { name: 'Milestones' }).click();
-  await dialog(page).getByRole('button', { name: 'Add milestone' }).click();
-  await dialog(page).getByRole('textbox', { name: 'Milestone name, row 1' }).fill('Kick-off');
+  await dialog(page).getByRole('button', { name: 'Add Milestone' }).click();
+  await dialog(page).getByRole('textbox', { name: 'Milestone Name, Row 1' }).fill('Kick-off');
   await dialog(page)
     .getByRole('button', { name: /^Date for Kick-off/ })
     .click();
@@ -120,8 +120,8 @@ test('critical path follows dependencies and draws a red line', async ({ page })
   await addTask(page, 'Build', ['2026-11-09', '2026-11-10'], 'Design');
   await addTask(page, 'Docs', ['2026-11-04', '2026-11-05']);
 
-  await page.getByRole('button', { name: 'Critical path' }).click();
-  await expect(page.getByText('2 critical tasks')).toBeVisible();
+  await page.getByRole('button', { name: 'Critical Path' }).click();
+  await expect(page.getByText('2 Critical Tasks')).toBeVisible();
 
   const design = timeline(page).getByRole('button', { name: /^Design:.*Critical$/ });
   await expect(design).toBeVisible();
@@ -179,7 +179,7 @@ test('blocking links are drawn as arrows from bar end to bar start', async ({ pa
     .getByRole('button', { name: /^Build:/ })
     .click();
   await dialog(page)
-    .getByRole('button', { name: /^Planned Start date/ })
+    .getByRole('button', { name: /^Planned Start Date/ })
     .click();
   await day(page, '2026-11-05').click();
   await dialog(page).getByRole('button', { name: 'Save' }).click();

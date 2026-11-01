@@ -49,7 +49,7 @@ export function addTask(
   links: TaskLinks = {},
 ): Command {
   return {
-    label: parentId ? 'Add subtask' : 'Add task',
+    label: parentId ? 'Add Subtask' : 'Add Task',
     apply: (project) => {
       if (parentId !== null && !project.tasks[parentId]) return;
       const index = insertionIndexForChild(project, parentId);
@@ -67,7 +67,7 @@ export function addTask(
  */
 export function updateTask(id: string, fields: TaskFields, links: TaskLinks = {}): Command {
   return {
-    label: 'Edit task',
+    label: 'Edit Task',
     apply: (project) => {
       const task = project.tasks[id];
       if (!task) return;
@@ -90,7 +90,7 @@ export function updateTask(id: string, fields: TaskFields, links: TaskLinks = {}
 /** Deletes the task, all of its subtasks, and any links or assignments that point at them. */
 export function deleteTask(id: string): Command {
   return {
-    label: 'Delete task',
+    label: 'Delete Task',
     apply: (project) => {
       if (!project.tasks[id]) return;
       const doomed = new Set([id, ...descendantIds(project, id)]);
@@ -114,7 +114,7 @@ export function deleteTask(id: string): Command {
  */
 export function moveTask(taskId: string, placement: DropPlacement): Command {
   return {
-    label: 'Move task',
+    label: 'Move Task',
     apply: (project) => {
       const plan = planMove(project, taskId, placement);
       if (!plan.ok) return;
@@ -134,7 +134,7 @@ export function moveTask(taskId: string, placement: DropPlacement): Command {
  */
 export function shiftTaskDates(id: string, mode: DragMode, delta: number): Command {
   return {
-    label: mode === 'move' ? 'Move task dates' : 'Change task dates',
+    label: mode === 'move' ? 'Move Task Dates' : 'Change Task Dates',
     apply: (project) => {
       const task = project.tasks[id];
       const span = task && ownSpan(task);

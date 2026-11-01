@@ -18,9 +18,9 @@ const summary = (mainTaskCount: number, edgeTaskCount: number): ProjectSummary =
 
 describe('task count tooltip', () => {
   it.each([
-    [summary(5, 10), '5 main tasks, 10 edge tasks (without subtasks)'],
-    [summary(1, 1), '1 main task, 1 edge task (without subtasks)'],
-    [summary(0, 0), '0 main tasks, 0 edge tasks (without subtasks)'],
+    [summary(5, 10), '5 Main Tasks, 10 Edge Tasks (Without Subtasks)'],
+    [summary(1, 1), '1 Main Task, 1 Edge Task (Without Subtasks)'],
+    [summary(0, 0), '0 Main Tasks, 0 Edge Tasks (Without Subtasks)'],
   ])('%j → %s', (input, expected) => {
     expect(taskCountTitle(input)).toBe(expected);
   });
@@ -36,13 +36,13 @@ describe('length labels', () => {
 
   it('spells out the dates in the tooltip', () => {
     expect(lengthTitle('Planned', length)).toBe(
-      'Planned: Mon 2 Nov 2026 – Fri 1 Jan 2027 (45 weekdays)',
+      'Planned: Mon 2 Nov 2026 – Fri 1 Jan 2027 (45 Weekdays)',
     );
     expect(
       lengthTitle('Actual', { start: '2026-11-04', finish: '2026-11-04', days: 1 }, true),
-    ).toBe('Actual: Wed 4 Nov 2026 (1 weekday, in progress)');
-    expect(lengthTitle('Planned', null)).toBe('Planned: no dates yet');
-    expect(lengthTitle('Actual', null)).toBe('Actual: no actual dates yet');
+    ).toBe('Actual: Wed 4 Nov 2026 (1 Weekday, In Progress)');
+    expect(lengthTitle('Planned', null)).toBe('Planned: No Dates Yet');
+    expect(lengthTitle('Actual', null)).toBe('Actual: No Actual Dates Yet');
   });
 });
 
@@ -50,10 +50,10 @@ describe('milestone summary', () => {
   const beta = { id: 'b', name: 'Beta', date: '2026-11-12' };
 
   it.each([
-    [{ total: 5, upcoming: 3, next: beta }, '5 milestones · 3 upcoming'],
-    [{ total: 1, upcoming: 1, next: beta }, '1 milestone · 1 upcoming'],
-    [{ total: 3, upcoming: 0, next: null }, '3 milestones · all passed'],
-    [{ total: 0, upcoming: 0, next: null }, 'No milestones'],
+    [{ total: 5, upcoming: 3, next: beta }, '5 Milestones · 3 Upcoming'],
+    [{ total: 1, upcoming: 1, next: beta }, '1 Milestone · 1 Upcoming'],
+    [{ total: 3, upcoming: 0, next: null }, '3 Milestones · All Passed'],
+    [{ total: 0, upcoming: 0, next: null }, 'No Milestones'],
   ])('%j → %s', (input, expected) => {
     expect(milestoneSummaryLabel(input)).toBe(expected);
   });

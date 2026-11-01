@@ -180,7 +180,7 @@ export function TaskList({
               onClick={addTask}
             >
               <IconButton
-                label="Add task"
+                label="Add Task"
                 className={styles.addButton}
                 data-row-focus=""
                 onClick={(e) => {

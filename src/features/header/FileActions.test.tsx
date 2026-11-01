@@ -34,7 +34,7 @@ function setup() {
   return user;
 }
 
-const fileInput = () => screen.getByLabelText('Project file to import');
+const fileInput = () => screen.getByLabelText('Project File to Import');
 const jsonFile = (text: string, name = 'plan.gantt.json') =>
   new File([text], name, { type: 'application/json' });
 
@@ -87,7 +87,7 @@ describe('import', () => {
     expect(project.id).toBe(before.id); // overwrites the open project
     expect(project.taskOrder).toEqual(['P', 'A']);
     expect(project.milestones.map((m) => m.name)).toEqual(['Sign-off']);
-    expect(screen.getByRole('textbox', { name: 'Project title' })).toHaveValue('Website relaunch');
+    expect(screen.getByRole('textbox', { name: 'Project Title' })).toHaveValue('Website relaunch');
 
     await user.click(screen.getByRole('button', { name: 'Undo' }));
     expect(useProjectStore.getState().project).toEqual(before);
@@ -103,7 +103,7 @@ describe('import', () => {
   it('explains why a file can’t be imported', async () => {
     const user = setup();
     await user.upload(fileInput(), jsonFile('{"hello": "world"}', 'notes.json'));
-    const error = screen.getByRole('dialog', { name: 'Couldn’t import “notes.json”' });
+    const error = screen.getByRole('dialog', { name: 'Couldn’t Import “notes.json”' });
     expect(error).toHaveTextContent("This isn't a Gantt Chart project file.");
     expect(error).toHaveTextContent('Nothing was changed.');
     await user.click(within(error).getByRole('button', { name: 'OK' }));

@@ -12,7 +12,7 @@ type MilestonesToolProps = {
   today: ISODate;
 };
 
-/** The Milestones button and "5 milestones · 3 upcoming" beside it. */
+/** The Milestones button and "5 Milestones · 3 Upcoming" beside it. */
 export function MilestonesTool({ today }: MilestonesToolProps) {
   const milestones = useProjectStore((s) => s.project.milestones);
   const openDialog = useUiStore((s) => s.openDialog);

@@ -60,7 +60,7 @@ type ImportErrorDialogProps = {
 
 export function ImportErrorDialog({ fileName, message, onClose }: ImportErrorDialogProps) {
   return (
-    <Dialog title={`Couldn’t import “${fileName}”`} onClose={onClose}>
+    <Dialog title={`Couldn’t Import “${fileName}”`} onClose={onClose}>
       <p className={styles.derived}>
         {message}
         <span className={styles.hint}>Nothing was changed.</span>

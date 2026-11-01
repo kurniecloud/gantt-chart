@@ -30,12 +30,12 @@ const dialog = () => screen.getByRole('dialog');
 
 describe('first view', () => {
   it('shows the project title, an empty task list and the add row', () => {
-    setup({ name: 'Untitled project' });
-    expect(screen.getByRole('textbox', { name: 'Project title' })).toHaveValue('Untitled project');
-    expect(screen.getByRole('textbox', { name: 'Project description' })).toHaveValue('');
-    expect(screen.getByText('Task name')).toBeInTheDocument();
+    setup({ name: 'Untitled Project' });
+    expect(screen.getByRole('textbox', { name: 'Project Title' })).toHaveValue('Untitled Project');
+    expect(screen.getByRole('textbox', { name: 'Project Description' })).toHaveValue('');
+    expect(screen.getByText('Task Name')).toBeInTheDocument();
     expect(taskNames()).toEqual([]);
-    expect(screen.getByRole('button', { name: 'Add task' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add Task' })).toBeInTheDocument();
   });
 
   it('warns when browser storage is unavailable', () => {
@@ -48,7 +48,7 @@ describe('first view', () => {
 describe('project header', () => {
   it('edits the title on Enter and refuses a blank title', async () => {
     const user = setup();
-    const title = () => screen.getByRole('textbox', { name: 'Project title' });
+    const title = () => screen.getByRole('textbox', { name: 'Project Title' });
     await user.clear(title());
     await user.type(title(), 'Website relaunch{Enter}');
     expect(useProjectStore.getState().project.name).toBe('Website relaunch');
@@ -60,7 +60,7 @@ describe('project header', () => {
 
   it('edits the description; Shift+Enter adds a line and Enter saves', async () => {
     const user = setup();
-    const description = () => screen.getByRole('textbox', { name: 'Project description' });
+    const description = () => screen.getByRole('textbox', { name: 'Project Description' });
     await user.click(description());
     await user.type(description(), 'Line one{Shift>}{Enter}{/Shift}Line two{Enter}');
     expect(useProjectStore.getState().project.description).toBe('Line one\nLine two');
@@ -69,7 +69,7 @@ describe('project header', () => {
 
   it('undoes and redoes header edits with the icon buttons', async () => {
     const user = setup();
-    const title = () => screen.getByRole('textbox', { name: 'Project title' });
+    const title = () => screen.getByRole('textbox', { name: 'Project Title' });
     await user.clear(title());
     await user.type(title(), 'Renamed{Enter}');
     await user.click(screen.getByRole('button', { name: 'Undo' }));
@@ -82,19 +82,19 @@ describe('project header', () => {
 describe('adding tasks', () => {
   it('requires a name, then adds the task above the add row', async () => {
     const user = setup();
-    await user.click(screen.getByRole('button', { name: 'Add task' }));
-    expect(dialog()).toHaveAccessibleName('Add task');
-    expect(within(dialog()).getByRole('textbox', { name: 'Task name' })).toHaveFocus();
+    await user.click(screen.getByRole('button', { name: 'Add Task' }));
+    expect(dialog()).toHaveAccessibleName('Add Task');
+    expect(within(dialog()).getByRole('textbox', { name: 'Task Name' })).toHaveFocus();
 
     await user.click(within(dialog()).getByRole('button', { name: 'Add' }));
     expect(within(dialog()).getByText('Enter a task name')).toBeInTheDocument();
 
-    await user.type(within(dialog()).getByRole('textbox', { name: 'Task name' }), 'Design');
+    await user.type(within(dialog()).getByRole('textbox', { name: 'Task Name' }), 'Design');
     await user.click(within(dialog()).getByRole('button', { name: 'Add' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(taskNames()).toEqual(['Design']);
     expect(within(taskList()).getAllByRole('listitem').at(-1)).toContainElement(
-      screen.getByRole('button', { name: 'Add task' }),
+      screen.getByRole('button', { name: 'Add Task' }),
     );
   });
 
@@ -107,10 +107,10 @@ describe('adding tasks', () => {
     });
 
     const addSubtask = async (parent: string, name: string) => {
-      await user.click(screen.getByRole('button', { name: `Add subtask to ${parent}` }));
-      expect(dialog()).toHaveAccessibleName(`Add subtask to “${parent}”`);
+      await user.click(screen.getByRole('button', { name: `Add Subtask to ${parent}` }));
+      expect(dialog()).toHaveAccessibleName(`Add Subtask to “${parent}”`);
       await user.type(
-        within(dialog()).getByRole('textbox', { name: 'Task name' }),
+        within(dialog()).getByRole('textbox', { name: 'Task Name' }),
         `${name}{Enter}`,
       );
     };
@@ -127,12 +127,12 @@ describe('adding tasks', () => {
 
   it('closes on Cancel or Esc without adding anything', async () => {
     const user = setup();
-    await user.click(screen.getByRole('button', { name: 'Add task' }));
-    await user.type(within(dialog()).getByRole('textbox', { name: 'Task name' }), 'Draft');
+    await user.click(screen.getByRole('button', { name: 'Add Task' }));
+    await user.type(within(dialog()).getByRole('textbox', { name: 'Task Name' }), 'Draft');
     await user.click(within(dialog()).getByRole('button', { name: 'Cancel' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Add task' }));
+    await user.click(screen.getByRole('button', { name: 'Add Task' }));
     await user.keyboard('{Escape}');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(taskNames()).toEqual([]);
@@ -140,10 +140,10 @@ describe('adding tasks', () => {
 
   it('saves dates picked from the calendar and the chosen priority', async () => {
     const user = setup();
-    await user.click(screen.getByRole('button', { name: 'Add task' }));
-    await user.type(within(dialog()).getByRole('textbox', { name: 'Task name' }), 'Build');
+    await user.click(screen.getByRole('button', { name: 'Add Task' }));
+    await user.type(within(dialog()).getByRole('textbox', { name: 'Task Name' }), 'Build');
     await user.click(within(dialog()).getByRole('radio', { name: 'High' }));
-    await user.click(within(dialog()).getByRole('button', { name: /^Planned Start date/ }));
+    await user.click(within(dialog()).getByRole('button', { name: /^Planned Start Date/ }));
     expect(within(dialog()).getByRole('grid')).toBeInTheDocument();
     await user.keyboard('{Escape}'); // closes the calendar, not the dialog
     expect(dialog()).toBeInTheDocument();
@@ -165,7 +165,7 @@ describe('date pickers', () => {
 
   it('greys out weekends', async () => {
     const user = await editDated();
-    await user.click(within(dialog()).getByRole('button', { name: /^Planned Start date/ }));
+    await user.click(within(dialog()).getByRole('button', { name: /^Planned Start Date/ }));
     const day = (label: RegExp) => within(dialog()).getByRole('button', { name: label });
     expect(day(/Saturday, November 7th, 2026/)).toBeDisabled();
     expect(day(/Sunday, November 8th, 2026/)).toBeDisabled();
@@ -174,7 +174,7 @@ describe('date pickers', () => {
 
   it('greys out end dates before the start date', async () => {
     const user = await editDated();
-    await user.click(within(dialog()).getByRole('button', { name: /^Planned End date/ }));
+    await user.click(within(dialog()).getByRole('button', { name: /^Planned End Date/ }));
     const day = (label: RegExp) => within(dialog()).getByRole('button', { name: label });
     expect(day(/Tuesday, November 3rd, 2026/)).toBeDisabled();
     expect(day(/Wednesday, November 4th, 2026/)).toBeEnabled();
@@ -182,12 +182,12 @@ describe('date pickers', () => {
 
   it('picks and clears dates', async () => {
     const user = await editDated();
-    await user.click(within(dialog()).getByRole('button', { name: /^Planned End date/ }));
+    await user.click(within(dialog()).getByRole('button', { name: /^Planned End Date/ }));
     await user.click(within(dialog()).getByRole('button', { name: /Friday, November 13th, 2026/ }));
-    expect(within(dialog()).getByRole('button', { name: /^Planned End date/ })).toHaveTextContent(
+    expect(within(dialog()).getByRole('button', { name: /^Planned End Date/ })).toHaveTextContent(
       'Fri 13 Nov 2026',
     );
-    await user.click(within(dialog()).getByRole('button', { name: 'Clear planned start date' }));
+    await user.click(within(dialog()).getByRole('button', { name: 'Clear Planned Start Date' }));
     await user.click(within(dialog()).getByRole('button', { name: 'Save' }));
     const task = useProjectStore.getState().project.tasks.A;
     expect(task).toMatchObject({ finish: '2026-11-13' });
@@ -201,14 +201,14 @@ describe('editing tasks', () => {
       tasks: [{ id: 'A', name: 'Design', start: '2026-11-02', priority: 'urgent' }],
     });
     await user.click(rowOf('Design'));
-    expect(dialog()).toHaveAccessibleName('Edit task');
-    expect(within(dialog()).getByRole('textbox', { name: 'Task name' })).toHaveValue('Design');
-    expect(within(dialog()).getByRole('button', { name: /^Planned Start date/ })).toHaveTextContent(
+    expect(dialog()).toHaveAccessibleName('Edit Task');
+    expect(within(dialog()).getByRole('textbox', { name: 'Task Name' })).toHaveValue('Design');
+    expect(within(dialog()).getByRole('button', { name: /^Planned Start Date/ })).toHaveTextContent(
       'Mon 2 Nov 2026',
     );
     expect(within(dialog()).getByRole('radio', { name: 'Urgent' })).toBeChecked();
 
-    const name = within(dialog()).getByRole('textbox', { name: 'Task name' });
+    const name = within(dialog()).getByRole('textbox', { name: 'Task Name' });
     await user.clear(name);
     await user.type(name, 'UI design');
     await user.click(within(dialog()).getByRole('button', { name: 'Save' }));
@@ -224,9 +224,9 @@ describe('editing tasks', () => {
     });
     await user.click(screen.getByRole('button', { name: 'Website' }));
     expect(dialog()).toHaveTextContent('Mon 2 Nov 2026 – Fri 13 Nov 2026');
-    expect(dialog()).toHaveTextContent('Calculated from subtasks');
+    expect(dialog()).toHaveTextContent('Calculated from Subtasks');
     expect(
-      within(dialog()).queryByRole('button', { name: /^Planned Start date/ }),
+      within(dialog()).queryByRole('button', { name: /^Planned Start Date/ }),
     ).not.toBeInTheDocument();
   });
 });
@@ -297,7 +297,7 @@ describe('expand / collapse', () => {
     await user.keyboard('{ArrowLeft}'); // already collapsed → go to parent
     expect(screen.getByRole('button', { name: 'Website' })).toHaveFocus();
     await user.keyboard('{End}');
-    expect(screen.getByRole('button', { name: 'Add task' })).toHaveFocus();
+    expect(screen.getByRole('button', { name: 'Add Task' })).toHaveFocus();
   });
 });
 
@@ -311,7 +311,7 @@ describe('blocking links', () => {
       .sort();
   const field = (label: string) => within(dialog()).getByRole('combobox', { name: label });
   const chips = (label: string) =>
-    within(within(dialog()).getByRole('list', { name: `${label} (chosen)` }))
+    within(within(dialog()).getByRole('list', { name: `${label} (Chosen)` }))
       .getAllByRole('listitem')
       .map((li) => li.textContent);
 
@@ -323,16 +323,16 @@ describe('blocking links', () => {
         { id: 'C', name: 'Launch' },
       ],
     });
-    await user.click(screen.getByRole('button', { name: 'Add task' }));
-    await user.type(within(dialog()).getByRole('textbox', { name: 'Task name' }), 'Review');
-    await user.selectOptions(field('Is blocked by'), 'Design');
-    await user.selectOptions(field('Is blocked by'), 'Build');
+    await user.click(screen.getByRole('button', { name: 'Add Task' }));
+    await user.type(within(dialog()).getByRole('textbox', { name: 'Task Name' }), 'Review');
+    await user.selectOptions(field('Is Blocked By'), 'Design');
+    await user.selectOptions(field('Is Blocked By'), 'Build');
     await user.click(
-      within(dialog()).getByRole('button', { name: 'Remove Build from “Is blocked by”' }),
+      within(dialog()).getByRole('button', { name: 'Remove Build from “Is Blocked By”' }),
     );
-    await user.selectOptions(field('Is blocking'), 'Launch');
-    expect(chips('Is blocked by')).toEqual(['Design']);
-    expect(chips('Is blocking')).toEqual(['Launch']);
+    await user.selectOptions(field('Is Blocking'), 'Launch');
+    expect(chips('Is Blocked By')).toEqual(['Design']);
+    expect(chips('Is Blocking')).toEqual(['Launch']);
     await user.click(within(dialog()).getByRole('button', { name: 'Add' }));
 
     expect(links()).toEqual(['Design → Review', 'Review → Launch']);
@@ -347,22 +347,22 @@ describe('blocking links', () => {
       ],
     });
     await user.click(screen.getByRole('button', { name: 'Build' }));
-    expect(chips('Is blocked by')).toEqual(['Design']);
-    expect(chips('Is blocking')).toEqual(['Launch']);
+    expect(chips('Is Blocked By')).toEqual(['Design']);
+    expect(chips('Is Blocking')).toEqual(['Launch']);
 
     // Design is upstream and Launch downstream: neither may appear on the other side.
     const options = (label: string) =>
       within(field(label))
         .getAllByRole('option')
         .map((o) => o.textContent);
-    expect(options('Is blocked by')).toEqual(['No tasks to choose from']);
-    expect(options('Is blocking')).toEqual(['No tasks to choose from']);
+    expect(options('Is Blocked By')).toEqual(['No Tasks to Choose From']);
+    expect(options('Is Blocking')).toEqual(['No Tasks to Choose From']);
 
     // Dropping the link to Launch frees it up for the other side — and vice versa.
     await user.click(
-      within(dialog()).getByRole('button', { name: 'Remove Launch from “Is blocking”' }),
+      within(dialog()).getByRole('button', { name: 'Remove Launch from “Is Blocking”' }),
     );
-    expect(options('Is blocked by')).toContain('Launch');
+    expect(options('Is Blocked By')).toContain('Launch');
     await user.click(within(dialog()).getByRole('button', { name: 'Save' }));
     expect(links()).toEqual(['Design → Build']);
   });
@@ -376,16 +376,16 @@ describe('planned vs actual dates', () => {
     expect(within(dialog()).getByRole('group', { name: 'Actual' })).toBeInTheDocument();
 
     // Planned end is empty: picking an actual end fills it; the planned start stays as it was.
-    await user.click(within(dialog()).getByRole('button', { name: /^Actual Start date/ }));
+    await user.click(within(dialog()).getByRole('button', { name: /^Actual Start Date/ }));
     await user.click(
       within(dialog()).getByRole('button', { name: /Thursday, November 5th, 2026/ }),
     );
-    await user.click(within(dialog()).getByRole('button', { name: /^Actual End date/ }));
+    await user.click(within(dialog()).getByRole('button', { name: /^Actual End Date/ }));
     await user.click(within(dialog()).getByRole('button', { name: /Monday, November 9th, 2026/ }));
-    expect(within(dialog()).getByRole('button', { name: /^Planned Start date/ })).toHaveTextContent(
+    expect(within(dialog()).getByRole('button', { name: /^Planned Start Date/ })).toHaveTextContent(
       'Wed 4 Nov 2026',
     );
-    expect(within(dialog()).getByRole('button', { name: /^Planned End date/ })).toHaveTextContent(
+    expect(within(dialog()).getByRole('button', { name: /^Planned End Date/ })).toHaveTextContent(
       'Mon 9 Nov 2026',
     );
 
@@ -415,6 +415,6 @@ describe('planned vs actual dates', () => {
     await user.click(screen.getByRole('button', { name: 'Website' }));
     const actual = within(dialog()).getByRole('group', { name: 'Actual' });
     expect(actual).toHaveTextContent('Tue 3 Nov 2026 – Fri 6 Nov 2026');
-    expect(actual).toHaveTextContent('Calculated from subtasks');
+    expect(actual).toHaveTextContent('Calculated from Subtasks');
   });
 });
