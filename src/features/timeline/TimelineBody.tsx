@@ -19,8 +19,11 @@ type TimelineBodyProps = {
   rows: TaskRow[];
   tasks: Record<string, Task>;
   spans: Map<string, EffectiveSpan>;
-  /** Actual-date spans (in-progress tasks run to today), drawn as a blue line under the bar. */
-  actualSpans: Map<string, EffectiveSpan>;
+  /**
+   * Actual-date spans (in-progress tasks run to today), drawn as a blue line under the bar, or
+   * null when actual dates are hidden.
+   */
+  actualSpans: Map<string, EffectiveSpan> | null;
   /** The rows to draw and their offsets, shared with the task list. */
   virtualRows: { index: number; top: number }[];
   /** Height of every row plus the "+" row, in px. */
@@ -93,26 +96,27 @@ export function TimelineBody({
         lastRow={virtualRows.at(-1)?.index ?? 0}
         rowHeight={rowHeight}
       />
-      {virtualRows.map(({ index, top }) => {
-        const row = rows[index];
-        const actual = row && actualSpans.get(row.id);
-        const task = row && tasks[row.id];
-        if (!actual || !task) return null;
-        const { x, width } = barGeometry(scale, actual);
-        const inProgress = !actual.fromSubtasks && !!task.actualStart && !task.actualFinish;
-        const label = actualLabel(actual, inProgress);
-        return (
-          <div
-            key={`actual-${row.id}`}
-            className={styles.actualLine}
-            data-testid="actual-line"
-            aria-label={`${task.name}: ${label}`}
-            role="img"
-            title={label}
-            style={{ transform: `translate(${x}px, ${top}px)`, width }}
-          />
-        );
-      })}
+      {actualSpans &&
+        virtualRows.map(({ index, top }) => {
+          const row = rows[index];
+          const actual = row && actualSpans.get(row.id);
+          const task = row && tasks[row.id];
+          if (!actual || !task) return null;
+          const { x, width } = barGeometry(scale, actual);
+          const inProgress = !actual.fromSubtasks && !!task.actualStart && !task.actualFinish;
+          const label = actualLabel(actual, inProgress);
+          return (
+            <div
+              key={`actual-${row.id}`}
+              className={styles.actualLine}
+              data-testid="actual-line"
+              aria-label={`${task.name}: ${label}`}
+              role="img"
+              title={label}
+              style={{ transform: `translate(${x}px, ${top}px)`, width }}
+            />
+          );
+        })}
       {virtualRows.map(({ index, top }) => {
         const row = rows[index];
         const span = row && spans.get(row.id);

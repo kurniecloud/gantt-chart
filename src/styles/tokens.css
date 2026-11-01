@@ -40,6 +40,8 @@
   --color-critical-line: #ff1f1f;
   --color-arrow: #8b95a3;
   --color-actual: #0a84ff;
+  /* The actual-dates blue dark enough for small text (WCAG AA). */
+  --color-actual-text: #0062cc;
   --color-arrow-broken: #d97706;
   --color-grid-line: #eef0f3;
   --color-grid-day: #f3f4f6;
@@ -104,6 +106,7 @@
     --color-critical-line: #ff3b3b;
     --color-arrow: #7b8597;
     --color-actual: #3d9bff;
+    --color-actual-text: #5aabff;
     --color-arrow-broken: #f59e0b;
     --color-grid-line: #1f242e;
     --color-grid-day: #1a1e26;
@@ -148,6 +151,7 @@
   --color-critical-line: #ff3b3b;
   --color-arrow: #7b8597;
   --color-actual: #3d9bff;
+  --color-actual-text: #5aabff;
   --color-arrow-broken: #f59e0b;
   --color-grid-line: #1f242e;
   --color-grid-day: #1a1e26;

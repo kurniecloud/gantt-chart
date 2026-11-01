@@ -2,8 +2,10 @@
 
 .toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
+  min-width: 0;
   padding: var(--space-2) var(--space-3);
 }
 
@@ -39,6 +41,38 @@
 .segment:has(input:focus-visible) {
   outline: 2px solid var(--color-focus);
   outline-offset: 1px;
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.check:hover {
+  background: var(--color-surface);
+}
+
+.check input {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+/* A short piece of the actual-dates line, as a legend. */
+.actualSample {
+  width: 14px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-actual);
 }
 
 .criticalOn {

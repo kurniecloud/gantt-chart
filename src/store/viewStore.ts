@@ -2,21 +2,33 @@ import { create } from 'zustand';
 
 export type ViewMode = 'daily' | 'weekly';
 
-const STORAGE_KEY = 'gantt-chart:view-mode';
+const MODE_KEY = 'gantt-chart:view-mode';
+const ACTUAL_DATES_KEY = 'gantt-chart:show-actual-dates';
 
-// A per-browser preference, so localStorage rather than the project. Storage can be blocked
+// Per-browser preferences, so localStorage rather than the project. Storage can be blocked
 // (private mode, sandboxed previews), in which case the choice just isn't remembered.
-function readMode(): ViewMode {
+function readSetting(key: string): string | null {
   try {
-    return localStorage.getItem(STORAGE_KEY) === 'weekly' ? 'weekly' : 'daily';
+    return localStorage.getItem(key);
   } catch {
-    return 'daily';
+    return null;
+  }
+}
+
+function writeSetting(key: string, value: string) {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // Not remembered across visits; the view still changes.
   }
 }
 
 type ViewState = {
   mode: ViewMode;
   setMode: (mode: ViewMode) => void;
+  /** Whether the blue actual-dates lines are drawn. Remembered per browser; on by default. */
+  showActualDates: boolean;
+  setShowActualDates: (show: boolean) => void;
   /** Whether critical-path lines are drawn (recalculated live while on). Not remembered. */
   showCriticalPath: boolean;
   toggleCriticalPath: () => void;
@@ -26,14 +38,15 @@ type ViewState = {
 };
 
 export const useViewStore = create<ViewState>()((set) => ({
-  mode: readMode(),
+  mode: readSetting(MODE_KEY) === 'weekly' ? 'weekly' : 'daily',
   setMode: (mode) => {
-    try {
-      localStorage.setItem(STORAGE_KEY, mode);
-    } catch {
-      // Not remembered across visits; the view still switches.
-    }
+    writeSetting(MODE_KEY, mode);
     set({ mode });
+  },
+  showActualDates: readSetting(ACTUAL_DATES_KEY) !== 'hidden',
+  setShowActualDates: (show) => {
+    writeSetting(ACTUAL_DATES_KEY, show ? 'shown' : 'hidden');
+    set({ showActualDates: show });
   },
   showCriticalPath: false,
   toggleCriticalPath: () => set((state) => ({ showCriticalPath: !state.showCriticalPath })),

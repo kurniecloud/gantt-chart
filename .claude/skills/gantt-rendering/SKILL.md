@@ -10,12 +10,13 @@ Behaviour is specified in `docs/specs/task-list-and-timeline.md`. This skill is 
 ## Layout: one scroll area (`features/workspace/Workspace.tsx`)
 
 ```
-┌ toolbar row: [spacer = task panel width] [Daily|Weekly] [Today] ┐
+┌ toolbar: [Milestones] n │ [Daily|Weekly][Today][☑ Actual][Crit] ┐
 ├ scroller (overflow: auto) ──────────────────────────────────────┤
 │ grid: columns [--task-panel-width][--timeline-width]            │
 │       rows    [--header-height][max(--rows-height, rest)]       │
 │ ┌ corner (sticky top+left) ┐┌ TimelineHeader (sticky top) ────┐│
-│ │ "Task name"              ││ month row / day-or-week row      ││
+│ │ totals (ProjectTotals)   ││ month row                        ││
+│ │ "Task name"              ││ day-or-week row                  ││
 │ ├ taskColumn (sticky left) ┤├ TimelineBody ───────────────────┤│
 │ │ TaskList (<ul>)          ││ grid lines, today column, bars   ││
 └─┴──────────────────────────┴┴──────────────────────────────────┴┘
@@ -25,6 +26,14 @@ Behaviour is specified in `docs/specs/task-list-and-timeline.md`. This skill is 
   scroller or sync scroll positions in JS.
 - Sizes come from TS constants in `Workspace.tsx` (`ROW_HEIGHT` 36, `HEADER_HEIGHT` 56, task
   panel 320 px, 196 px under 720 px wide) and are passed down as CSS custom properties.
+- Stacking: corner 4 › **taskColumn 3 › timelineHeader 2** › body 1. The task panel sits above
+  the date header because a milestone's ◆ hangs 6 px below the header; once its day scrolls
+  behind the panel, the panel must cover it (e2e-guarded).
+- The corner is two halves level with the header's month and day rows: `ProjectTotals`
+  ("4 tasks · Planned 45D · Actual 30D", from `domain/summary.ts`) on top, "Task name" below.
+  At phone width it drops the dots and line sample, shows "Plan" (the full word stays for screen
+  readers, visually hidden) and wraps to two tight lines rather than clipping.
+- Both toolbars wrap: at 375 px the timeline toolbar doesn't fit on one line.
 - `scroll-padding-top` keeps focused rows clear of the pinned header. **Never add
   `scroll-padding-left`:** focus lands in the pinned task panel (e.g. when a dialog closes) and
   the browser would scroll the timeline sideways by the panel width each time (e2e-guarded).
@@ -115,7 +124,10 @@ are drawn. Never read layout inside scroll handlers; derive everything from the 
 ## Actual dates line
 
 `effectiveSpans(project, 'actual', today)` (in-progress tasks run to today); drawn as a 4 px
-`--color-actual` line 2 px under the bar, with a "Actual: …" label.
+`--color-actual` line 2 px under the bar, with a "Actual: …" label. The "Actual dates" checkbox
+(`viewStore.showActualDates`, remembered in `localStorage`) hides the lines: `Workspace` passes
+`actualSpans={null}` to `TimelineBody`. Text in the actual blue uses `--color-actual-text`
+(`--color-actual` is too light for small text on the light theme).
 
 ## Critical-path refresh
 

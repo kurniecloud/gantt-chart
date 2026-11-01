@@ -84,6 +84,29 @@ test('milestones are managed in a dialog and shown in green', async ({ page }) =
   expect(Math.abs(box.x - friday.x)).toBeLessThanOrEqual(1);
 });
 
+test('a milestone scrolled behind the task panel does not show over it', async ({ page }) => {
+  await page.getByRole('button', { name: 'Milestones' }).click();
+  await dialog(page).getByRole('button', { name: 'Add milestone' }).click();
+  await dialog(page).getByRole('textbox', { name: 'Milestone name, row 1' }).fill('Kick-off');
+  await dialog(page)
+    .getByRole('button', { name: /^Date for Kick-off/ })
+    .click();
+  await day(page, '2026-11-02').click(); // Monday: left of today's first column, under the panel
+  await dialog(page).getByRole('button', { name: 'Save' }).click();
+  await expect(dialog(page)).toBeHidden();
+
+  const marker = page.getByRole('img', { name: /^Milestone: Kick-off/ });
+  const box = (await marker.boundingBox())!;
+  const panel = (await page.getByRole('list', { name: 'Tasks' }).boundingBox())!;
+  expect(box.x + box.width).toBeLessThan(panel.x + panel.width);
+  // The ◆'s lower half hangs below the header, over the task panel: the panel must cover it.
+  const covered = await marker.evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    return !el.contains(document.elementFromPoint(r.x + r.width / 2, r.bottom - 2));
+  });
+  expect(covered).toBe(true);
+});
+
 test('today is light yellow, a single day even in weekly view', async ({ page }) => {
   const today = page.getByTestId('today-highlight');
   await expect(today).toHaveCSS('background-color', 'rgb(255, 246, 196)');
