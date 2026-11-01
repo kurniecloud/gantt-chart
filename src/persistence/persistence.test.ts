@@ -85,7 +85,7 @@ describe('IndexedDB storage', () => {
     const first = await loadInitialProject();
     expect(first.persistent).toBe(true);
     expect(first.project).toMatchObject({
-      name: 'Untitled project',
+      name: 'Untitled Project',
       description: '',
       taskOrder: [],
     });

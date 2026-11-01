@@ -75,8 +75,8 @@ export function MilestonesDialog({ onClose }: { onClose: () => void }) {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th scope="col">Milestone name</th>
-              <th scope="col">Milestone date</th>
+              <th scope="col">Milestone Name</th>
+              <th scope="col">Milestone Date</th>
               <th scope="col">
                 <span className="visually-hidden">Delete</span>
               </th>
@@ -99,8 +99,8 @@ export function MilestonesDialog({ onClose }: { onClose: () => void }) {
                     <input
                       className={styles.input}
                       value={row.name}
-                      placeholder="e.g. Design sign-off"
-                      aria-label={`Milestone name, row ${index + 1}`}
+                      placeholder="e.g. Design Sign-Off"
+                      aria-label={`Milestone Name, Row ${index + 1}`}
                       aria-invalid={rowErrors.name ? true : undefined}
                       data-milestone-name={row.id}
                       onChange={(e) => update(row.id, { name: e.target.value })}
@@ -120,7 +120,7 @@ export function MilestonesDialog({ onClose }: { onClose: () => void }) {
                   </td>
                   <td className={styles.actionCell}>
                     <IconButton
-                      label={`Delete milestone ${rowLabel}`}
+                      label={`Delete Milestone ${rowLabel}`}
                       tone="danger"
                       onClick={() => setRows((current) => current.filter((r) => r.id !== row.id))}
                     >
@@ -134,7 +134,7 @@ export function MilestonesDialog({ onClose }: { onClose: () => void }) {
         </table>
         <Button className={styles.add} data-autofocus onClick={addRow}>
           <PlusIcon />
-          Add milestone
+          Add Milestone
         </Button>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>

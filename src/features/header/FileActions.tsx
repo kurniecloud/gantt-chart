@@ -45,7 +45,7 @@ export function FileActions() {
         type="file"
         accept=".json,application/json"
         className={styles.fileInput}
-        aria-label="Project file to import"
+        aria-label="Project File to Import"
         tabIndex={-1}
         onChange={(event) => {
           const file = event.target.files?.[0];

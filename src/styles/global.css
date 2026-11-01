@@ -34,6 +34,14 @@ textarea {
   outline-offset: 1px;
 }
 
+/* After a mouse or touch press, Chrome shows the ring on the clicked control as soon as any key
+   is pressed — Shift for a screenshot, ⌘Z… — which makes an "off" toggle look selected. Keep it
+   hidden until the user really uses the keyboard (utils/inputModality.ts). Text fields have
+   their own :focus style and aren't affected. */
+:root[data-input='pointer'] :focus-visible {
+  outline: none;
+}
+
 /* Text for screen readers only. */
 .visually-hidden {
   position: absolute;

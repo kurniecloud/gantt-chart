@@ -2,27 +2,30 @@
 
 Status: done.
 
-## Decisions (agreed with the product owner, 2026-11-01; toggle style 2026-11-02)
+## Decisions (agreed with the product owner, 2026-11-01; toggle style, count and text case 2026-11-02)
 
-| Topic               | Decision                                                                                                                                                                                                                                               |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Total days          | **Project length**: weekdays from the earliest start to the latest finish (the same rule as a parent row's "(nD)"). Overlapping tasks don't add up. Planned and actual are measured alike.                                                             |
-| Task count          | **Only tasks without subtasks** (the work items; parents are groups) — the same rule as the "n critical tasks" count. Rows inside collapsed parents still count.                                                                                       |
-| Summary layout      | **Two lines in the "Task name" corner: totals on top** (level with the month row), **"Task name" underneath** (level with the day row, right above the task names).                                                                                    |
-| Milestone summary   | **Text beside the Milestones button**, in the style of the critical-path count: "5 milestones · 3 upcoming".                                                                                                                                           |
-| Actual-dates toggle | ~~A checkbox "Actual dates"~~ (first build, superseded 2026-11-02). **A toggle button like Critical path** (icon + "Actual dates", `aria-pressed`), **just left of Critical path**, **on by default**, remembered **per browser** (like Daily/Weekly). |
+| Topic               | Decision                                                                                                                                                                                                                                                           |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Total days          | **Project length**: weekdays from the earliest start to the latest finish (the same rule as a parent row's "(nD)"). Overlapping tasks don't add up. Planned and actual are measured alike.                                                                         |
+| Task count          | **Top-level (main) tasks**, with or without subtasks; hover shows "5 main tasks, 10 edge tasks (without subtasks)" (2026-11-02). ~~Only tasks without subtasks~~ (first build, superseded). Rows inside collapsed parents still count.                             |
+| Summary layout      | **Two lines in the "Task name" corner: totals on top** (level with the month row), **"Task name" underneath** (level with the day row, right above the task names).                                                                                                |
+| Milestone summary   | **Text beside the Milestones button**, in the style of the critical-path count: "5 milestones · 3 upcoming".                                                                                                                                                       |
+| Actual-dates toggle | ~~A checkbox "Actual dates"~~ (first build, superseded 2026-11-02). **A toggle button like Critical path** (icon + "Actual dates", `aria-pressed`), **just left of Critical path**, **on by default**, remembered **per browser** (like Daily/Weekly).             |
+| Text case           | (2026-11-02) **Title Case for every label** app-wide; small words lowercase unless first/last; sentences unchanged. So the strings below read "5 Tasks · Planned 45D", "5 Milestones · 3 Upcoming", "No Milestones", "Actual Dates", "Critical Path", "Task Name". |
 
 ## Project summary (top-left corner)
 
-- Top line: `4 tasks · Planned 45D · Actual 30D`. Figures in the text colour, labels muted;
+- Top line: `5 tasks · Planned 45D · Actual 30D`. Figures in the text colour, labels muted;
   "Actual" has a short blue line sample (the actual line's colour), so it doubles as a legend.
 - Bottom line: "Task name" (unchanged look: larger, semi-bold, centred).
-- **Tasks**: tasks without subtasks. A parent with no subtasks yet is a work item and counts.
+- **Tasks**: top-level (main) tasks, with or without subtasks. Hover: "5 main tasks, 10 edge
+  tasks (without subtasks)" — edge tasks are tasks without subtasks at any depth, so a top-level
+  task without subtasks is both.
 - **Planned**: weekdays from the earliest planned start to the latest planned finish over all
   dated tasks (parents span their subtasks, as on the timeline). "—" when nothing is dated.
 - **Actual**: the same over actual dates; a task started but not finished runs **up to today**
   (as the blue line does). "—" when no task has actual dates.
-- Tooltips: "4 tasks without subtasks (2 parent tasks not counted)", "Planned: Mon 2 Nov 2026 –
+- Tooltips: "5 main tasks, 10 edge tasks (without subtasks)", "Planned: Mon 2 Nov 2026 –
   Fri 1 Jan 2027 (45 weekdays)", "Actual: … (in progress)".
 - Covers the whole project, whatever is collapsed; updates after every change, undo included.
 - Phones (panel 196 px): 11 px type, no dots or line sample, "Plan" instead of "Planned"
@@ -53,6 +56,15 @@ Status: done.
 
 ## Fixed along the way
 
+**Focus ring after a click (owner's screenshot, 2026-11-02).** Clicking "Actual dates" off and
+then pressing a key — even just Shift or ⌘, as in the ⌘⇧4 screenshot shortcut, or ⌘Z — made
+Chrome draw the keyboard focus ring (`:focus-visible`, the same blue as the "on" border) round
+the clicked button, so an off toggle looked half on. Every button did this. Now modifier keys and
+shortcuts don't count as keyboard use (`utils/inputModality.ts` sets `data-input` on `<html>`;
+`global.css` hides the ring while it's `pointer`); Tab, arrows, Space and Enter still show it.
+Covers the Daily/Weekly control and the task dialog's priority options too. E2E-guarded.
+
+**Milestone ◆ over the task panel.**
 A milestone whose day had scrolled behind the task panel showed the lower half of its ◆ over
 the first task row (the marker hangs below the date header, which stacked above the panel). The
 task panel now stacks above the date header. Guarded by an e2e test.

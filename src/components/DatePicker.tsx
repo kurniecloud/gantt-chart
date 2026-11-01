@@ -23,7 +23,7 @@ type DatePickerProps = {
   hideLabel?: boolean;
   /**
    * Group the field belongs to (e.g. "Planned"), prepended to its accessible name so two
-   * "Start date" fields can be told apart.
+   * "Start Date" fields can be told apart.
    */
   context?: string;
 };
@@ -76,14 +76,14 @@ export function DatePicker({
         >
           <CalendarIcon />
           <span className={value ? undefined : styles.placeholder}>
-            {value ? formatDate(value) : 'No date'}
+            {value ? formatDate(value) : 'No Date'}
           </span>
         </button>
         {value && (
           <button
             type="button"
             className={styles.clear}
-            aria-label={`Clear ${context ? `${context.toLowerCase()} ` : ''}${label.toLowerCase()}`}
+            aria-label={`Clear ${context ? `${context} ` : ''}${label}`}
             onClick={() => {
               onChange(undefined);
               onOpenChange(false);

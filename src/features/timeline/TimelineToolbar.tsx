@@ -24,7 +24,7 @@ export function TimelineToolbar({ onToday, criticalCount }: TimelineToolbarProps
 
   return (
     <div className={styles.toolbar}>
-      <div className={styles.segmented} role="radiogroup" aria-label="Timeline view">
+      <div className={styles.segmented} role="radiogroup" aria-label="Timeline View">
         {MODES.map(({ value, label }) => (
           <label key={value} className={styles.segment}>
             <input
@@ -39,7 +39,7 @@ export function TimelineToolbar({ onToday, criticalCount }: TimelineToolbarProps
         ))}
       </div>
       <Button onClick={onToday}>Today</Button>
-      {/* Left of Critical path, so its count stays beside it and nothing moves when it toggles. */}
+      {/* Left of Critical Path, so its count stays beside it and nothing moves when it toggles. */}
       <Button
         className={showActualDates ? styles.actualOn : undefined}
         aria-pressed={showActualDates}
@@ -47,7 +47,7 @@ export function TimelineToolbar({ onToday, criticalCount }: TimelineToolbarProps
         onClick={toggleActualDates}
       >
         <ActualDatesIcon />
-        Actual dates
+        Actual Dates
       </Button>
       <Button
         className={showCriticalPath ? styles.criticalOn : undefined}
@@ -56,14 +56,14 @@ export function TimelineToolbar({ onToday, criticalCount }: TimelineToolbarProps
         onClick={toggleCriticalPath}
       >
         <PathIcon />
-        Critical path
+        Critical Path
       </Button>
       <span className={styles.status} role="status">
         {criticalCount === null
           ? ''
           : criticalCount === 0
-            ? 'No dated tasks'
-            : `${criticalCount} critical task${criticalCount === 1 ? '' : 's'}`}
+            ? 'No Dated Tasks'
+            : `${criticalCount} Critical Task${criticalCount === 1 ? '' : 's'}`}
       </span>
     </div>
   );

@@ -8,10 +8,10 @@ export type ProjectLength = DateSpan & {
 };
 
 export type ProjectSummary = {
-  /** Tasks without subtasks — the work items. Parents only group them and aren't counted. */
-  taskCount: number;
-  /** Tasks with subtasks (not in `taskCount`). */
-  parentCount: number;
+  /** Main tasks: every top-level task, with or without subtasks. */
+  mainTaskCount: number;
+  /** Edge tasks: every task without subtasks, at any depth (the work items). */
+  edgeTaskCount: number;
   /** Earliest planned start → latest planned finish, or null when nothing is dated. */
   planned: ProjectLength | null;
   /** The same over actual dates, or null when no task has any. */
@@ -31,21 +31,19 @@ export function projectSummary(
   actual: Map<string, EffectiveSpan>,
 ): ProjectSummary {
   const children = childrenByParent(project);
-  let taskCount = 0;
-  let parentCount = 0;
+  let edgeTaskCount = 0;
   let inProgress = false;
   for (const id of project.taskOrder) {
     const task = project.tasks[id];
     if (!task) continue;
-    if (children.has(id)) parentCount += 1;
-    else taskCount += 1;
+    if (!children.has(id)) edgeTaskCount += 1;
     // Same test as the timeline's "(in progress)" line: the task's own actual dates are drawn.
     const span = actual.get(id);
     if (span && !span.fromSubtasks && task.actualStart && !task.actualFinish) inProgress = true;
   }
   return {
-    taskCount,
-    parentCount,
+    mainTaskCount: children.get(null)?.length ?? 0,
+    edgeTaskCount,
     planned: projectLength(planned.values()),
     actual: projectLength(actual.values()),
     inProgress,

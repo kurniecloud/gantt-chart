@@ -11,15 +11,15 @@ const timeline = (page: Page) => page.getByRole('group', { name: 'Timeline' });
 const names = (page: Page) => page.locator('[data-task-name]').allTextContents();
 
 async function addTask(page: Page, name: string, dates?: [string, string]) {
-  await page.getByRole('button', { name: 'Add task', exact: true }).click();
-  await dialog(page).getByRole('textbox', { name: 'Task name' }).fill(name);
+  await page.getByRole('button', { name: 'Add Task', exact: true }).click();
+  await dialog(page).getByRole('textbox', { name: 'Task Name' }).fill(name);
   if (dates) {
     await dialog(page)
-      .getByRole('button', { name: /^Planned Start date/ })
+      .getByRole('button', { name: /^Planned Start Date/ })
       .click();
     await dialog(page).locator(`[data-day="${dates[0]}"] button`).click();
     await dialog(page)
-      .getByRole('button', { name: /^Planned End date/ })
+      .getByRole('button', { name: /^Planned End Date/ })
       .click();
     await dialog(page).locator(`[data-day="${dates[1]}"] button`).click();
   }
@@ -89,14 +89,14 @@ test('actual dates draw a blue line under the planned bar', async ({ page }) => 
     .getByRole('button', { name: /^Build:/ })
     .click();
   await dialog(page)
-    .getByRole('button', { name: /^Actual Start date/ })
+    .getByRole('button', { name: /^Actual Start Date/ })
     .click();
   await dialog(page).locator('[data-day="2026-11-03"] button').click();
   await dialog(page).getByRole('button', { name: 'Save' }).click();
 
   const line = page.getByTestId('actual-line');
   await expect(line).toHaveAccessibleName(
-    'Build: Actual: Tue 3 Nov 2026 – Wed 4 Nov 2026 (in progress)',
+    'Build: Actual: Tue 3 Nov 2026 – Wed 4 Nov 2026 (In Progress)',
   );
   await expect(line).toHaveCSS('background-color', 'rgb(10, 132, 255)');
   const lineBox = (await line.boundingBox())!;
@@ -111,8 +111,8 @@ test('actual dates draw a blue line under the planned bar', async ({ page }) => 
 test('the critical path recalculates after a drag', async ({ page }) => {
   await addTask(page, 'Design', ['2026-11-04', '2026-11-06']);
   await addTask(page, 'Docs', ['2026-11-04', '2026-11-05']);
-  await page.getByRole('button', { name: 'Critical path' }).click();
-  await expect(page.getByText('1 critical task')).toBeVisible();
+  await page.getByRole('button', { name: 'Critical Path' }).click();
+  await expect(page.getByText('1 Critical Task')).toBeVisible();
   await expect(timeline(page).getByRole('button', { name: /^Docs:/ })).not.toHaveAttribute(
     'data-critical',
   );
@@ -121,7 +121,7 @@ test('the critical path recalculates after a drag', async ({ page }) => {
   const docs = timeline(page).getByRole('button', { name: /^Docs:/ });
   const box = (await docs.boundingBox())!;
   await drag(page, docs, { x: box.x + box.width / 2 + 48, y: box.y + box.height / 2 });
-  await expect(page.getByText('2 critical tasks')).toBeVisible();
+  await expect(page.getByText('2 Critical Tasks')).toBeVisible();
   await expect(docs).toHaveAttribute('data-critical', 'true');
   await expect(page.getByTestId('busy-overlay')).toHaveCount(0);
 });

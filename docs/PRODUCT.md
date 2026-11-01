@@ -43,7 +43,7 @@ Spec: [specs/task-list-and-timeline.md](specs/task-list-and-timeline.md); 1.16�
 | 1.13 | Project milestones: managed in a dialog, highlighted green with a ◆ marker                                     | ✅     |
 | 1.14 | Weekday count "(7D)" per task in its priority colour                                                           | ✅     |
 | 1.15 | Planned vs actual dates: two boxes in the dialog, blue actual line under the bar                               | ✅     |
-| 1.16 | Project totals above "Task name": tasks (without subtasks), planned and actual length in weekdays              | ✅     |
+| 1.16 | Project totals above "Task name": top-level tasks (hover: main / edge counts), planned and actual length       | ✅     |
 | 1.17 | Milestone count beside the Milestones button ("5 milestones · 3 upcoming")                                     | ✅     |
 | 1.18 | "Actual dates" toggle button to show / hide the blue actual lines (remembered per browser)                     | ✅     |
 

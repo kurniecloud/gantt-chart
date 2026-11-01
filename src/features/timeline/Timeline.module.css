@@ -38,7 +38,8 @@
   box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
 }
 
-.segment:has(input:focus-visible) {
+/* Not after a mouse press: see the input-modality rule in global.css. */
+:global(:root:not([data-input='pointer'])) .segment:has(input:focus-visible) {
   outline: 2px solid var(--color-focus);
   outline-offset: 1px;
 }

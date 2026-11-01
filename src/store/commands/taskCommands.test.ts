@@ -37,7 +37,7 @@ describe('addTask', () => {
       mode: 'manual',
       percentComplete: 0,
     });
-    expect(state().past.at(-1)?.label).toBe('Add task');
+    expect(state().past.at(-1)?.label).toBe('Add Task');
   });
 
   it('stores dates and priority when given', () => {
@@ -64,7 +64,7 @@ describe('addTask', () => {
     state().dispatch(addTask({ name: 'New' }, parentId, 'N'));
     expect(project().taskOrder).toEqual(order);
     expect(project().tasks.N?.parentId).toBe(parentId);
-    expect(state().past.at(-1)?.label).toBe('Add subtask');
+    expect(state().past.at(-1)?.label).toBe('Add Subtask');
   });
 
   it('expands a collapsed parent so the new subtask is visible', () => {
