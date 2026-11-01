@@ -1,12 +1,10 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
-import { Button } from '../../components/Button';
-import { FlagIcon } from '../../components/icons';
 import { todayISO } from '../../domain/dates';
+import { projectSummary } from '../../domain/summary';
 import { effectiveSpans } from '../../domain/taskDates';
 import { visibleTaskRows } from '../../domain/tree';
 import { useProjectStore } from '../../store/projectStore';
-import { useUiStore } from '../../store/uiStore';
 import { useViewStore } from '../../store/viewStore';
 import { useCriticalPath } from '../criticalPath/useCriticalPath';
 import { TaskList } from '../tasks/TaskList';
@@ -24,6 +22,8 @@ import {
   todayColumn,
   type TimelineScale,
 } from '../timeline/scale';
+import { MilestonesTool } from './MilestonesTool';
+import { ProjectTotals } from './ProjectTotals';
 import styles from './Workspace.module.css';
 
 export const ROW_HEIGHT = 36;
@@ -58,8 +58,8 @@ function useTaskPanelWidth(): number {
 export function Workspace() {
   const project = useProjectStore((s) => s.project);
   const mode = useViewStore((s) => s.mode);
+  const showActualDates = useViewStore((s) => s.showActualDates);
   const showCriticalPath = useViewStore((s) => s.showCriticalPath);
-  const openDialog = useUiStore((s) => s.openDialog);
   const [today] = useState(todayISO);
   const panelWidth = useTaskPanelWidth();
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -67,6 +67,10 @@ export function Workspace() {
   const rows = useMemo(() => visibleTaskRows(project), [project]);
   const spans = useMemo(() => effectiveSpans(project), [project]);
   const actualSpans = useMemo(() => effectiveSpans(project, 'actual', today), [project, today]);
+  const summary = useMemo(
+    () => projectSummary(project, spans, actualSpans),
+    [project, spans, actualSpans],
+  );
   const scale = useMemo(() => createScale(mode, today), [mode, today]);
   const highlighted = todayColumn(scale, today);
   const todaySlot = dayRange(scale, today);
@@ -150,17 +154,18 @@ export function Workspace() {
     >
       <div className={styles.toolbarRow}>
         <div className={styles.panelTools}>
-          <Button onClick={() => openDialog({ kind: 'milestones' })}>
-            <FlagIcon />
-            Milestones
-          </Button>
+          <MilestonesTool today={today} />
         </div>
         <TimelineToolbar onToday={scrollToToday} criticalCount={criticalCount} />
       </div>
       <div ref={scrollerRef} className={styles.scroller} data-testid="workspace-scroller">
         <div className={styles.grid}>
-          <div className={styles.corner} aria-hidden="true">
-            Task name
+          <div className={styles.corner}>
+            <ProjectTotals summary={summary} />
+            {/* The list has its own accessible name; this is the visible column heading. */}
+            <div className={styles.cornerTitle} aria-hidden="true">
+              Task name
+            </div>
           </div>
           <div className={styles.timelineHeader}>
             <TimelineHeader
@@ -188,7 +193,7 @@ export function Workspace() {
               rows={rows}
               tasks={project.tasks}
               spans={spans}
-              actualSpans={actualSpans}
+              actualSpans={showActualDates ? actualSpans : null}
               virtualRows={virtualRows}
               rowsHeight={rowsHeight}
               todaySlot={todaySlot}

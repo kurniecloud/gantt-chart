@@ -116,7 +116,8 @@ Details: `.claude/skills/gantt-rendering/SKILL.md`.
 ## Persistence
 
 - IndexedDB database `gantt-chart`, stores `projects` (by id) and `meta` (last opened project).
-- The daily/weekly choice is a per-browser preference in `localStorage` (`store/viewStore.ts`).
+- The daily/weekly choice and "Actual dates" on/off are per-browser preferences in
+  `localStorage` (`store/viewStore.ts`), not part of the project.
 - Autosave debounced 500 ms after each command; save on `visibilitychange` too.
 - On load, run migrations from the stored `schemaVersion` to the current one.
 

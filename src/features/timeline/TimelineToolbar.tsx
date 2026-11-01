@@ -1,5 +1,5 @@
 import { Button } from '../../components/Button';
-import { PathIcon } from '../../components/icons';
+import { ActualDatesIcon, PathIcon } from '../../components/icons';
 import { useViewStore, type ViewMode } from '../../store/viewStore';
 import styles from './Timeline.module.css';
 
@@ -17,6 +17,8 @@ type TimelineToolbarProps = {
 export function TimelineToolbar({ onToday, criticalCount }: TimelineToolbarProps) {
   const mode = useViewStore((s) => s.mode);
   const setMode = useViewStore((s) => s.setMode);
+  const showActualDates = useViewStore((s) => s.showActualDates);
+  const toggleActualDates = useViewStore((s) => s.toggleActualDates);
   const showCriticalPath = useViewStore((s) => s.showCriticalPath);
   const toggleCriticalPath = useViewStore((s) => s.toggleCriticalPath);
 
@@ -37,6 +39,16 @@ export function TimelineToolbar({ onToday, criticalCount }: TimelineToolbarProps
         ))}
       </div>
       <Button onClick={onToday}>Today</Button>
+      {/* Left of Critical path, so its count stays beside it and nothing moves when it toggles. */}
+      <Button
+        className={showActualDates ? styles.actualOn : undefined}
+        aria-pressed={showActualDates}
+        title="Show or hide the blue lines for actual dates under the bars"
+        onClick={toggleActualDates}
+      >
+        <ActualDatesIcon />
+        Actual dates
+      </Button>
       <Button
         className={showCriticalPath ? styles.criticalOn : undefined}
         aria-pressed={showCriticalPath}
