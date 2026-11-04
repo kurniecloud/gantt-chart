@@ -98,3 +98,41 @@ test('weekends cannot be picked, and edits are saved', async ({ page }) => {
   await page.keyboard.press('Escape');
   await expect(dialog(page)).toBeHidden();
 });
+
+test('End Date stays disabled until its Start Date is set', async ({ page }) => {
+  await page.clock.setFixedTime(new Date(2026, 10, 4, 10, 0)); // Wed 4 Nov 2026
+  await page.goto('./');
+  await page.getByRole('button', { name: 'Add Task', exact: true }).click();
+  await dialog(page).getByRole('textbox', { name: 'Task Name' }).fill('Design');
+  const start = dialog(page).getByRole('button', { name: /^Planned Start Date/ });
+  const end = dialog(page).getByRole('button', { name: /^Planned End Date/ });
+  const day = (iso: string) => dialog(page).locator(`[data-day="${iso}"] button`);
+
+  for (const box of ['Planned', 'Actual']) {
+    const boxEnd = dialog(page).getByRole('button', { name: new RegExp(`^${box} End Date`) });
+    await expect(boxEnd).toBeDisabled();
+    await expect(boxEnd).toHaveAccessibleDescription('Pick a start date first');
+    await expect(boxEnd).toHaveCSS('cursor', 'not-allowed');
+  }
+
+  await start.click();
+  await day('2026-11-04').click();
+  await expect(end).toBeEnabled();
+  await end.click();
+  await day('2026-11-06').click();
+  await expect(end).toHaveText(/Fri 6 Nov 2026/);
+
+  // Clearing the start clears and disables the end again.
+  await dialog(page).getByRole('button', { name: 'Clear Planned Start Date' }).click();
+  await expect(end).toHaveText(/No Date/);
+  await expect(end).toBeDisabled();
+
+  await start.click();
+  await day('2026-11-05').click();
+  await end.click();
+  await day('2026-11-09').click();
+  await dialog(page).getByRole('button', { name: 'Add', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: /^Design: Thu 5 Nov 2026 – Mon 9 Nov 2026/ }),
+  ).toBeVisible();
+});

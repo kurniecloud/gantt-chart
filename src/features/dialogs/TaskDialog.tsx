@@ -20,6 +20,9 @@ import styles from './TaskDialog.module.css';
 
 type DateField = 'start' | 'finish' | 'actualStart' | 'actualFinish';
 
+/** Under an End Date that waits for its Start Date. */
+const END_DATE_HINT = 'Pick a start date first';
+
 type TaskDialogProps =
   | { mode: 'add'; parentId: string | null; onClose: () => void }
   | { mode: 'edit'; taskId: string; onClose: () => void };
@@ -127,14 +130,20 @@ export function TaskDialog(props: TaskDialogProps) {
                   error={errors.start}
                   open={openPicker === 'start'}
                   onOpenChange={(open) => setOpenPicker(open ? 'start' : null)}
-                  onChange={setStart}
+                  onChange={(date) => {
+                    setStart(date);
+                    // An end date needs a start: clearing the start clears it too.
+                    if (!date) setFinish(undefined);
+                  }}
                 />
                 <DatePicker
                   context="Planned"
                   label="End Date"
                   value={finish}
                   minDate={start}
-                  error={errors.finish}
+                  disabled={!start}
+                  disabledHint={END_DATE_HINT}
+                  error={start ? errors.finish : undefined}
                   open={openPicker === 'finish'}
                   onOpenChange={(open) => setOpenPicker(open ? 'finish' : null)}
                   onChange={setFinish}
@@ -162,6 +171,7 @@ export function TaskDialog(props: TaskDialogProps) {
                   onOpenChange={(open) => setOpenPicker(open ? 'actualStart' : null)}
                   onChange={(date) => {
                     setActualStart(date);
+                    if (!date) setActualFinish(undefined);
                     // An actual date fills an empty planned one (not a parent's calculated one).
                     if (date && !start && !derivedSpan) setStart(date);
                   }}
@@ -172,12 +182,15 @@ export function TaskDialog(props: TaskDialogProps) {
                   value={actualFinish}
                   minDate={actualStart}
                   openMonth={finish ?? start}
-                  error={errors.actualFinish}
+                  disabled={!actualStart}
+                  disabledHint={END_DATE_HINT}
+                  error={actualStart ? errors.actualFinish : undefined}
                   open={openPicker === 'actualFinish'}
                   onOpenChange={(open) => setOpenPicker(open ? 'actualFinish' : null)}
                   onChange={(date) => {
                     setActualFinish(date);
-                    if (date && !finish && !derivedSpan) setFinish(date);
+                    // Only with a planned start, or the planned end would have no start.
+                    if (date && start && !finish && !derivedSpan) setFinish(date);
                   }}
                 />
               </div>

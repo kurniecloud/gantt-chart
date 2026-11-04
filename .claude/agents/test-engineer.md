@@ -21,7 +21,8 @@ You are a test engineer for a browser-only Gantt chart app. Follow
 ## Rules
 
 - Never weaken or delete an assertion to make a test pass; if the code is wrong, report it.
-- Freeze "today" in tests (`vi.setSystemTime`) and use fixed ISO dates.
+- Freeze "today" in tests (`vi.useFakeTimers({ toFake: ['Date'] })` + `vi.setSystemTime`, or
+  `page.clock.setFixedTime` in Playwright) and use fixed ISO dates.
 - Keep tests deterministic and independent; no shared mutable fixtures.
 
 Run the relevant suites and report: tests added, pass/fail counts, and any bugs found in

@@ -16,7 +16,7 @@ Behaviour is specified in `docs/specs/task-list-and-timeline.md`. This skill is 
 │       rows    [--header-height][max(--rows-height, rest)]       │
 │ ┌ corner (sticky top+left) ┐┌ TimelineHeader (sticky top) ────┐│
 │ │ totals (ProjectTotals)   ││ month row                        ││
-│ │ "Task name"              ││ day-or-week row                  ││
+│ │ "Task Name"              ││ day-or-week row                  ││
 │ ├ taskColumn (sticky left) ┤├ TimelineBody ───────────────────┤│
 │ │ TaskList (<ul>)          ││ grid lines, today column, bars   ││
 └─┴──────────────────────────┴┴──────────────────────────────────┴┘
@@ -31,7 +31,7 @@ Behaviour is specified in `docs/specs/task-list-and-timeline.md`. This skill is 
   behind the panel, the panel must cover it (e2e-guarded).
 - The corner is two halves level with the header's month and day rows: `ProjectTotals`
   ("5 tasks · Planned 45D · Actual 30D" — top-level tasks; hover: main / edge counts — from
-  `domain/summary.ts`) on top, "Task name" below.
+  `domain/summary.ts`) on top, "Task Name" below.
   At phone width it drops the dots and line sample, shows "Plan" (the full word stays for screen
   readers, visually hidden) and wraps to two tight lines rather than clipping.
 - Both toolbars wrap: at 375 px the timeline toolbar doesn't fit on one line.
@@ -84,7 +84,7 @@ Today: `--color-today` slot behind the header cells and in the body. Milestones
 - Leaf bar: 20 px, rounded, `background: var(--bar-color)` where `--bar-color` is
   `var(--color-priority-<level|none>)`. Parent (has children): 14 px bracket via `clip-path`.
 - `aria-label`/`title` = `barLabel()` ("Design: Mon 2 Nov 2026 – Fri 6 Nov 2026 · High
-  priority"), so colour is never the only signal. Bars are `tabIndex={-1}` buttons — the task
+  Priority"), so colour is never the only signal. Bars are `tabIndex={-1}` buttons — the task
   list is the keyboard path; clicking a bar opens the edit dialog.
 - Critical path (toolbar toggle, `domain/criticalPath.ts`, recomputed while on): `data-critical`
   adds a `--color-critical-line` stripe via `::after`, 20 % of the bar's height, centred (in the
@@ -125,7 +125,7 @@ are drawn. Never read layout inside scroll handlers; derive everything from the 
 ## Actual dates line
 
 `effectiveSpans(project, 'actual', today)` (in-progress tasks run to today); drawn as a 4 px
-`--color-actual` line 2 px under the bar, with a "Actual: …" label. The "Actual dates" toggle
+`--color-actual` line 2 px under the bar, with a "Actual: …" label. The Actual Dates toggle
 button (`viewStore.showActualDates`, remembered in `localStorage`) hides the lines: `Workspace` passes
 `actualSpans={null}` to `TimelineBody`. Toolbar view toggles are
 `Button`s with an icon, `aria-pressed` and an "on" class (`actualOn`, `criticalOn`) — not

@@ -8,7 +8,7 @@ GitHub Pages.
 ## Start here (every task)
 
 1. **Read [docs/CONTEXT.md](docs/CONTEXT.md)** — current state, every product decision agreed
-   with the owner (including superseded ones), how we work together, lessons learned and the
+   with the owner (each in its current form), how we work together, lessons learned and the
    backlog. Then read the spec in `docs/specs/` for the area you're touching.
 2. **Update docs/CONTEXT.md in the same PR** whenever the snapshot, a decision, a lesson or the
    backlog changes. A task isn't done until the handover is current.
@@ -23,6 +23,8 @@ Reference: roadmap [docs/PRODUCT.md](docs/PRODUCT.md) · architecture
   first) → state defaults → plan → build → verify → **one signed PR** → owner merges.
 - Don't assume the recommended option was chosen; record every answer in the batch's spec
   (`docs/specs/<slug>.md`, dated Decisions table) and in docs/CONTEXT.md §3.
+- A changed decision is **overwritten everywhere** it is described (older specs, CONTEXT,
+  PRODUCT, ARCHITECTURE, README, skills) — no superseded text (docs/CONTEXT.md §2.4).
 - Report plainly: what changed, how it was verified, what wasn't, trade-offs.
 
 ## Tech stack
@@ -33,7 +35,7 @@ Reference: roadmap [docs/PRODUCT.md](docs/PRODUCT.md) · architecture
 | Language       | TypeScript 6, `strict: true`, no `any` without a comment saying why                      |
 | UI             | React 19 function components + hooks, CSS Modules                                        |
 | State          | Zustand + immer patches, command-based undo/redo                                         |
-| Timeline       | Custom SVG rendering (no third-party Gantt library)                                      |
+| Timeline       | Custom DOM + SVG rendering (no third-party Gantt library)                                |
 | Virtualization | `@tanstack/react-virtual`: rows shared by task list and timeline, date columns           |
 | Dates          | `date-fns`; dates are stored as `YYYY-MM-DD` strings                                     |
 | Persistence    | IndexedDB via `idb` (autosave), native `.gantt.json` import/export (CSV / MSPDI planned) |
@@ -78,12 +80,13 @@ src/
     tasks/       Left panel: nested task list, expand/collapse, row actions, drag/keyboard moves.
     dialogs/     Task, delete, milestones and import dialogs; AppDialogs shows the one in uiStore.
     timeline/    Right panel: weekday scale, date header, bars (drag/resize), arrows, actual line.
-    workspace/   The shared scroll area: sticky task panel + header, row/column virtualization.
+    workspace/   The shared scroll area: sticky task panel + header, row/column virtualization,
+                 project totals and the Milestones button with its count.
     criticalPath/ Recalculation after every change while on, and the input-blocking overlay.
   components/    Shared UI: Button/IconButton, Dialog (native <dialog>), DatePicker, icons.
   persistence/   IndexedDB autosave, project list, migrations between schema versions.
   io/            Import/export: native .gantt.json (done); CSV, MS Project XML, PNG/PDF later.
-  utils/         Small generic helpers.
+  utils/         Small generic helpers (date formatting, priority labels, input modality).
 tests/e2e/       Playwright specs.
 docs/            Product and architecture docs.
 ```

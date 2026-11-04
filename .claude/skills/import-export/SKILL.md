@@ -8,14 +8,15 @@ description: File formats the app reads and writes — native JSON, CSV, Microso
 All IO is client-side: read with `File.text()`, write with a `Blob` + temporary `<a download>`.
 No dependencies are needed for XML (`DOMParser`, `XMLSerializer`).
 
-Imported files are **untrusted**: validate everything, cap file size (50 MB), never `eval`,
-never inject strings as HTML. Import produces a new `Project` and runs the scheduler; report
-anything dropped or adjusted in an import summary shown to the user.
+Imported files are **untrusted**: validate everything, cap file size (20 MB, `MAX_FILE_BYTES`),
+never `eval`, never inject strings as HTML. Native import replaces the open project's content
+after validation (no scheduler exists yet). Future CSV / MSPDI imports should report anything
+dropped or adjusted in an import summary shown to the user.
 
 ## Native JSON (`.gantt.json`) — implemented in `src/io/projectFile.ts`
 
 ```json
-{ "format": "gantt-chart", "schemaVersion": 3, "exportedAt": "2026-11-01", "project": { ... } }
+{ "format": "gantt-chart", "schemaVersion": 4, "exportedAt": "2026-11-04", "project": { ... } }
 ```
 
 - Export: header button → `serializeProject()` → `downloadTextFile()` (`src/io/download.ts`),
@@ -25,7 +26,8 @@ anything dropped or adjusted in an import summary shown to the user.
   task order, dependency and milestone. Any problem → `ProjectFileError` with a readable reason
   shown in a dialog; nothing changes. Valid → confirm dialog → `importProject()` command
   replaces the open project's content (keeps its id), undoable in one step.
-- Cap: 20 MB. Task order is rebuilt so each task precedes its subtasks.
+- Task order is rebuilt so each task precedes its subtasks. Dialog titles: `Import “file”?`
+  (confirm) and `Couldn’t Import “file”` (error).
 
 ## CSV
 
@@ -77,6 +79,7 @@ the import summary.
 
 ## Tests
 
-Keep fixtures in `tests/fixtures/` (small hand-written MSPDI, CSV, JSON files). Required:
+Put file fixtures in `tests/fixtures/` (create it with the first CSV / MSPDI work; today's JSON
+tests build files in code). Required:
 round-trip tests (export → import → deep-equal project), each dependency type and lag format,
 a malformed file per format (must fail with a readable message, not throw uncaught).

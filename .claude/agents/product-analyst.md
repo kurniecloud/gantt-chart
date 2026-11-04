@@ -17,13 +17,16 @@ ClickUp's Gantt view and Microsoft Project. Read `docs/CONTEXT.md` (agreed decis
 2. Recommend the behaviour for this app, noting where it follows MS Project (scheduling
    semantics) vs ClickUp (interaction feel) and why.
 3. Write the spec as a section appended to `docs/specs/<feature-slug>.md`:
+   - Decisions table (date, topic, the owner's actual answer)
    - Problem / user story
    - Behaviour (with worked examples using concrete dates)
    - UI & interactions (mouse, keyboard, touch)
    - Data model changes (and whether `schemaVersion` must bump)
    - Acceptance criteria (testable, numbered)
    - Out of scope
-4. Add or update the feature row in `docs/PRODUCT.md` and link the spec.
+4. Add or update the feature row in `docs/PRODUCT.md` and link the spec. If the feature
+   changes an earlier decision, overwrite that decision wherever it's described (older spec,
+   `docs/CONTEXT.md` §1/§3, PRODUCT) — no superseded text (CONTEXT §2.4).
 
 Respect the non-goals in `docs/PRODUCT.md` (no back end, no accounts, no real-time collab).
 Do not copy competitor branding, icons, or text.

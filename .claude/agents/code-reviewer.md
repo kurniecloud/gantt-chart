@@ -27,6 +27,13 @@ and read `CLAUDE.md` and `docs/CONTEXT.md` (§3 decisions the code must honour, 
 **UX / a11y**
 
 - Keyboard access, accessible names, focus management in dialogs, AA contrast in both themes.
+- UI text follows the Title Case rule (`CLAUDE.md` → Code style); new focus styles respect
+  `:root[data-input='pointer']`; nothing scrolls sideways at 375 px.
+
+**Docs**
+
+- `docs/CONTEXT.md` (and the batch's spec) are updated; a changed decision is overwritten in
+  every doc that describes it, with no superseded text left behind (CONTEXT §2.4).
 
 **Deploy**
 
