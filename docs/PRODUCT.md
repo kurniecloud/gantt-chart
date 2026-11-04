@@ -23,8 +23,12 @@ Status legend: ⬜ not started · 🟨 in progress · ✅ done
 
 ## Phase 1 — MVP (usable Gantt)
 
-Spec: [specs/task-list-and-timeline.md](specs/task-list-and-timeline.md); 1.16–1.18:
-[specs/summaries-and-actual-toggle.md](specs/summaries-and-actual-toggle.md).
+Specs: 1.1–1.6, 1.10 [task-list-and-timeline](specs/task-list-and-timeline.md) ·
+1.7, 1.13, 1.14 [import-export-milestones-critical-path](specs/import-export-milestones-critical-path.md) ·
+1.9 [dependency-arrows](specs/dependency-arrows.md) · 1.8, 1.11, 1.15
+[drag-and-actuals](specs/drag-and-actuals.md) · 1.16–1.18
+[summaries-and-actual-toggle](specs/summaries-and-actual-toggle.md) · 1.3 (end needs a start)
+[end-date-needs-start](specs/end-date-needs-start.md).
 
 | #    | Feature                                                                                                        | Status |
 | ---- | -------------------------------------------------------------------------------------------------------------- | ------ |
@@ -36,16 +40,16 @@ Spec: [specs/task-list-and-timeline.md](specs/task-list-and-timeline.md); 1.16�
 | 1.6  | Task bars: colour by priority, parents span subtasks, 1-day bars for single dates                              | ✅     |
 | 1.7  | Native JSON import / export                                                                                    | ✅     |
 | 1.8  | Drag bar to move, drag edges to resize (tasks without subtasks)                                                | ✅     |
-| 1.9  | Finish-to-start links: "Is blocked by" / "Is blocking" ✅, grey arrows (amber when broken) ✅, drag-to-link ⬜ | 🟨     |
-| 1.10 | Undo / redo (Ctrl/Cmd+Z, Shift+Ctrl/Cmd+Z)                                                                     | ✅     |
+| 1.9  | Finish-to-start links: "Is Blocked By" / "Is Blocking" ✅, grey arrows (amber when broken) ✅, drag-to-link ⬜ | 🟨     |
+| 1.10 | Undo / redo (Ctrl/Cmd+Z, Shift+Ctrl/Cmd+Z, Ctrl+Y)                                                             | ✅     |
 | 1.11 | Reorder / nest tasks by dragging the grip, or Alt+Shift+arrow keys                                             | ✅     |
 | 1.12 | Light / dark theme                                                                                             | 🟨     |
 | 1.13 | Project milestones: managed in a dialog, highlighted green with a ◆ marker                                     | ✅     |
 | 1.14 | Weekday count "(7D)" per task in its priority colour                                                           | ✅     |
 | 1.15 | Planned vs actual dates: two boxes in the dialog, blue actual line under the bar                               | ✅     |
-| 1.16 | Project totals above "Task name": top-level tasks (hover: main / edge counts), planned and actual length       | ✅     |
-| 1.17 | Milestone count beside the Milestones button ("5 milestones · 3 upcoming")                                     | ✅     |
-| 1.18 | "Actual dates" toggle button to show / hide the blue actual lines (remembered per browser)                     | ✅     |
+| 1.16 | Project totals above "Task Name": top-level tasks (hover: main / edge counts), planned and actual length       | ✅     |
+| 1.17 | Milestone count beside the Milestones button ("5 Milestones · 3 Upcoming")                                     | ✅     |
+| 1.18 | "Actual Dates" toggle button to show / hide the blue actual lines (remembered per browser)                     | ✅     |
 
 ## Phase 2 — MS Project parity (scheduling)
 
@@ -93,9 +97,9 @@ Spec: [specs/task-list-and-timeline.md](specs/task-list-and-timeline.md); 1.16�
 
 ## Notes on partially done items
 
-- **2.3** — the critical path toggle shows the **driving chain** (back from the last task through
-  the latest-finishing blocker at each step; spare days don't break it) over the user's own dates.
-  Slack figures and auto-scheduling (moving tasks) are still to do.
+- **2.3** — the Critical Path toggle shows the **driving chain** (back from the last task through
+  the latest-finishing blocker at each step; spare days don't break it) over the user's own
+  planned dates. Slack figures and auto-scheduling (moving tasks) are still to do.
 
 - **0.4** — autosave, reload and `listProjects()` work; a UI to switch/create/delete projects is still to do.
 - **1.12** — follows the OS light/dark setting via tokens; a manual toggle (`data-theme`) is still to do.

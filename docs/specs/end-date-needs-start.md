@@ -1,22 +1,17 @@
 # Spec: End Date needs a Start Date
 
-Status: done.
+Status: done (PR #10).
 
-## Decisions (agreed with the product owner, 2026-11-04)
+## Decisions (agreed with the product owner)
 
-| Topic                   | Decision                                                                                                                               |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Rule                    | In the task dialog, **End Date is disabled until its Start Date is set**.                                                              |
-| Boxes                   | **Planned and Actual**: each End Date waits for its own Start Date.                                                                    |
-| Clearing the start      | **Clears the End Date too** (and disables it again). Cancel in the dialog brings both back.                                            |
-| Existing end-only tasks | **No special handling**: there are none in use. They still import and draw as before; in the dialog their End Date is simply disabled. |
-| Hint                    | Default (not asked): "Pick a start date first" under a disabled End Date — sentence case, as hints are sentences.                      |
-| After picking a start   | Default (not asked): End Date becomes available; its calendar doesn't open by itself and still greys out days before the start.        |
-
-_Supersedes in part_ the 2026-10-31 "Partial dates" decision
-([task-list-and-timeline](task-list-and-timeline.md)): an end date without a start can no longer be
-entered. Start only still gives a one-day bar; the timeline still draws end-only data (e.g. from
-an old file) as a one-day bar.
+| Date       | Topic                   | Decision                                                                                                                               |
+| ---------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-11-04 | Rule                    | In the task dialog, **End Date is disabled until its Start Date is set**.                                                              |
+| 2026-11-04 | Boxes                   | **Planned and Actual**: each End Date waits for its own Start Date.                                                                    |
+| 2026-11-04 | Clearing the start      | **Clears the End Date too** (and disables it again). Cancel in the dialog brings both back.                                            |
+| 2026-11-04 | Existing end-only tasks | **No special handling**: there are none in use. They still import and draw as a one-day bar; in the dialog their End Date is disabled. |
+| 2026-11-04 | Hint                    | "Pick a start date first" under a disabled End Date (sentence case, as hints are sentences).                                           |
+| 2026-11-04 | After picking a start   | End Date becomes available; its calendar doesn't open by itself and greys out days before the start.                                   |
 
 ## Behaviour
 

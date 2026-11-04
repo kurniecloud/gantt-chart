@@ -1,6 +1,6 @@
 ---
 name: scheduling-engine
-description: Authoritative rules for how the app computes task dates — calendar-day representation, working-day arithmetic, FS/SS/FF/SF dependencies with lag, constraints, summary rollups, critical path (CPM) and slack, cycle prevention. Use before writing or changing anything in src/domain that touches dates, or when debugging why a task moved.
+description: Authoritative rules for how the app computes task dates — calendar-day representation, working-day arithmetic, FS/SS/FF/SF dependencies with lag, constraints, summary rollups, critical path (driving chain) and slack (CPM), cycle prevention. Use before writing or changing anything in src/domain that touches dates, or when debugging why a task moved.
 ---
 
 # Scheduling engine rules
@@ -11,8 +11,7 @@ off for SNLT/FNLT conflicts → shown as negative slack) at **day granularity**.
 > **Status:** sections 3–6 describe the future auto-scheduler. Today tasks are manually dated
 > (`mode: 'manual'`), links are finish-to-start with no lag, and the critical-path toggle uses the
 > agreed **driving chain** rule (`src/domain/criticalPath.ts`, spec
-> `docs/specs/dependency-arrows.md`), not zero total slack. Keep that rule unless the product
-> owner changes it.
+> `docs/specs/dependency-arrows.md`). Keep that rule unless the product owner changes it.
 
 ## 1. Date representation
 
@@ -114,9 +113,12 @@ show an indicator.
 5. **Backward pass** in reverse topo order → LS/LF, using the inverse formulas
    (e.g. FS: `P.LF ≤ addWorkingDays(S.LS, -(1 + lag))`).
 6. Total slack = working days from ES to LS (signed). Free slack = min over successors of the
-   gap before the successor's ES requirement. Critical ⇔ total slack ≤ 0.
+   gap before the successor's ES requirement. These are shown as figures; the critical path
+   stays the owner's **driving chain** rule (`criticalPath.ts`) — don't switch it to
+   "total slack ≤ 0" without asking.
 7. Roll up summaries bottom-up.
-8. Return `{ tasks: Record<id, ComputedDates>, projectFinish, criticalIds, conflicts }`.
+8. Return `{ tasks: Record<id, ComputedDates>, projectFinish, conflicts }` (critical ids come
+   from the driving chain over the computed dates).
 
 Incremental mode: given changed ids, recompute forward pass only for their downstream
 closure; recompute backward pass fully (it's cheap) when the project finish changes.

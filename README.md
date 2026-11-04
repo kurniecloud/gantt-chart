@@ -1,21 +1,34 @@
 # Gantt Chart
 
 A free, stand-alone Gantt chart web application — no back end and no database — inspired by
-the ClickUp Gantt view and Microsoft Project. Bring data in by uploading a file, add, update
-and delete tasks in the UI, and save your work by exporting it to a JSON file. Work in progress
-is also autosaved in your browser, so nothing is lost if you close the tab.
+the ClickUp Gantt view and Microsoft Project. Plan nested tasks on a weekday timeline, link
+them, track planned against actual dates, and save your work by exporting a `.gantt.json`
+file. Work in progress is also autosaved in your browser, so nothing is lost if you close the
+tab.
 
-> Status: Phase 0 (foundation) — app shell, task list, undo/redo and local autosave. See the [roadmap](docs/PRODUCT.md).
+Live: https://kurniecloud.github.io/gantt-chart/ · Status: Phase 1 (usable Gantt) nearly done —
+see the [roadmap](docs/PRODUCT.md).
 
-## Planned features
+## What it does today
 
-- Task grid + interactive timeline (drag to move, resize, link)
-- Hierarchy with summary tasks, milestones, WBS numbering
-- FS / SS / FF / SF dependencies with lag, auto-scheduling, critical path
-- Working calendars, constraints, baselines, deadlines
+- Project title and description, edited in place; undo / redo for every change.
+- Nested tasks to any depth: add, edit, delete, collapse, reorder and nest by drag or keyboard.
+- Task dialog: Planned and Actual dates (weekday-only pickers; an end date needs a start),
+  "Is Blocked By" / "Is Blocking" links, priority.
+- Timeline: daily and weekly views, weekends hidden, today highlighted; bars coloured by
+  priority, drag to move and resize; link arrows (amber when the dates break a link); blue
+  actual-dates lines (Actual Dates toggle); Critical Path toggle (driving chain).
+- Milestones (dialog, green days with ◆ markers) and project totals (tasks, planned and actual
+  length).
+- Import / export of the native `.gantt.json` file; follows the OS light / dark setting.
+
+## Planned
+
+- Auto-scheduling, all dependency types with lag, working calendars, constraints, baselines,
+  deadlines
 - Resources, assignments and workload view
-- Import / export: JSON, CSV, Microsoft Project XML, PNG / PDF
-- Works offline; light and dark themes
+- CSV and Microsoft Project XML import / export; PNG / PDF export
+- Project list, light / dark toggle, search / filter / group, PWA
 
 ## Development
 
@@ -26,8 +39,9 @@ npm install
 npm run dev
 ```
 
-See [CLAUDE.md](CLAUDE.md) for commands and conventions, and
-[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design.
+See [CLAUDE.md](CLAUDE.md) for commands and conventions, [docs/CONTEXT.md](docs/CONTEXT.md) for
+the current state and agreed decisions, and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for
+the design.
 
 ## Deployment
 

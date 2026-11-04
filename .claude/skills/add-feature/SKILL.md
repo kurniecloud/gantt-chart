@@ -19,7 +19,9 @@ styling change has no domain step) and say which steps you skipped.
 - Ask the owner the open questions (question tool, ≤ 4, recommended option first); state the
   smaller defaults you'll use instead of asking about them.
 - Write `docs/specs/<feature-slug>.md`: dated Decisions table (the owner's actual answers),
-  behaviour, data-model changes, out of scope. Mark superseded decisions in older specs.
+  behaviour, data-model changes, out of scope. If an answer changes an earlier decision,
+  overwrite it everywhere it's described (older spec's Decisions row and behaviour, CONTEXT
+  §1/§3, PRODUCT, ARCHITECTURE, README, skills) — no superseded text (CONTEXT §2.4).
 - Add or mark the row 🟨 in `docs/PRODUCT.md`.
 
 ## 2. Domain (`src/domain/`)

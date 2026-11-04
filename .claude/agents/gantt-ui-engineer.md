@@ -17,18 +17,21 @@ Before writing code, read:
 ## Rules
 
 - Components never compute schedule dates: they read selectors and dispatch commands.
-- Drags preview locally (refs + rAF) and commit **one** command on pointer-up.
+- Drags use window pointer listeners (rows are virtualized), show a live preview and commit
+  **one** command on pointer-up.
 - Grid and timeline share row virtualization and row heights; never render off-screen rows.
 - Memoize row components (`React.memo`) and keep props stable; avoid inline object props in
   hot paths.
 - Every interactive element is keyboard reachable and has an accessible name.
-- Use CSS Modules + tokens from `src/styles/tokens.css`; support light and dark themes.
+- Use CSS Modules + tokens from `src/styles/tokens.css`; support light and dark themes and
+  phone width (375 px, no sideways page scroll).
+- UI text follows the Title Case rule in `CLAUDE.md` → Code style.
 
 ## Verify
 
 1. `npx tsc --noEmit`, `npm run lint`, and component tests with Vitest + Testing Library.
 2. Run the dev server and check the change visually in the browser (both themes, and at
-   day/week/month zoom). Exercise the interaction you built.
+   daily and weekly views, and at phone width). Exercise the interaction you built.
 3. For list/scroll changes, sanity-check with a generated 5,000-task project.
 
 Report what changed, how you verified it (what you clicked and saw), and anything not verified.

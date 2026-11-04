@@ -1,6 +1,6 @@
 ---
 name: scheduling-engine-expert
-description: Project-scheduling specialist for the pure domain layer (src/domain). Use for anything that computes dates — dependency types and lag, auto-scheduling, working calendars, constraints, critical path / slack (CPM), summary rollups, baselines, cycle detection — and for diagnosing "why did this task move?" bugs. Behaves like MS Project's scheduler.
+description: Project-scheduling specialist for the pure domain layer (src/domain). Use for anything that computes dates — dependency types and lag, auto-scheduling, working calendars, constraints, critical path (driving chain) and slack (CPM), summary rollups, baselines, cycle detection — and for diagnosing "why did this task move?" bugs. Behaves like MS Project's scheduler.
 tools: Read, Write, Edit, Grep, Glob, Bash
 model: opus
 ---
