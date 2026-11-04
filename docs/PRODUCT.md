@@ -30,7 +30,7 @@ Spec: [specs/task-list-and-timeline.md](specs/task-list-and-timeline.md); 1.16�
 | ---- | -------------------------------------------------------------------------------------------------------------- | ------ |
 | 1.1  | Project title and description at the top, edited in place                                                      | ✅     |
 | 1.2  | Nested tasks to any depth, indented per level, expand / collapse                                               | ✅     |
-| 1.3  | Add / edit dialog: name, weekday-only start & end pickers, priority                                            | ✅     |
+| 1.3  | Add / edit dialog: name, weekday-only start & end pickers (end needs a start), priority                        | ✅     |
 | 1.4  | Add subtask (⊕) and delete with confirmation (✕) on every row                                                  | ✅     |
 | 1.5  | Timeline: daily / weekly views, weekdays only, scroll past & future, today highlighted                         | ✅     |
 | 1.6  | Task bars: colour by priority, parents span subtasks, 1-day bars for single dates                              | ✅     |

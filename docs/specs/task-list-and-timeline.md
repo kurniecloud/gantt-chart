@@ -9,12 +9,12 @@ tasks on the left, and a weekday-only timeline on the right that shows each task
 
 ## Decisions (agreed with the product owner, 2026-10-31)
 
-| Topic             | Decision                                                                                                                                                                                                                  |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Parent task dates | A task with subtasks spans them: earliest descendant start → latest descendant finish, recursively. Its own dates apply only while no descendant has dates; the dialog shows them read-only ("Calculated from subtasks"). |
-| Partial dates     | Start and end are each optional. Start only → 1-day bar on the start. End only → 1-day bar on the end. Neither → no bar.                                                                                                  |
-| Weekends          | Saturdays and Sundays cannot be selected in the date pickers (greyed out). The end picker also disables days before the start.                                                                                            |
-| Priority          | None, Urgent, High, Normal, Low. Shown as the bar colour: Urgent red, High orange, Normal blue, Low grey, none neutral slate. Also stated in the bar's tooltip and accessible label.                                      |
+| Topic             | Decision                                                                                                                                                                                                                                             |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Parent task dates | A task with subtasks spans them: earliest descendant start → latest descendant finish, recursively. Its own dates apply only while no descendant has dates; the dialog shows them read-only ("Calculated from subtasks").                            |
+| Partial dates     | Start and end are each optional. Start only → 1-day bar on the start. End only → 1-day bar on the end (_can no longer be entered since 2026-11-04 — see [end-date-needs-start](end-date-needs-start.md); still drawn if present_). Neither → no bar. |
+| Weekends          | Saturdays and Sundays cannot be selected in the date pickers (greyed out). The end picker also disables days before the start.                                                                                                                       |
+| Priority          | None, Urgent, High, Normal, Low. Shown as the bar colour: Urgent red, High orange, Normal blue, Low grey, none neutral slate. Also stated in the bar's tooltip and accessible label.                                                                 |
 
 ## Behaviour
 

@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from './App';
 import { useProjectStore } from './store/projectStore';
 import { useUiStore } from './store/uiStore';
@@ -180,7 +180,7 @@ describe('date pickers', () => {
     expect(day(/Wednesday, November 4th, 2026/)).toBeEnabled();
   });
 
-  it('picks and clears dates', async () => {
+  it('clearing a Start Date clears and disables its End Date', async () => {
     const user = await editDated();
     await user.click(within(dialog()).getByRole('button', { name: /^Planned End Date/ }));
     await user.click(within(dialog()).getByRole('button', { name: /Friday, November 13th, 2026/ }));
@@ -188,10 +188,96 @@ describe('date pickers', () => {
       'Fri 13 Nov 2026',
     );
     await user.click(within(dialog()).getByRole('button', { name: 'Clear Planned Start Date' }));
+    const end = within(dialog()).getByRole('button', { name: /^Planned End Date/ });
+    expect(end).toHaveTextContent('No Date');
+    expect(end).toBeDisabled();
     await user.click(within(dialog()).getByRole('button', { name: 'Save' }));
     const task = useProjectStore.getState().project.tasks.A;
-    expect(task).toMatchObject({ finish: '2026-11-13' });
     expect(task).not.toHaveProperty('start');
+    expect(task).not.toHaveProperty('finish');
+  });
+});
+
+describe('End Date needs a Start Date', () => {
+  // A new task's calendars open on today's month: pin it.
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(2026, 10, 4, 10, 0)); // Wed 4 Nov 2026
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const field = (name: RegExp) => within(dialog()).getByRole('button', { name });
+  const pick = (user: ReturnType<typeof userEvent.setup>, day: RegExp) =>
+    user.click(within(dialog()).getByRole('button', { name: day }));
+
+  it('is disabled with a hint in both boxes until each box has a start', async () => {
+    const user = setup();
+    await user.click(screen.getByRole('button', { name: 'Add Task' }));
+    for (const box of ['Planned', 'Actual']) {
+      const end = field(new RegExp(`^${box} End Date`));
+      expect(end).toBeDisabled();
+      expect(end).toHaveAccessibleDescription('Pick a start date first');
+      expect(within(dialog()).queryByRole('button', { name: `Clear ${box} End Date` })).toBeNull();
+    }
+
+    await user.click(field(/^Planned Start Date/));
+    await pick(user, /Monday, November 9th, 2026/);
+    expect(field(/^Planned End Date/)).toBeEnabled();
+    expect(field(/^Planned End Date/)).not.toHaveAccessibleDescription();
+    expect(field(/^Actual End Date/)).toBeDisabled(); // its own start is still empty
+
+    await user.click(field(/^Actual Start Date/));
+    await pick(user, /Tuesday, November 10th, 2026/);
+    expect(field(/^Actual End Date/)).toBeEnabled();
+    expect(within(dialog()).queryAllByText('Pick a start date first')).toHaveLength(0);
+  });
+
+  it('an actual start enables the planned end by filling the planned start', async () => {
+    const user = setup();
+    await user.click(screen.getByRole('button', { name: 'Add Task' }));
+    await user.click(field(/^Actual Start Date/));
+    await pick(user, /Wednesday, November 4th, 2026/);
+    expect(field(/^Planned Start Date/)).toHaveTextContent('Wed 4 Nov 2026');
+    expect(field(/^Planned End Date/)).toBeEnabled();
+  });
+
+  it('an actual end does not fill the planned end while the planned box has no start', async () => {
+    const user = setup({ tasks: [{ id: 'A', name: 'Build' }] });
+    await user.click(screen.getByRole('button', { name: 'Build' }));
+    await user.click(field(/^Actual Start Date/));
+    await pick(user, /Wednesday, November 4th, 2026/); // also fills the planned start…
+    await user.click(within(dialog()).getByRole('button', { name: 'Clear Planned Start Date' }));
+    await user.click(field(/^Actual End Date/));
+    await pick(user, /Friday, November 6th, 2026/);
+    expect(field(/^Planned End Date/)).toHaveTextContent('No Date'); // …but not the planned end
+    expect(field(/^Planned End Date/)).toBeDisabled();
+
+    await user.click(within(dialog()).getByRole('button', { name: 'Save' }));
+    const task = useProjectStore.getState().project.tasks.A;
+    expect(task).toMatchObject({ actualStart: '2026-11-04', actualFinish: '2026-11-06' });
+    expect(task).not.toHaveProperty('finish');
+  });
+
+  it('clearing an Actual Start Date clears its Actual End Date', async () => {
+    const user = setup({
+      tasks: [
+        {
+          id: 'A',
+          name: 'Build',
+          start: '2026-11-02',
+          finish: '2026-11-06',
+          actualStart: '2026-11-03',
+          actualFinish: '2026-11-05',
+        },
+      ],
+    });
+    await user.click(screen.getByRole('button', { name: 'Build' }));
+    await user.click(within(dialog()).getByRole('button', { name: 'Clear Actual Start Date' }));
+    expect(field(/^Actual End Date/)).toHaveTextContent('No Date');
+    expect(field(/^Actual End Date/)).toBeDisabled();
+    expect(field(/^Planned End Date/)).toHaveTextContent('Fri 6 Nov 2026'); // the other box stays
   });
 });
 

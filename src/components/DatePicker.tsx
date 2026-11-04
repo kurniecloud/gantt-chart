@@ -26,6 +26,10 @@ type DatePickerProps = {
    * "Start Date" fields can be told apart.
    */
   context?: string;
+  /** Greys the field out (no calendar, no Clear) — e.g. an End Date before a start is set. */
+  disabled?: boolean;
+  /** Shown under the field while it's disabled, saying what enables it. */
+  disabledHint?: string;
 };
 
 const WEEKENDS: Matcher = { dayOfWeek: [0, 6] };
@@ -42,13 +46,18 @@ export function DatePicker({
   error,
   hideLabel = false,
   context,
+  disabled = false,
+  disabledHint,
 }: DatePickerProps) {
   const contextId = useId();
   const labelId = useId();
   const buttonId = useId();
   const errorId = useId();
   const calendarId = useId();
-  const disabled: Matcher[] = minDate
+  const hintId = useId();
+  const hint = disabled ? disabledHint : undefined;
+  const describedBy = [error && errorId, hint && hintId].filter(Boolean).join(' ') || undefined;
+  const disabledDays: Matcher[] = minDate
     ? [WEEKENDS, { before: isoToLocalDate(minDate) }]
     : [WEEKENDS];
 
@@ -68,10 +77,11 @@ export function DatePicker({
           type="button"
           className={styles.trigger}
           aria-labelledby={`${context ? `${contextId} ` : ''}${labelId} ${buttonId}`}
-          aria-expanded={open}
-          aria-controls={open ? calendarId : undefined}
+          aria-expanded={open && !disabled}
+          aria-controls={open && !disabled ? calendarId : undefined}
           aria-invalid={error ? true : undefined}
-          aria-describedby={error ? errorId : undefined}
+          aria-describedby={describedBy}
+          disabled={disabled}
           onClick={() => onOpenChange(!open)}
         >
           <CalendarIcon />
@@ -79,7 +89,7 @@ export function DatePicker({
             {value ? formatDate(value) : 'No Date'}
           </span>
         </button>
-        {value && (
+        {value && !disabled && (
           <button
             type="button"
             className={styles.clear}
@@ -98,7 +108,12 @@ export function DatePicker({
           {error}
         </p>
       )}
-      {open && (
+      {hint && (
+        <p id={hintId} className={styles.hint}>
+          {hint}
+        </p>
+      )}
+      {open && !disabled && (
         <div id={calendarId} className={styles.calendar}>
           <DayPicker
             mode="single"
@@ -107,7 +122,7 @@ export function DatePicker({
             showOutsideDays
             selected={value ? isoToLocalDate(value) : undefined}
             defaultMonth={isoToLocalDate(value ?? minDate ?? openMonth ?? todayISO())}
-            disabled={disabled}
+            disabled={disabledDays}
             onSelect={(date) => {
               if (date) onChange(localDateToISO(date));
               onOpenChange(false);
