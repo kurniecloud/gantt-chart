@@ -127,6 +127,18 @@ describe('import', () => {
   });
 });
 
+describe('remarks in files', () => {
+  it('round-trips remarks, line breaks included, and rejects damaged ones', () => {
+    const project = sample();
+    project.tasks.A = { ...project.tasks.A!, notes: 'Line one\nLine two' };
+    expect(parseProjectFile(serializeProject(project, '2026-11-01')).tasks.A?.notes).toBe(
+      'Line one\nLine two',
+    );
+    (project.tasks.A as { notes: unknown }).notes = 42;
+    expect(() => parseProjectFile(envelope(project))).toThrow(/“Design” has invalid remarks/);
+  });
+});
+
 describe('actual dates in files', () => {
   it('round-trips actual dates and rejects damaged ones', () => {
     const project = sample();

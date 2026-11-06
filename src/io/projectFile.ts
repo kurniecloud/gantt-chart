@@ -95,6 +95,9 @@ function contentProblems(project: Project): string[] {
     if (value.priority !== undefined && !PRIORITIES.includes(value.priority as never)) {
       problems.push(`${label} has an unknown priority`);
     }
+    if (value.notes !== undefined && typeof value.notes !== 'string') {
+      problems.push(`${label} has invalid remarks`);
+    }
     if (value.collapsed !== undefined && typeof value.collapsed !== 'boolean') {
       problems.push(`${label} has an invalid collapsed flag`);
     }

@@ -16,7 +16,7 @@ Status: done (PR #4; kept current with later changes).
 
 - **Export** (header button) downloads `<project-title>.gantt.json` (the title as a slug):
   `{ "format": "gantt-chart", "schemaVersion": 4, "exportedAt": "YYYY-MM-DD", "project": {…} }`
-  with title, description, tasks, hierarchy, planned and actual dates, priorities, collapse
+  with title, description, tasks, hierarchy, planned and actual dates, priorities, remarks, collapse
   state, links and milestones.
 - **Import** (header button) picks a `.json` file (at most 20 MB), validates it, and asks for
   confirmation in `Import “file.gantt.json”?`, saying what is replaced and what the file

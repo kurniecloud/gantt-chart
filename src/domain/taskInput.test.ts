@@ -41,4 +41,18 @@ describe('normalizeTaskInput', () => {
       }),
     ).toEqual({ name: 'Build', start: '2026-11-02', finish: '2026-11-03', priority: 'high' });
   });
+
+  it.each([
+    ['  Waiting on the quote \n', 'Waiting on the quote'],
+    ['\n\nLine one\n\nLine two\n', 'Line one\n\nLine two'], // inner line breaks stay
+  ])('trims remarks: %j', (notes, expected) => {
+    expect(normalizeTaskInput({ name: 'Design', notes })).toEqual({
+      name: 'Design',
+      notes: expected,
+    });
+  });
+
+  it.each(['', '   ', '\n \n', undefined])('drops empty remarks: %j', (notes) => {
+    expect(normalizeTaskInput({ name: 'Design', notes })).toEqual({ name: 'Design' });
+  });
 });

@@ -27,7 +27,7 @@ Specs: 1.1–1.6, 1.10 [task-list-and-timeline](specs/task-list-and-timeline.md)
 1.9 [dependency-arrows](specs/dependency-arrows.md) · 1.8, 1.11, 1.15
 [drag-and-actuals](specs/drag-and-actuals.md) · 1.16–1.18
 [summaries-and-actual-toggle](specs/summaries-and-actual-toggle.md) · 1.3 (end needs a start)
-[end-date-needs-start](specs/end-date-needs-start.md).
+[end-date-needs-start](specs/end-date-needs-start.md) · 1.19 [task-remarks](specs/task-remarks.md).
 
 | #    | Feature                                                                                                        | Status |
 | ---- | -------------------------------------------------------------------------------------------------------------- | ------ |
@@ -49,6 +49,7 @@ Specs: 1.1–1.6, 1.10 [task-list-and-timeline](specs/task-list-and-timeline.md)
 | 1.16 | Project totals above "Task Name": top-level tasks (hover: main / edge counts), planned and actual length       | ✅     |
 | 1.17 | Milestone count beside the Milestones button ("5 Milestones · 3 Upcoming")                                     | ✅     |
 | 1.18 | "Actual Dates" toggle button to show / hide the blue actual lines (remembered per browser)                     | ✅     |
+| 1.19 | Remarks: a plain-text box in the task dialog, below Priority                                                   | ✅     |
 
 ## Phase 2 — Advanced scheduling
 

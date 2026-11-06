@@ -31,6 +31,7 @@ export type Task = {
   calendarId?: string;
   collapsed?: boolean;
   color?: string;
+  /** Plain text, shown as "Remarks" in the task dialog. */
   notes?: string;
   custom?: Record<string, unknown>;
 };

@@ -13,7 +13,7 @@ see the [roadmap](docs/PRODUCT.md).
 - Project title and description, edited in place; undo / redo for every change.
 - Nested tasks to any depth: add, edit, delete, collapse, reorder and nest by drag or keyboard.
 - Task dialog: Planned and Actual dates (weekday-only pickers; an end date needs a start),
-  "Is Blocked By" / "Is Blocking" links, priority.
+  "Is Blocked By" / "Is Blocking" links, priority, remarks.
 - Timeline: daily and weekly views, weekends hidden, today highlighted; bars coloured by
   priority, drag to move and resize; link arrows (amber when the dates break a link); blue
   actual-dates lines (Actual Dates toggle); Critical Path toggle (driving chain).

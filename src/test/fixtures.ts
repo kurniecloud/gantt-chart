@@ -10,6 +10,7 @@ type TaskSpec = {
   actualFinish?: ISODate;
   parent?: string;
   priority?: Priority;
+  notes?: string;
   collapsed?: boolean;
   deps?: { from: string; type?: DependencyType; lag?: number }[];
 };
@@ -50,6 +51,7 @@ export function makeProject(spec: ProjectSpec = {}): Project {
       ...(t.actualStart && { actualStart: t.actualStart }),
       ...(t.actualFinish && { actualFinish: t.actualFinish }),
       ...(t.priority && { priority: t.priority }),
+      ...(t.notes && { notes: t.notes }),
       ...(t.collapsed && { collapsed: true }),
     };
     project.taskOrder.push(t.id);

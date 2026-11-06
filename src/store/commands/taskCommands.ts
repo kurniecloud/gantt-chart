@@ -62,8 +62,8 @@ export function addTask(
 }
 
 /**
- * Replaces the task's name, dates and priority (absent optional fields are cleared) and the
- * sides of its links that are given (an omitted side is left alone).
+ * Replaces the task's name, dates, priority and remarks (absent optional fields are cleared) and
+ * the sides of its links that are given (an omitted side is left alone).
  */
 export function updateTask(id: string, fields: TaskFields, links: TaskLinks = {}): Command {
   return {
@@ -83,6 +83,8 @@ export function updateTask(id: string, fields: TaskFields, links: TaskLinks = {}
       else delete task.actualFinish;
       if (fields.priority) task.priority = fields.priority;
       else delete task.priority;
+      if (fields.notes) task.notes = fields.notes;
+      else delete task.notes;
     },
   };
 }

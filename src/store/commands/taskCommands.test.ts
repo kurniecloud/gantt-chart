@@ -85,6 +85,19 @@ describe('addTask', () => {
   });
 });
 
+describe('remarks', () => {
+  it('addTask stores them and updateTask replaces or clears them', () => {
+    state().dispatch(addTask({ name: 'New', notes: 'First' }, null, 'N'));
+    expect(state().project.tasks.N?.notes).toBe('First');
+    state().dispatch(updateTask('N', { name: 'New', notes: 'Second' }));
+    expect(state().project.tasks.N?.notes).toBe('Second');
+    state().dispatch(updateTask('N', { name: 'New' }));
+    expect(state().project.tasks.N).not.toHaveProperty('notes');
+    state().undo();
+    expect(state().project.tasks.N?.notes).toBe('Second');
+  });
+});
+
 describe('updateTask', () => {
   it('replaces name, dates and priority, clearing fields that are left out', () => {
     state().dispatch(updateTask('A', { name: 'Design', finish: '2026-11-13', priority: 'low' }));

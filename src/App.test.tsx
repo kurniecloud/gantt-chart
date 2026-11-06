@@ -281,6 +281,69 @@ describe('End Date needs a Start Date', () => {
   });
 });
 
+describe('remarks', () => {
+  const remarks = () => within(dialog()).getByRole('textbox', { name: 'Remarks' });
+  const stored = (id: string) => useProjectStore.getState().project.tasks[id];
+
+  it('sits below Priority and is saved with a new task', async () => {
+    const user = setup();
+    await user.click(screen.getByRole('button', { name: 'Add Task' }));
+    const priority = within(dialog()).getByRole('group', { name: 'Priority' });
+    expect(
+      priority.compareDocumentPosition(remarks()) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(remarks()).toHaveValue('');
+
+    await user.type(within(dialog()).getByRole('textbox', { name: 'Task Name' }), 'Design');
+    await user.type(remarks(), 'Line one{Enter}Line two'); // Enter adds a line, it doesn't save
+    expect(dialog()).toBeInTheDocument();
+    await user.click(within(dialog()).getByRole('button', { name: 'Add' }));
+
+    const { taskOrder, tasks } = useProjectStore.getState().project;
+    expect(tasks[taskOrder[0]!]?.notes).toBe('Line one\nLine two');
+  });
+
+  it('is on subtasks too, and one undo takes it back', async () => {
+    const user = setup({
+      tasks: [
+        { id: 'P', name: 'Website' },
+        { id: 'C', name: 'Design', parent: 'P' },
+      ],
+    });
+    await user.click(screen.getByRole('button', { name: 'Design' }));
+    await user.type(remarks(), 'Check the brief');
+    await user.click(within(dialog()).getByRole('button', { name: 'Save' }));
+    expect(stored('C')?.notes).toBe('Check the brief');
+    expect(stored('P')).not.toHaveProperty('notes'); // a parent's remarks are its own
+
+    await user.click(screen.getByRole('button', { name: 'Undo' }));
+    expect(stored('C')).not.toHaveProperty('notes');
+  });
+
+  it('shows saved remarks when editing, and emptying the box removes them', async () => {
+    const user = setup({ tasks: [{ id: 'A', name: 'Design', notes: 'Waiting on the quote' }] });
+    await user.click(screen.getByRole('button', { name: 'Design' }));
+    expect(remarks()).toHaveValue('Waiting on the quote');
+    await user.clear(remarks());
+    await user.click(within(dialog()).getByRole('button', { name: 'Save' }));
+    expect(stored('A')).not.toHaveProperty('notes');
+  });
+
+  it('discards changes on Cancel', async () => {
+    const user = setup({ tasks: [{ id: 'A', name: 'Design', notes: 'Keep me' }] });
+    await user.click(screen.getByRole('button', { name: 'Design' }));
+    await user.type(remarks(), ' and more');
+    await user.click(within(dialog()).getByRole('button', { name: 'Cancel' }));
+    expect(stored('A')?.notes).toBe('Keep me');
+  });
+
+  it('stays out of the task list and timeline', () => {
+    setup({ tasks: [{ id: 'A', name: 'Design', start: '2026-11-02', notes: 'Private note' }] });
+    expect(screen.queryByText(/Private note/)).not.toBeInTheDocument();
+    expect(screen.queryByTitle(/Private note/)).not.toBeInTheDocument();
+  });
+});
+
 describe('editing tasks', () => {
   it('opens the edit dialog from the row or the name, prefilled', async () => {
     const user = setup({

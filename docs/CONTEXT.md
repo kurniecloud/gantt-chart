@@ -3,7 +3,7 @@
 **Read this at the start of every task. Update it in the same PR as any change that alters
 what's below** (status, a decision, a lesson learned, the backlog). It is the memory of the
 project between sessions; `CLAUDE.md` holds the always-on rules, this file holds the history
-and the why. Last updated: 2026-11-06, after PR #11.
+and the why. Last updated: 2026-11-06, after PR #12.
 
 ---
 
@@ -15,10 +15,10 @@ and the why. Last updated: 2026-11-06, after PR #11.
 | Live site      | https://kurniecloud.github.io/gantt-chart/ (deployed by `.github/workflows/deploy.yml` on `main`)                                               |
 | Product owner  | GitHub user **kurniecloud** — sets priorities, answers design questions, merges PRs                                                             |
 | Stack          | Vite 8 · React 19 · TypeScript 6 (strict) · Zustand 5 + immer 11 · `@tanstack/react-virtual` 3 · `react-day-picker` 10 · `date-fns` 4 · `idb` 8 |
-| Tests          | Vitest 5 + Testing Library (384 tests, 27 files) · Playwright 1.64 Chromium (26 e2e)                                                            |
+| Tests          | Vitest 5 + Testing Library (397 tests, 27 files) · Playwright 1.64 Chromium (27 e2e)                                                            |
 | Runtime        | Node 26 LTS (`.nvmrc`), npm 11                                                                                                                  |
 | Schema version | **4** (`src/domain/project.ts`, migrations in `src/persistence/migrations.ts`)                                                                  |
-| Bundle         | ~402 KB JS / 124 KB gzipped (PR #10)                                                                                                            |
+| Bundle         | ~403 KB JS / 124 KB gzipped (PR #12)                                                                                                            |
 
 ### History of merged work
 
@@ -35,6 +35,7 @@ and the why. Last updated: 2026-11-06, after PR #11.
 | #9  | `fix/focus-ring-task-count`            | Focus ring only after real keyboard use (not Shift/⌘ after a click); totals count top-level tasks (hover: main / edge); Title Case labels              | [summaries-and-actual-toggle](specs/summaries-and-actual-toggle.md)                       |
 | #10 | `feat/end-date-needs-start`            | End Date disabled until its Start Date is set (Planned and Actual); clearing a start clears its end; every doc rewritten to current behaviour          | [end-date-needs-start](specs/end-date-needs-start.md)                                     |
 | #11 | `docs/remove-product-references`       | Removed all mentions of other products from the docs; JSON made the only import/export format (CSV, XML and image/PDF export dropped from the roadmap) | —                                                                                         |
+| #12 | `feat/task-remarks`                    | "Remarks" text box in the task dialog, below Priority                                                                                                  | [task-remarks](specs/task-remarks.md)                                                     |
 
 ### What the app does today (user's view)
 
@@ -48,7 +49,7 @@ and the why. Last updated: 2026-11-06, after PR #11.
   Reorder/nest by dragging the ⋮⋮ grip or Alt+Shift+arrows.
 - **Task dialog**: name, **Planned** box and **Actual** box (weekday-only pickers; each End Date
   is disabled until its Start Date is set), "Is Blocked By" / "Is Blocking" links, priority
-  (None / Urgent / High / Normal / Low).
+  (None / Urgent / High / Normal / Low), Remarks (plain text, seen only in the dialog).
 - **Timeline** (right): Daily / Weekly, Today, ±10 years, weekends hidden; bars coloured by
   priority, parents as brackets; drag to move, edges to resize; grey link arrows (dashed amber
   when dates break a link); blue actual-dates line; light-yellow today; light-green milestones
@@ -95,6 +96,7 @@ it was last decided; a changed decision is overwritten here and in its spec (see
 
 | Date       | Area                 | Decision                                                                                                                                                                                                                                                 | Spec                                                                                      |
 | ---------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| 2026-11-06 | Remarks              | **"Remarks" text box below Priority** in the task dialog, for every task and subtask; optional plain text, no limit; **dialog only** (not on rows or the timeline). Stored in the existing `Task.notes`.                                                 | [task-remarks](specs/task-remarks.md)                                                     |
 | 2026-11-06 | Import / export      | Native `.gantt.json` (schema 4) is the **only** import and export format: no other file, image or PDF formats are planned. Import **replaces** title, description, tasks, links and milestones of the open project (keeps its id), asks first, one undo. | [import-export-milestones-critical-path](specs/import-export-milestones-critical-path.md) |
 | 2026-11-06 | Positioning          | Docs and code comments describe the app on its own terms and **name no other products**. Scheduling questions the written rules don't cover go to the owner.                                                                                             | —                                                                                         |
 | 2026-11-04 | End needs start      | In the task dialog **End Date is disabled until its Start Date is set**, in both boxes, with the hint "Pick a start date first"; **clearing a start clears its end**. No special handling for old end-only tasks.                                        | [end-date-needs-start](specs/end-date-needs-start.md)                                     |

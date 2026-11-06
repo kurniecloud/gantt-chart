@@ -38,7 +38,7 @@ const p = makeProject({
 ```
 
 List tasks in display order (each parent before its subtasks). Task fields: `name`, `start`,
-`finish`, `actualStart`, `actualFinish`, `parent`, `priority`, `collapsed`, `deps`
+`finish`, `actualStart`, `actualFinish`, `parent`, `priority`, `notes`, `collapsed`, `deps`
 (`{ from, type?, lag? }`). Defaults: project starts Monday 2026-11-02, Mon–Fri calendar, tasks
 are manually dated (`mode: 'manual'`) with no dates, top-level unless `parent` is set.
 
