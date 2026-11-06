@@ -50,6 +50,7 @@ export function TaskDialog(props: TaskDialogProps) {
   const [actualStart, setActualStart] = useState(task?.actualStart);
   const [actualFinish, setActualFinish] = useState(task?.actualFinish);
   const [priority, setPriority] = useState<Priority | undefined>(task?.priority);
+  const [notes, setNotes] = useState(task?.notes ?? '');
   const [blockedBy, setBlockedBy] = useState<string[]>(() =>
     editTaskId ? predecessorIds(project, editTaskId) : [],
   );
@@ -66,13 +67,14 @@ export function TaskDialog(props: TaskDialogProps) {
   const [errors, setErrors] = useState<TaskInputErrors>({});
   const nameId = useId();
   const nameErrorId = useId();
+  const remarksId = useId();
 
   const title =
     props.mode === 'edit' ? 'Edit Task' : parent ? `Add Subtask to “${parent.name}”` : 'Add Task';
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    const input = { name, start, finish, actualStart, actualFinish, priority };
+    const input = { name, start, finish, actualStart, actualFinish, priority, notes };
     const found = validateTaskInput(input);
     setErrors(found);
     if (Object.keys(found).length > 0) return;
@@ -236,6 +238,19 @@ export function TaskDialog(props: TaskDialogProps) {
             ))}
           </div>
         </fieldset>
+
+        <div className={styles.field}>
+          <label htmlFor={remarksId} className={styles.label}>
+            Remarks
+          </label>
+          <textarea
+            id={remarksId}
+            className={`${styles.input} ${styles.remarks}`}
+            rows={3}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+          />
+        </div>
 
         <DialogActions>
           <Button onClick={props.onClose}>Cancel</Button>

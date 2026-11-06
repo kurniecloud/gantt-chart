@@ -5,8 +5,9 @@ description: Authoritative rules for how the app computes task dates — calenda
 
 # Scheduling engine rules
 
-Semantics follow Microsoft Project (auto-scheduled tasks, "tasks honour constraint dates"
-off for SNLT/FNLT conflicts → shown as negative slack) at **day granularity**.
+Auto-scheduled tasks at **day granularity**; links win over SNLT/FNLT constraints, and the
+conflict shows as negative slack. These written rules are the authority: anything they don't
+cover is the product owner's call.
 
 > **Status:** sections 3–6 describe the future auto-scheduler. Today tasks are manually dated
 > (`mode: 'manual'`), links are finish-to-start with no lag, and the critical-path toggle uses the

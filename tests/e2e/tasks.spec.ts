@@ -136,3 +136,23 @@ test('End Date stays disabled until its Start Date is set', async ({ page }) => 
     page.getByRole('button', { name: /^Design: Thu 5 Nov 2026 – Mon 9 Nov 2026/ }),
   ).toBeVisible();
 });
+
+test('remarks are saved with the task and survive a reload', async ({ page }) => {
+  await page.goto('./');
+  await page.getByRole('button', { name: 'Add Task', exact: true }).click();
+  await dialog(page).getByRole('textbox', { name: 'Task Name' }).fill('Design');
+  const remarks = dialog(page).getByRole('textbox', { name: 'Remarks' });
+  const priority = (await dialog(page).getByRole('group', { name: 'Priority' }).boundingBox())!;
+  expect((await remarks.boundingBox())!.y).toBeGreaterThan(priority.y + priority.height - 1);
+  await expect(remarks).toHaveCSS('resize', 'vertical');
+  await remarks.fill('Waiting on the quote\nThen start');
+  await dialog(page).getByRole('button', { name: 'Add', exact: true }).click();
+  await expect(dialog(page)).toBeHidden();
+
+  await page.waitForTimeout(800); // autosave is debounced
+  await page.reload();
+  await taskName(page, 'Design').click();
+  await expect(dialog(page).getByRole('textbox', { name: 'Remarks' })).toHaveValue(
+    'Waiting on the quote\nThen start',
+  );
+});

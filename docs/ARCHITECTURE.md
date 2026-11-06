@@ -19,7 +19,7 @@
 └────────────┬───────────────────────────────────────────────┘
              │
 ┌────────────▼──────────────┐   ┌────────────────────────────┐
-│ Persistence: IndexedDB    │   │ IO: JSON (CSV, MSPDI later)│
+│ Persistence: IndexedDB    │   │ IO: .gantt.json (JSON)     │
 └───────────────────────────┘   └────────────────────────────┘
 ```
 
@@ -67,7 +67,7 @@ type Task = {
   calendarId?: string;
   collapsed?: boolean;
   color?: string;
-  notes?: string;
+  notes?: string; // plain text, shown as "Remarks" in the task dialog
   custom?: Record<string, unknown>;
 };
 

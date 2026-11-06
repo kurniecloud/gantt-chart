@@ -37,10 +37,10 @@ export function calendarFor(project: Project, task?: Task): Calendar {
 
 export type TaskFields = Pick<
   Task,
-  'name' | 'start' | 'finish' | 'actualStart' | 'actualFinish' | 'priority'
+  'name' | 'start' | 'finish' | 'actualStart' | 'actualFinish' | 'priority' | 'notes'
 >;
 
-/** A new task with the given fields. Absent dates/priority are left off the object entirely. */
+/** A new task with the given fields. Absent optional fields are left off the object entirely. */
 export function createTask(
   fields: TaskFields,
   parentId: string | null = null,
@@ -52,5 +52,6 @@ export function createTask(
   if (fields.actualStart) task.actualStart = fields.actualStart;
   if (fields.actualFinish) task.actualFinish = fields.actualFinish;
   if (fields.priority) task.priority = fields.priority;
+  if (fields.notes) task.notes = fields.notes;
   return task;
 }

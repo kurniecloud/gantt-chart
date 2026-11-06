@@ -286,7 +286,7 @@
   box-shadow: inset 0 0 0 1px rgb(0 0 0 / 14%);
 }
 
-/* A thin bar with downward end caps, like MS Project's summary tasks. */
+/* A thin bar with downward end caps, marking a parent task. */
 .summaryBar {
   height: 14px;
   margin-top: calc((var(--row-height) - 14px) / 2);

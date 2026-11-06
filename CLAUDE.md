@@ -1,9 +1,8 @@
 # Gantt Chart — Project Instructions
 
-A stand-alone, browser-only Gantt chart / project-scheduling application, aiming for feature
-parity with the ClickUp Gantt view and Microsoft Project. No back end: all data lives in the
-browser (IndexedDB) and in files the user imports/exports. Deployed as a static site to
-GitHub Pages.
+A stand-alone, browser-only Gantt chart / project-scheduling application. No back end: all data
+lives in the browser (IndexedDB) and in `.gantt.json` files the user imports/exports. Deployed as
+a static site to GitHub Pages.
 
 ## Start here (every task)
 
@@ -25,24 +24,25 @@ Reference: roadmap [docs/PRODUCT.md](docs/PRODUCT.md) · architecture
   (`docs/specs/<slug>.md`, dated Decisions table) and in docs/CONTEXT.md §3.
 - A changed decision is **overwritten everywhere** it is described (older specs, CONTEXT,
   PRODUCT, ARCHITECTURE, README, skills) — no superseded text (docs/CONTEXT.md §2.4).
+- Docs and code comments describe the app on its own terms: they name no other products.
 - Report plainly: what changed, how it was verified, what wasn't, trade-offs.
 
 ## Tech stack
 
-| Concern        | Choice                                                                                   |
-| -------------- | ---------------------------------------------------------------------------------------- |
-| Build          | Vite 8, Node 26 LTS (`.nvmrc`)                                                           |
-| Language       | TypeScript 6, `strict: true`, no `any` without a comment saying why                      |
-| UI             | React 19 function components + hooks, CSS Modules                                        |
-| State          | Zustand + immer patches, command-based undo/redo                                         |
-| Timeline       | Custom DOM + SVG rendering (no third-party Gantt library)                                |
-| Virtualization | `@tanstack/react-virtual`: rows shared by task list and timeline, date columns           |
-| Dates          | `date-fns`; dates are stored as `YYYY-MM-DD` strings                                     |
-| Persistence    | IndexedDB via `idb` (autosave), native `.gantt.json` import/export (CSV / MSPDI planned) |
-| Unit tests     | Vitest + Testing Library                                                                 |
-| E2E tests      | Playwright                                                                               |
-| Lint/format    | ESLint + Prettier                                                                        |
-| Deploy         | GitHub Actions → GitHub Pages                                                            |
+| Concern        | Choice                                                                             |
+| -------------- | ---------------------------------------------------------------------------------- |
+| Build          | Vite 8, Node 26 LTS (`.nvmrc`)                                                     |
+| Language       | TypeScript 6, `strict: true`, no `any` without a comment saying why                |
+| UI             | React 19 function components + hooks, CSS Modules                                  |
+| State          | Zustand + immer patches, command-based undo/redo                                   |
+| Timeline       | Custom DOM + SVG rendering (no third-party Gantt library)                          |
+| Virtualization | `@tanstack/react-virtual`: rows shared by task list and timeline, date columns     |
+| Dates          | `date-fns`; dates are stored as `YYYY-MM-DD` strings                               |
+| Persistence    | IndexedDB via `idb` (autosave), `.gantt.json` import/export (the only file format) |
+| Unit tests     | Vitest + Testing Library                                                           |
+| E2E tests      | Playwright                                                                         |
+| Lint/format    | ESLint + Prettier                                                                  |
+| Deploy         | GitHub Actions → GitHub Pages                                                      |
 
 Do not add a server, database, auth provider or any runtime network dependency. The app must
 work offline once loaded. New runtime dependencies need a one-line justification in the PR
@@ -85,7 +85,7 @@ src/
     criticalPath/ Recalculation after every change while on, and the input-blocking overlay.
   components/    Shared UI: Button/IconButton, Dialog (native <dialog>), DatePicker, icons.
   persistence/   IndexedDB autosave, project list, migrations between schema versions.
-  io/            Import/export: native .gantt.json (done); CSV, MS Project XML, PNG/PDF later.
+  io/            Import/export of the native .gantt.json file, the only supported format.
   utils/         Small generic helpers (date formatting, priority labels, input modality).
 tests/e2e/       Playwright specs.
 docs/            Product and architecture docs.
