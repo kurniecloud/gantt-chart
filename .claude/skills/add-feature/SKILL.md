@@ -43,8 +43,7 @@ styling change has no domain step) and say which steps you skipped.
 
 - Follow the `gantt-rendering` skill for timeline work.
 - Read via selectors, write via commands. Keyboard access + accessible names required.
-- Add a keyboard shortcut if the competitor equivalent has one, and list it in the
-  shortcuts panel.
+- Add a keyboard shortcut when the feature is used often, and list it in the shortcuts panel.
 
 ## 5. Tests
 

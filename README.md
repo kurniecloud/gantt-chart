@@ -1,9 +1,8 @@
 # Gantt Chart
 
-A free, stand-alone Gantt chart web application — no back end and no database — inspired by
-the ClickUp Gantt view and Microsoft Project. Plan nested tasks on a weekday timeline, link
-them, track planned against actual dates, and save your work by exporting a `.gantt.json`
-file. Work in progress is also autosaved in your browser, so nothing is lost if you close the
+A free, stand-alone Gantt chart web application — no back end and no database. Plan nested
+tasks on a weekday timeline, link them, track planned against actual dates, and save your work
+by exporting a `.gantt.json` file. Work in progress is also autosaved in your browser, so nothing is lost if you close the
 tab.
 
 Live: https://kurniecloud.github.io/gantt-chart/ · Status: Phase 1 (usable Gantt) nearly done —
@@ -27,7 +26,6 @@ see the [roadmap](docs/PRODUCT.md).
 - Auto-scheduling, all dependency types with lag, working calendars, constraints, baselines,
   deadlines
 - Resources, assignments and workload view
-- CSV and Microsoft Project XML import / export; PNG / PDF export
 - Project list, light / dark toggle, search / filter / group, PWA
 
 ## Development

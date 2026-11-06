@@ -1,16 +1,15 @@
 # Product Scope & Roadmap
 
-Goal: a free, offline-capable, browser-only project scheduler that covers what most people use
-in the ClickUp Gantt view and Microsoft Project — without accounts, servers or licences.
+Goal: a free, offline-capable, browser-only project scheduler that covers what most people need
+from a Gantt chart — without accounts, servers or licences.
 
 Status legend: ⬜ not started · 🟨 in progress · ✅ done
 
 ## Target users
 
-- Project managers who need MS Project-style scheduling (dependencies, critical path,
-  baselines) without the licence.
-- Small teams who like ClickUp's drag-and-drop Gantt but want a local, private file.
-- Anyone who receives an `.xml` MS Project file and needs to view or tweak it.
+- Project managers who need dependency-based scheduling (critical path, baselines) without
+  paying for a licence.
+- Small teams who want a drag-and-drop Gantt chart in a local, private file.
 
 ## Phase 0 — Foundation
 
@@ -51,20 +50,18 @@ Specs: 1.1–1.6, 1.10 [task-list-and-timeline](specs/task-list-and-timeline.md)
 | 1.17 | Milestone count beside the Milestones button ("5 Milestones · 3 Upcoming")                                     | ✅     |
 | 1.18 | "Actual Dates" toggle button to show / hide the blue actual lines (remembered per browser)                     | ✅     |
 
-## Phase 2 — MS Project parity (scheduling)
+## Phase 2 — Advanced scheduling
 
-| #    | Feature                                                                             | Status |
-| ---- | ----------------------------------------------------------------------------------- | ------ |
-| 2.1  | All dependency types: FS, SS, FF, SF, with lead/lag (days or %)                     | ⬜     |
-| 2.2  | Working calendars: weekends, holidays, exceptions; per-task calendars               | ⬜     |
-| 2.3  | Critical path (CPM forward/backward pass), total & free slack, highlight            | 🟨     |
-| 2.4  | Constraints: ASAP, ALAP, SNET, SNLT, FNET, FNLT, MSO, MFO                           | ⬜     |
-| 2.5  | Manual vs auto-scheduled tasks per task                                             | ⬜     |
-| 2.6  | Baselines (save up to 11), baseline vs actual bars, variance columns                | ⬜     |
-| 2.7  | Deadlines with missed-deadline indicators                                           | ⬜     |
-| 2.8  | Configurable columns (show/hide, reorder, custom fields: text/number/date/dropdown) | ⬜     |
-| 2.9  | MS Project XML (MSPDI) import / export                                              | ⬜     |
-| 2.10 | CSV import / export                                                                 | ⬜     |
+| #   | Feature                                                                             | Status |
+| --- | ----------------------------------------------------------------------------------- | ------ |
+| 2.1 | All dependency types: FS, SS, FF, SF, with lead/lag (days or %)                     | ⬜     |
+| 2.2 | Working calendars: weekends, holidays, exceptions; per-task calendars               | ⬜     |
+| 2.3 | Critical path (CPM forward/backward pass), total & free slack, highlight            | 🟨     |
+| 2.4 | Constraints: ASAP, ALAP, SNET, SNLT, FNET, FNLT, MSO, MFO                           | ⬜     |
+| 2.5 | Manual vs auto-scheduled tasks per task                                             | ⬜     |
+| 2.6 | Baselines (save up to 11), baseline vs actual bars, variance columns                | ⬜     |
+| 2.7 | Deadlines with missed-deadline indicators                                           | ⬜     |
+| 2.8 | Configurable columns (show/hide, reorder, custom fields: text/number/date/dropdown) | ⬜     |
 
 ## Phase 3 — Resources & collaboration-lite
 
@@ -76,7 +73,7 @@ Specs: 1.1–1.6, 1.10 [task-list-and-timeline](specs/task-list-and-timeline.md)
 | 3.4 | Cost rollups                                                 | ⬜     |
 | 3.5 | Share via URL (compressed project in URL hash) and file      | ⬜     |
 
-## Phase 4 — ClickUp-style polish
+## Phase 4 — Polish & productivity
 
 | #   | Feature                                                   | Status |
 | --- | --------------------------------------------------------- | ------ |
@@ -84,16 +81,16 @@ Specs: 1.1–1.6, 1.10 [task-list-and-timeline](specs/task-list-and-timeline.md)
 | 4.2 | Group by / filter / sort / search                         | ⬜     |
 | 4.3 | Multi-select and bulk edit / bulk drag                    | ⬜     |
 | 4.4 | Board (kanban) and list views over the same data          | ⬜     |
-| 4.5 | Export to PNG / PDF / print layout                        | ⬜     |
-| 4.6 | Keyboard shortcuts panel; command palette                 | ⬜     |
-| 4.7 | PWA: installable, offline cache                           | ⬜     |
-| 4.8 | Project templates                                         | ⬜     |
+| 4.5 | Keyboard shortcuts panel; command palette                 | ⬜     |
+| 4.6 | PWA: installable, offline cache                           | ⬜     |
+| 4.7 | Project templates                                         | ⬜     |
 
 ## Non-goals
 
 - Real-time multi-user editing, user accounts, or any server component.
 - Portfolio management across many projects (one project open at a time).
 - Timesheets and billing.
+- Any import / export format other than the native `.gantt.json` (JSON).
 
 ## Notes on partially done items
 

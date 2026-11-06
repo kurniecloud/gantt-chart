@@ -4,13 +4,13 @@ Status: done (PR #4; kept current with later changes).
 
 ## Decisions (agreed with the product owner)
 
-| Date       | Topic                | Decision                                                                                                                                                                              |
-| ---------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-11-01 | Import / export      | Native `.gantt.json`. Import **replaces** the open project's title, description, tasks, links and milestones (keeps its id), asks first, and is one undo step.                        |
-| 2026-11-01 | Links                | Finish-to-start only, no lag, edited in the task dialog as **"Is Blocked By"** and **"Is Blocking"**. Links to/from a parent apply to all its subtasks; loops are refused.            |
-| 2026-11-01 | Critical path rule   | **Driving chain** back from the task(s) finishing last through the latest-finishing blockers — see [dependency-arrows](dependency-arrows.md).                                         |
-| 2026-11-01 | Critical Path button | A toggle. While on, the red lines recalculate after every change; click again to hide. The toolbar shows the number of critical subtasks ("3 Critical Tasks").                        |
-| 2026-11-01 | Milestones           | Project-level `{ name, date }` list edited in a dialog table; weekday dates; the day is light green with a ◆ marker in the date header; hovering shows the name. Today's yellow wins. |
+| Date       | Topic                | Decision                                                                                                                                                                                                |
+| ---------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-11-06 | Import / export      | Native `.gantt.json` is the **only** import and export format. Import **replaces** the open project's title, description, tasks, links and milestones (keeps its id), asks first, and is one undo step. |
+| 2026-11-01 | Links                | Finish-to-start only, no lag, edited in the task dialog as **"Is Blocked By"** and **"Is Blocking"**. Links to/from a parent apply to all its subtasks; loops are refused.                              |
+| 2026-11-01 | Critical path rule   | **Driving chain** back from the task(s) finishing last through the latest-finishing blockers — see [dependency-arrows](dependency-arrows.md).                                                           |
+| 2026-11-01 | Critical Path button | A toggle. While on, the red lines recalculate after every change; click again to hide. The toolbar shows the number of critical subtasks ("3 Critical Tasks").                                          |
+| 2026-11-01 | Milestones           | Project-level `{ name, date }` list edited in a dialog table; weekday dates; the day is light green with a ◆ marker in the date header; hovering shows the name. Today's yellow wins.                   |
 
 ## Import / export
 
@@ -60,4 +60,4 @@ Status: done (PR #4; kept current with later changes).
 
 ## Out of scope
 
-Auto-scheduling (moving blocked tasks), lag/lead, other link types, MS Project XML / CSV import.
+Auto-scheduling (moving blocked tasks), lag/lead, other link types.
