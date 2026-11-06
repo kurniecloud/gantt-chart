@@ -1,6 +1,6 @@
 # Spec: Remarks on tasks
 
-Status: done (PR #12).
+Status: done (PR #11).
 
 ## Decisions (agreed with the product owner)
 
