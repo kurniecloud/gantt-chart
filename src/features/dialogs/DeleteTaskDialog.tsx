@@ -3,9 +3,8 @@ import { Dialog, DialogActions } from '../../components/Dialog';
 import { descendantIds } from '../../domain/tree';
 import { deleteTask } from '../../store/commands/taskCommands';
 import { useProjectStore } from '../../store/projectStore';
+import { isMac } from '../../utils/platform';
 import styles from './TaskDialog.module.css';
-
-const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
 
 type DeleteTaskDialogProps = {
   taskId: string;

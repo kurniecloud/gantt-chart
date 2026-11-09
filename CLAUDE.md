@@ -76,9 +76,10 @@ src/
                  NO React, NO DOM, NO store imports. 100% unit-testable.
   store/         Zustand stores, commands (for undo/redo), selectors.
   features/
-    header/      Title + description (edited in place), Import/Export, undo/redo + shortcuts.
+    header/      Title + description (edited in place), New/Import/Export, undo/redo + shortcuts.
     tasks/       Left panel: nested task list, expand/collapse, row actions, drag/keyboard moves.
-    dialogs/     Task, delete, milestones and import dialogs; AppDialogs shows the one in uiStore.
+    dialogs/     Task, delete, milestones, import and new-project dialogs; AppDialogs shows the one
+                 in uiStore.
     timeline/    Right panel: weekday scale, date header, bars (drag/resize), arrows, actual line.
     workspace/   The shared scroll area: sticky task panel + header, row/column virtualization,
                  project totals and the Milestones button with its count.
@@ -86,7 +87,7 @@ src/
   components/    Shared UI: Button/IconButton, Dialog (native <dialog>), DatePicker, icons.
   persistence/   IndexedDB autosave, project list, migrations between schema versions.
   io/            Import/export of the native .gantt.json file, the only supported format.
-  utils/         Small generic helpers (date formatting, priority labels, input modality).
+  utils/         Small generic helpers (date formatting, priority labels, input modality, platform).
 tests/e2e/       Playwright specs.
 docs/            Product and architecture docs.
 ```

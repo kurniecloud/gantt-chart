@@ -28,6 +28,11 @@ export function createProject(name: string, startDate: ISODate): Project {
   };
 }
 
+/** Whether the project holds any task or milestone. A title or description alone doesn't count. */
+export function projectHasEntries(project: Project): boolean {
+  return project.taskOrder.length > 0 || project.milestones.length > 0;
+}
+
 export function calendarFor(project: Project, task?: Task): Calendar {
   const id = task?.calendarId ?? project.defaultCalendarId;
   return (

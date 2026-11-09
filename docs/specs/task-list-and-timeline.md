@@ -27,7 +27,8 @@ are specified separately — see [Related specs](#related-specs).
   the page, both edited in place. Enter saves; Shift+Enter adds a line in the description; Esc
   reverts. A blank title reverts to the previous title. Placeholders: "Untitled Project",
   "Add a Description".
-- Import / Export buttons ([import-export-milestones-critical-path](import-export-milestones-critical-path.md)).
+- New, Import and Export buttons ([new-project](new-project.md),
+  [import-export-milestones-critical-path](import-export-milestones-critical-path.md)).
 - Undo / Redo icon buttons at the top right (Cmd/Ctrl+Z, Shift+Cmd/Ctrl+Z, Ctrl+Y), with
   tooltips naming the step, e.g. "Undo Edit Task (⌘Z)", or "Nothing to Undo".
 
@@ -114,4 +115,4 @@ milestones, "(nD)" labels) · [dependency-arrows](dependency-arrows.md) (links, 
 path) · [drag-and-actuals](drag-and-actuals.md) (reorder, drag bars, planned vs actual) ·
 [summaries-and-actual-toggle](summaries-and-actual-toggle.md) (totals, milestone count, Actual
 Dates toggle, focus ring) · [end-date-needs-start](end-date-needs-start.md) ·
-[task-remarks](task-remarks.md).
+[task-remarks](task-remarks.md) · [new-project](new-project.md).

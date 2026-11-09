@@ -3,6 +3,7 @@ import { useUiStore } from '../../store/uiStore';
 import { DeleteTaskDialog } from './DeleteTaskDialog';
 import { ConfirmImportDialog, ImportErrorDialog } from './ImportDialogs';
 import { MilestonesDialog } from './MilestonesDialog';
+import { ClearProjectDialog, ExportBeforeNewDialog } from './NewProjectDialogs';
 import { TaskDialog } from './TaskDialog';
 
 /** Renders whichever dialog the UI store says is open. */
@@ -53,5 +54,9 @@ export function AppDialogs() {
           onClose={closeDialog}
         />
       );
+    case 'new-project-export':
+      return <ExportBeforeNewDialog onClose={closeDialog} />;
+    case 'new-project-clear':
+      return <ClearProjectDialog onClose={closeDialog} />;
   }
 }
