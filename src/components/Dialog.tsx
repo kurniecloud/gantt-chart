@@ -13,9 +13,10 @@ type DialogProps = {
 };
 
 /**
- * A modal built on the native `<dialog>`: the browser traps focus, makes the page behind inert and
- * restores focus when it closes. Render it only while it should be open. Mark the element that
- * should receive focus with `data-autofocus` (React's `autoFocus` fires before the dialog opens).
+ * A modal built on the native `<dialog>`: the browser traps focus and makes the page behind inert;
+ * focus returns to what opened it on closing. Render it only while it should be open. Mark the
+ * element that should receive focus with `data-autofocus` (React's `autoFocus` fires before the
+ * dialog opens).
  */
 export function Dialog({ title, onClose, onEscape, size = 'default', children }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -24,9 +25,14 @@ export function Dialog({ title, onClose, onEscape, size = 'default', children }:
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
+    const opener = document.activeElement;
     if (!dialog.open) dialog.showModal();
     dialog.querySelector<HTMLElement>('[data-autofocus]')?.focus();
-    return () => dialog.close();
+    return () => {
+      dialog.close();
+      // React has already removed the dialog by now, so the browser won't restore focus itself.
+      if (opener instanceof HTMLElement) opener.focus({ preventScroll: true });
+    };
   }, []);
 
   return (

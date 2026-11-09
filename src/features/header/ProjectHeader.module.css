@@ -97,4 +97,13 @@
   .title {
     font-size: 18px;
   }
+
+  /* Three labelled buttons plus undo and redo only fit a phone without the icons. */
+  .fileActions svg {
+    display: none;
+  }
+
+  .actions {
+    flex-wrap: wrap;
+  }
 }

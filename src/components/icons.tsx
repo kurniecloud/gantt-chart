@@ -101,6 +101,15 @@ export function DownloadIcon(props: IconProps) {
   );
 }
 
+export function NewFileIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M9 2H4.5A1.5 1.5 0 0 0 3 3.5v9A1.5 1.5 0 0 0 4.5 14h7a1.5 1.5 0 0 0 1.5-1.5V6z" />
+      <path d="M9 2v4h4M8 8.5v3M6.5 10h3" />
+    </Icon>
+  );
+}
+
 export function DiamondIcon(props: IconProps) {
   return (
     <Icon {...props}>

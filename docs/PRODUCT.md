@@ -27,7 +27,8 @@ Specs: 1.1–1.6, 1.10 [task-list-and-timeline](specs/task-list-and-timeline.md)
 1.9 [dependency-arrows](specs/dependency-arrows.md) · 1.8, 1.11, 1.15
 [drag-and-actuals](specs/drag-and-actuals.md) · 1.16–1.18
 [summaries-and-actual-toggle](specs/summaries-and-actual-toggle.md) · 1.3 (end needs a start)
-[end-date-needs-start](specs/end-date-needs-start.md) · 1.19 [task-remarks](specs/task-remarks.md).
+[end-date-needs-start](specs/end-date-needs-start.md) · 1.19 [task-remarks](specs/task-remarks.md) · 1.20
+[new-project](specs/new-project.md).
 
 | #    | Feature                                                                                                        | Status |
 | ---- | -------------------------------------------------------------------------------------------------------------- | ------ |
@@ -50,6 +51,7 @@ Specs: 1.1–1.6, 1.10 [task-list-and-timeline](specs/task-list-and-timeline.md)
 | 1.17 | Milestone count beside the Milestones button ("5 Milestones · 3 Upcoming")                                     | ✅     |
 | 1.18 | "Actual Dates" toggle button to show / hide the blue actual lines (remembered per browser)                     | ✅     |
 | 1.19 | Remarks: a plain-text box in the task dialog, below Priority                                                   | ✅     |
+| 1.20 | "New" button: offers to export, then empties the project (one undo)                                            | ✅     |
 
 ## Phase 2 — Advanced scheduling
 
@@ -99,5 +101,6 @@ Specs: 1.1–1.6, 1.10 [task-list-and-timeline](specs/task-list-and-timeline.md)
   the latest-finishing blocker at each step; spare days don't break it) over the user's own
   planned dates. Slack figures and auto-scheduling (moving tasks) are still to do.
 
-- **0.4** — autosave, reload and `listProjects()` work; a UI to switch/create/delete projects is still to do.
+- **0.4** — autosave, reload and `listProjects()` work; New empties the one open project; a UI to
+  switch/create/delete projects is still to do.
 - **1.12** — follows the OS light/dark setting via tokens; a manual toggle (`data-theme`) is still to do.

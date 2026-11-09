@@ -1,4 +1,5 @@
-import type { Project } from '../../domain/types';
+import { DEFAULT_PROJECT_NAME, createProject } from '../../domain/project';
+import type { ISODate, Project } from '../../domain/types';
 import type { Command } from './types';
 
 /** Blank names are ignored, so the project always has a title. */
@@ -32,6 +33,20 @@ export function importProject(imported: Project): Command {
     apply: (project) => {
       const { id, schemaVersion, ...content } = imported;
       Object.assign(project, structuredClone(content));
+    },
+  };
+}
+
+/**
+ * Empties the open project, leaving what a first launch creates. Keeps the project's id, so it is
+ * overwritten in storage rather than leaving the old one behind. Undo restores the content.
+ */
+export function clearProject(today: ISODate): Command {
+  return {
+    label: 'New Project',
+    apply: (project) => {
+      const { id, schemaVersion, ...content } = createProject(DEFAULT_PROJECT_NAME, today);
+      Object.assign(project, content);
     },
   };
 }

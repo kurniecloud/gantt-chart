@@ -1,27 +1,22 @@
 import { useRef } from 'react';
 import { Button } from '../../components/Button';
-import { DownloadIcon, UploadIcon } from '../../components/icons';
-import { todayISO } from '../../domain/dates';
-import { downloadTextFile } from '../../io/download';
-import {
-  MAX_FILE_BYTES,
-  ProjectFileError,
-  exportFileName,
-  parseProjectFile,
-  serializeProject,
-} from '../../io/projectFile';
+import { DownloadIcon, NewFileIcon, UploadIcon } from '../../components/icons';
+import { projectHasEntries } from '../../domain/project';
+import { downloadProject } from '../../io/download';
+import { MAX_FILE_BYTES, ProjectFileError, parseProjectFile } from '../../io/projectFile';
 import { useProjectStore } from '../../store/projectStore';
 import { useUiStore } from '../../store/uiStore';
 import styles from './ProjectHeader.module.css';
 
-/** Import (replace the project from a .gantt.json file) and Export (download it). */
+/** New (empty the project), Import (replace it from a .gantt.json file) and Export (download it). */
 export function FileActions() {
   const openDialog = useUiStore((s) => s.openDialog);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const exportProject = () => {
-    const { project } = useProjectStore.getState();
-    downloadTextFile(exportFileName(project), serializeProject(project, todayISO()));
+  const startNewProject = () => {
+    if (projectHasEntries(useProjectStore.getState().project)) {
+      openDialog({ kind: 'new-project-export' });
+    }
   };
 
   const readFile = async (file: File) => {
@@ -53,6 +48,10 @@ export function FileActions() {
           if (file) void readFile(file);
         }}
       />
+      <Button title="Clear this project and start a new one" onClick={startNewProject}>
+        <NewFileIcon />
+        New
+      </Button>
       <Button
         title="Replace this project with one from a .gantt.json file"
         onClick={() => inputRef.current?.click()}
@@ -60,7 +59,10 @@ export function FileActions() {
         <UploadIcon />
         Import
       </Button>
-      <Button title="Download this project as a .gantt.json file" onClick={exportProject}>
+      <Button
+        title="Download this project as a .gantt.json file"
+        onClick={() => downloadProject(useProjectStore.getState().project)}
+      >
         <DownloadIcon />
         Export
       </Button>

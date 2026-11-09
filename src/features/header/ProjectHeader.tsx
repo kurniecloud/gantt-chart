@@ -9,10 +9,10 @@ import {
   selectUndoLabel,
   useProjectStore,
 } from '../../store/projectStore';
+import { isMac } from '../../utils/platform';
 import { FileActions } from './FileActions';
 import styles from './ProjectHeader.module.css';
 
-const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
 const mod = isMac ? '⌘' : 'Ctrl+';
 
 type TitleFieldProps = {

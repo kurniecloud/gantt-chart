@@ -3,9 +3,8 @@ import { Dialog, DialogActions } from '../../components/Dialog';
 import type { Project } from '../../domain/types';
 import { importProject } from '../../store/commands/projectCommands';
 import { useProjectStore } from '../../store/projectStore';
+import { isMac } from '../../utils/platform';
 import styles from './TaskDialog.module.css';
-
-const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
 
 function count(n: number, noun: string) {
   return `${n} ${noun}${n === 1 ? '' : 's'}`;

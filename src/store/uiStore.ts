@@ -10,6 +10,10 @@ export type OpenDialog =
   /** A file that passed validation, waiting for the user to confirm the overwrite. */
   | { kind: 'import-confirm'; fileName: string; project: Project }
   | { kind: 'import-error'; fileName: string; message: string }
+  /** New was clicked on a project with entries: offer to export it first. */
+  | { kind: 'new-project-export' }
+  /** The user declined to export: confirm clearing the project anyway. */
+  | { kind: 'new-project-clear' }
   | null;
 
 type UiState = {

@@ -63,6 +63,74 @@ test('export downloads the project and import brings it back', async ({ page }) 
   await expect(page.getByText('(3D)')).toBeVisible();
 });
 
+test('New exports on Yes, then starts an empty project that survives a reload', async ({
+  page,
+}) => {
+  await page.getByRole('textbox', { name: 'Project Title' }).fill('Website relaunch');
+  await page.getByRole('textbox', { name: 'Project Title' }).press('Enter');
+  await addTask(page, 'Design', ['2026-11-04', '2026-11-06']);
+
+  await page.getByRole('button', { name: 'New', exact: true }).click();
+  await expect(dialog(page)).toHaveAccessibleName('Start a New Project?');
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    dialog(page).getByRole('button', { name: 'Yes' }).click(),
+  ]);
+  expect(download.suggestedFilename()).toBe('website-relaunch.gantt.json');
+  const file = JSON.parse(await readFile(await download.path(), 'utf8'));
+  expect(file.project.name).toBe('Website relaunch');
+  expect(file.project.taskOrder).toHaveLength(1);
+
+  await expect(dialog(page)).toBeHidden();
+  const title = page.getByRole('textbox', { name: 'Project Title' });
+  await expect(title).toHaveValue('Untitled Project');
+  await expect(page.getByRole('button', { name: 'Design', exact: true })).toBeHidden();
+
+  await page.waitForTimeout(800); // autosave
+  await page.reload();
+  await expect(title).toHaveValue('Untitled Project');
+  await expect(page.getByRole('button', { name: 'Design', exact: true })).toBeHidden();
+});
+
+test('New with No confirms, clears without a download, and undo brings it back', async ({
+  page,
+}) => {
+  await addTask(page, 'Design', ['2026-11-04', '2026-11-06']);
+  const newButton = page.getByRole('button', { name: 'New', exact: true });
+  let downloads = 0;
+  page.on('download', () => (downloads += 1));
+
+  await newButton.click();
+  await dialog(page).getByRole('button', { name: 'Cancel' }).click();
+  await expect(dialog(page)).toBeHidden();
+  await expect(newButton).toBeFocused();
+
+  await newButton.click();
+  await dialog(page).getByRole('button', { name: 'No' }).click();
+  await expect(dialog(page)).toHaveAccessibleName('Clear Without Exporting?');
+
+  // Cancel closes everything and hands focus back to the button.
+  await dialog(page).getByRole('button', { name: 'Cancel' }).click();
+  await expect(dialog(page)).toBeHidden();
+  await expect(newButton).toBeFocused();
+  await expect(page.getByRole('button', { name: 'Design', exact: true })).toBeVisible();
+
+  await newButton.click();
+  await dialog(page).getByRole('button', { name: 'No' }).click();
+  await dialog(page).getByRole('button', { name: 'Clear Project' }).click();
+  await expect(dialog(page)).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Design', exact: true })).toBeHidden();
+  expect(downloads).toBe(0);
+
+  await page.getByRole('button', { name: 'Undo' }).click();
+  await expect(page.getByRole('button', { name: 'Design', exact: true })).toBeVisible();
+});
+
+test('New does nothing on a project with no tasks or milestones', async ({ page }) => {
+  await page.getByRole('button', { name: 'New', exact: true }).click();
+  await expect(dialog(page)).toBeHidden();
+});
+
 test('milestones are managed in a dialog and shown in green', async ({ page }) => {
   await page.getByRole('button', { name: 'Milestones' }).click();
   await dialog(page).getByRole('button', { name: 'Add Milestone' }).click();
