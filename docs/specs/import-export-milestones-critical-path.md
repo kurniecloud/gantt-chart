@@ -21,7 +21,10 @@ Status: done (PR #4; kept current with later changes).
 - **Import** (header button) picks a `.json` file (at most 20 MB), validates it, and asks for
   confirmation in `Import “file.gantt.json”?`, saying what is replaced and what the file
   contains. One undo restores the previous project. Invalid files show `Couldn’t Import “…”`
-  with the reason and change nothing. Files from older schema versions are upgraded.
+  with the reason (for broken JSON, the line and column when the browser reports them) and change
+  nothing. Files from older schema versions are upgraded.
+- The **JSON Editor** shows and accepts the same text, with the same checks, for when files are
+  blocked ([json-editor](json-editor.md)).
 
 ## Timeline and list polish
 

@@ -76,10 +76,11 @@ src/
                  NO React, NO DOM, NO store imports. 100% unit-testable.
   store/         Zustand stores, commands (for undo/redo), selectors.
   features/
-    header/      Title + description (edited in place), New/Import/Export, undo/redo + shortcuts.
+    header/      Title + description (edited in place), New/Import/Export/JSON Editor, undo/redo
+                 + shortcuts.
     tasks/       Left panel: nested task list, expand/collapse, row actions, drag/keyboard moves.
-    dialogs/     Task, delete, milestones, import and new-project dialogs; AppDialogs shows the one
-                 in uiStore.
+    dialogs/     Task, delete, milestones, import, new-project and JSON editor dialogs; AppDialogs
+                 shows the one in uiStore.
     timeline/    Right panel: weekday scale, date header, bars (drag/resize), arrows, actual line.
     workspace/   The shared scroll area: sticky task panel + header, row/column virtualization,
                  project totals and the Milestones button with its count.

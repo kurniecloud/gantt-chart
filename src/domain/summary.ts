@@ -25,6 +25,11 @@ export type ProjectSummary = {
  * row: from the earliest start to the latest finish, so overlapping tasks don't add up.
  * `planned` and `actual` are the maps from `effectiveSpans` (actual with `today`).
  */
+/** Top-level tasks, with or without subtasks: what the totals call tasks. */
+export function mainTaskCount(project: Project): number {
+  return project.taskOrder.filter((id) => project.tasks[id]?.parentId === null).length;
+}
+
 export function projectSummary(
   project: Project,
   planned: Map<string, EffectiveSpan>,
@@ -42,7 +47,7 @@ export function projectSummary(
     if (span && !span.fromSubtasks && task.actualStart && !task.actualFinish) inProgress = true;
   }
   return {
-    mainTaskCount: children.get(null)?.length ?? 0,
+    mainTaskCount: mainTaskCount(project),
     edgeTaskCount,
     planned: projectLength(planned.values()),
     actual: projectLength(actual.values()),

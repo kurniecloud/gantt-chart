@@ -2,6 +2,7 @@ import { useProjectStore } from '../../store/projectStore';
 import { useUiStore } from '../../store/uiStore';
 import { DeleteTaskDialog } from './DeleteTaskDialog';
 import { ConfirmImportDialog, ImportErrorDialog } from './ImportDialogs';
+import { JsonEditorDialog } from './JsonEditorDialog';
 import { MilestonesDialog } from './MilestonesDialog';
 import { ClearProjectDialog, ExportBeforeNewDialog } from './NewProjectDialogs';
 import { TaskDialog } from './TaskDialog';
@@ -58,5 +59,7 @@ export function AppDialogs() {
       return <ExportBeforeNewDialog onClose={closeDialog} />;
     case 'new-project-clear':
       return <ClearProjectDialog onClose={closeDialog} />;
+    case 'json-editor':
+      return <JsonEditorDialog onClose={closeDialog} />;
   }
 }

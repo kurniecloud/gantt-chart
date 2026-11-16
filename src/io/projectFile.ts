@@ -43,8 +43,9 @@ export function parseProjectFile(text: string): Project {
   let data: unknown;
   try {
     data = JSON.parse(text);
-  } catch {
-    throw new ProjectFileError("This file isn't valid JSON.");
+  } catch (error) {
+    const where = error instanceof Error ? jsonErrorLocation(error.message, text) : null;
+    throw new ProjectFileError(`This isn't valid JSON${where ? ` (${where})` : ''}.`);
   }
   if (!isRecord(data) || data.format !== FILE_FORMAT || !isRecord(data.project)) {
     throw new ProjectFileError("This isn't a Gantt Chart project file.");
@@ -64,6 +65,19 @@ export function parseProjectFile(text: string): Project {
     throw new ProjectFileError(`The project data is damaged: ${shown}${more}.`);
   }
   return { ...project, schemaVersion: CURRENT_SCHEMA_VERSION, taskOrder: displayOrder(project) };
+}
+
+/**
+ * "line 3, column 5" from a `JSON.parse` error, or null. Browsers word these differently: some
+ * give the line and column, some only a character position, some nothing.
+ */
+export function jsonErrorLocation(message: string, text: string): string | null {
+  const lineColumn = /line (\d+) column (\d+)/.exec(message);
+  if (lineColumn) return `line ${lineColumn[1]}, column ${lineColumn[2]}`;
+  const position = /position (\d+)/.exec(message);
+  if (!position) return null;
+  const before = text.slice(0, Number(position[1])).split('\n');
+  return `line ${before.length}, column ${before.at(-1)!.length + 1}`;
 }
 
 function contentProblems(project: Project): string[] {

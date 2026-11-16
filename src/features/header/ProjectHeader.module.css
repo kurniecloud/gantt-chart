@@ -98,12 +98,14 @@
     font-size: 18px;
   }
 
-  /* Three labelled buttons plus undo and redo only fit a phone without the icons. */
-  .fileActions svg {
+  /* The file buttons only fit a phone as text; undo and redo move to a second line. */
+  .fileActions svg,
+  .divider {
     display: none;
   }
 
-  .actions {
+  .actions,
+  .fileActions {
     flex-wrap: wrap;
   }
 }

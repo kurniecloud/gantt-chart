@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { makeProject } from '../../test/fixtures';
 import { useProjectStore } from '../projectStore';
-import { clearProject } from './projectCommands';
+import { clearProject, saveProjectJson } from './projectCommands';
 
 const full = () =>
   makeProject({
@@ -48,5 +48,25 @@ describe('clearProject', () => {
 
     redo();
     expect(useProjectStore.getState().project.taskOrder).toEqual([]);
+  });
+});
+
+describe('saveProjectJson', () => {
+  beforeEach(() => useProjectStore.getState().loadProject(full()));
+
+  it('replaces the content under the same id, as one "Edit JSON" step', () => {
+    const before = structuredClone(useProjectStore.getState().project);
+    const edited = makeProject({ name: 'Edited', tasks: [{ id: 'X', name: 'New task' }] });
+    useProjectStore.getState().dispatch(saveProjectJson(edited));
+
+    const { project, past } = useProjectStore.getState();
+    expect(project.id).toBe(before.id);
+    expect(project.name).toBe('Edited');
+    expect(project.taskOrder).toEqual(['X']);
+    expect(project.milestones).toEqual([]);
+    expect(past.at(-1)?.label).toBe('Edit JSON');
+
+    useProjectStore.getState().undo();
+    expect(useProjectStore.getState().project).toEqual(before);
   });
 });

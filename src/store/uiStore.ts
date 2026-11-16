@@ -14,6 +14,7 @@ export type OpenDialog =
   | { kind: 'new-project-export' }
   /** The user declined to export: confirm clearing the project anyway. */
   | { kind: 'new-project-clear' }
+  | { kind: 'json-editor' }
   | null;
 
 type UiState = {

@@ -20,8 +20,8 @@ validation.
 { "format": "gantt-chart", "schemaVersion": 4, "exportedAt": "2026-11-04", "project": { ... } }
 ```
 
-- Export: header button → `serializeProject()` → `downloadTextFile()` (`src/io/download.ts`),
-  file named `exportFileName()` (slug of the title).
+- Export: header button (and Yes in the New dialog) → `downloadProject()` (`src/io/download.ts`):
+  `serializeProject()` + `downloadTextFile()`, file named `exportFileName()` (slug of the title).
 - Import: header button → hidden file input → `parseProjectFile()`: checks `format`, runs
   `migrateProject()` (older schemas upgrade), then validates every task, parent chain (no loops),
   task order, dependency and milestone. Any problem → `ProjectFileError` with a readable reason
@@ -29,6 +29,12 @@ validation.
   replaces the open project's content (keeps its id), undoable in one step.
 - Task order is rebuilt so each task precedes its subtasks. Dialog titles: `Import “file”?`
   (confirm) and `Couldn’t Import “file”` (error).
+
+- JSON Editor (`features/dialogs/JsonEditorDialog.tsx`): the same file text without a file —
+  shows `serializeProject()`; Validate and Save run `parseProjectFile()` (plus the 20 MB limit);
+  Save dispatches `saveProjectJson()`, which, like `importProject()`, replaces the content and
+  keeps the id. Broken JSON reports "line L, column C" via `jsonErrorLocation()`, which reads the
+  browser's `JSON.parse` message (line/column, a position, or nothing — Safari).
 
 ## Tests
 

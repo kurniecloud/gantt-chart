@@ -4,6 +4,7 @@ import { makeProject } from '../test/fixtures';
 import {
   ProjectFileError,
   exportFileName,
+  jsonErrorLocation,
   parseProjectFile,
   serializeProject,
 } from './projectFile';
@@ -155,5 +156,28 @@ describe('actual dates in files', () => {
     expect(() => parseProjectFile(envelope(project))).toThrow(
       /“Design” has an invalid actual end date/,
     );
+  });
+});
+
+describe('jsonErrorLocation', () => {
+  const text = '{\n  "a": 1,\n}';
+
+  it('uses the line and column when the browser gives them', () => {
+    const message = 'JSON.parse: expected property name at line 3 column 1 of the JSON data';
+    expect(jsonErrorLocation(message, text)).toBe('line 3, column 1');
+  });
+
+  it('works them out from a character position', () => {
+    expect(jsonErrorLocation('Unexpected token } in JSON at position 12', text)).toBe(
+      'line 3, column 1',
+    );
+  });
+
+  it('gives nothing when the browser says nowhere', () => {
+    expect(jsonErrorLocation('JSON Parse error: Expected a property name', text)).toBeNull();
+  });
+
+  it('is part of the message for broken JSON', () => {
+    expect(() => parseProjectFile(text)).toThrow("This isn't valid JSON (line 3, column 1).");
   });
 });
