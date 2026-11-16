@@ -27,7 +27,8 @@ Status: done (PR #13).
 - The cleared project keeps its id, so the browser still holds one project and autosave overwrites
   it. Its start date becomes today.
 - Daily/Weekly, Actual Dates and Critical Path are view settings and stay as they are.
-- On phones the New, Import and Export buttons show text only, so the header fits at 375 px.
+- On phones the header's file buttons show text only and Undo / Redo move to a second line
+  ([json-editor](json-editor.md)).
 
 ## Data model
 

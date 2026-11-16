@@ -149,7 +149,7 @@ describe('new', () => {
     const names = within(header)
       .getAllByRole('button')
       .map((button) => button.textContent);
-    expect(names.slice(0, 3)).toEqual(['New', 'Import', 'Export']);
+    expect(names.slice(0, 4)).toEqual(['New', 'Import', 'Export', 'JSON Editor']);
   });
 
   it('does nothing on a project with only a title and description', async () => {

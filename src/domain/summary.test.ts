@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { makeProject } from '../test/fixtures';
-import { milestoneSummary, projectLength, projectSummary } from './summary';
+import { mainTaskCount, milestoneSummary, projectLength, projectSummary } from './summary';
 import { effectiveSpans } from './taskDates';
 import type { Project } from './types';
 
@@ -142,5 +142,18 @@ describe('milestoneSummary', () => {
 
   it('is empty without milestones', () => {
     expect(milestoneSummary([], TODAY)).toEqual({ total: 0, upcoming: 0, next: null });
+  });
+});
+
+describe('mainTaskCount', () => {
+  it('counts top-level tasks only', () => {
+    const project = makeProject({
+      tasks: [
+        { id: 'P', name: 'Website' },
+        { id: 'A', name: 'Design', parent: 'P' },
+        { id: 'B', name: 'Launch' },
+      ],
+    });
+    expect(mainTaskCount(project)).toBe(2);
   });
 });

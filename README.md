@@ -19,8 +19,9 @@ see the [roadmap](docs/PRODUCT.md).
   actual-dates lines (Actual Dates toggle); Critical Path toggle (driving chain).
 - Milestones (dialog, green days with ◆ markers) and project totals (tasks, planned and actual
   length).
-- New (offers to export, then starts over), import / export of the native `.gantt.json` file;
-  follows the OS light / dark setting.
+- New (offers to export, then starts over), import / export of the native `.gantt.json` file,
+  and a JSON Editor to read and change the same text where files are blocked; follows the OS
+  light / dark setting.
 
 ## Planned
 

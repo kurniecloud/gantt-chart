@@ -1,0 +1,56 @@
+.hint {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* Code-style text box: monospace, long lines scroll sideways instead of wrapping. */
+.editor {
+  display: block;
+  width: 100%;
+  height: min(60dvh, 640px);
+  min-height: 160px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-md);
+  line-height: 1.45;
+  white-space: pre;
+  overflow: auto;
+  resize: vertical;
+  tab-size: 2;
+}
+
+.editor:focus {
+  border-color: var(--color-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+.editor[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+
+/* Always rendered (so screen readers hear each change) and one line tall when empty. */
+.status {
+  min-height: 1.45em;
+  margin: var(--space-3) 0 0;
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.valid {
+  color: var(--color-success-text);
+}
+
+.invalid {
+  color: var(--color-danger);
+}
+
+.validate {
+  margin-right: auto;
+}

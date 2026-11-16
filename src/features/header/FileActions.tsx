@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { Button } from '../../components/Button';
-import { DownloadIcon, NewFileIcon, UploadIcon } from '../../components/icons';
+import { BracesIcon, DownloadIcon, NewFileIcon, UploadIcon } from '../../components/icons';
 import { projectHasEntries } from '../../domain/project';
 import { downloadProject } from '../../io/download';
 import { MAX_FILE_BYTES, ProjectFileError, parseProjectFile } from '../../io/projectFile';
@@ -8,7 +8,10 @@ import { useProjectStore } from '../../store/projectStore';
 import { useUiStore } from '../../store/uiStore';
 import styles from './ProjectHeader.module.css';
 
-/** New (empty the project), Import (replace it from a .gantt.json file) and Export (download it). */
+/**
+ * New (empty the project), Import (replace it from a .gantt.json file), Export (download it) and
+ * JSON Editor (the same text edited in place, for when files are blocked).
+ */
 export function FileActions() {
   const openDialog = useUiStore((s) => s.openDialog);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -65,6 +68,13 @@ export function FileActions() {
       >
         <DownloadIcon />
         Export
+      </Button>
+      <Button
+        title="View and edit the whole project as JSON text"
+        onClick={() => openDialog({ kind: 'json-editor' })}
+      >
+        <BracesIcon />
+        JSON Editor
       </Button>
     </div>
   );

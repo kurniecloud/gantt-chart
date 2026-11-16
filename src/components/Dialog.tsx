@@ -7,8 +7,8 @@ type DialogProps = {
   onClose: () => void;
   /** Overrides what Esc does, e.g. closing an open date picker first. */
   onEscape?: () => void;
-  /** `wide` for dialogs holding a table. */
-  size?: 'default' | 'wide';
+  /** `wide` for dialogs holding a table, `large` for the JSON Editor's text box. */
+  size?: 'default' | 'wide' | 'large';
   children: ReactNode;
 };
 
@@ -38,7 +38,7 @@ export function Dialog({ title, onClose, onEscape, size = 'default', children }:
   return (
     <dialog
       ref={ref}
-      className={size === 'wide' ? `${styles.dialog} ${styles.wide}` : styles.dialog}
+      className={size === 'default' ? styles.dialog : `${styles.dialog} ${styles[size]}`}
       aria-labelledby={titleId}
       onCancel={(event) => {
         event.preventDefault();

@@ -110,6 +110,15 @@ export function NewFileIcon(props: IconProps) {
   );
 }
 
+export function BracesIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M5.5 2.5H5A1.5 1.5 0 0 0 3.5 4v2.3c0 .9-.6 1.7-1.5 1.7.9 0 1.5.8 1.5 1.7V12A1.5 1.5 0 0 0 5 13.5h.5" />
+      <path d="M10.5 2.5h.5A1.5 1.5 0 0 1 12.5 4v2.3c0 .9.6 1.7 1.5 1.7-.9 0-1.5.8-1.5 1.7V12a1.5 1.5 0 0 1-1.5 1.5h-.5" />
+    </Icon>
+  );
+}
+
 export function DiamondIcon(props: IconProps) {
   return (
     <Icon {...props}>

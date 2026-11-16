@@ -28,7 +28,7 @@ Specs: 1.1–1.6, 1.10 [task-list-and-timeline](specs/task-list-and-timeline.md)
 [drag-and-actuals](specs/drag-and-actuals.md) · 1.16–1.18
 [summaries-and-actual-toggle](specs/summaries-and-actual-toggle.md) · 1.3 (end needs a start)
 [end-date-needs-start](specs/end-date-needs-start.md) · 1.19 [task-remarks](specs/task-remarks.md) · 1.20
-[new-project](specs/new-project.md).
+[new-project](specs/new-project.md) · 1.21 [json-editor](specs/json-editor.md).
 
 | #    | Feature                                                                                                        | Status |
 | ---- | -------------------------------------------------------------------------------------------------------------- | ------ |
@@ -52,6 +52,7 @@ Specs: 1.1–1.6, 1.10 [task-list-and-timeline](specs/task-list-and-timeline.md)
 | 1.18 | "Actual Dates" toggle button to show / hide the blue actual lines (remembered per browser)                     | ✅     |
 | 1.19 | Remarks: a plain-text box in the task dialog, below Priority                                                   | ✅     |
 | 1.20 | "New" button: offers to export, then empties the project (one undo)                                            | ✅     |
+| 1.21 | "JSON Editor": view and edit the whole project as text (Validate / Cancel / Save), for when files are blocked  | ✅     |
 
 ## Phase 2 — Advanced scheduling
 

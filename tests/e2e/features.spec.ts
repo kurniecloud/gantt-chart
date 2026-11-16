@@ -131,6 +131,39 @@ test('New does nothing on a project with no tasks or milestones', async ({ page 
   await expect(dialog(page)).toBeHidden();
 });
 
+test('JSON Editor edits the whole project as text, without any file', async ({ page }) => {
+  await addTask(page, 'Design', ['2026-11-04', '2026-11-06']);
+  const open = page.getByRole('button', { name: 'JSON Editor' });
+  await open.click();
+  await expect(dialog(page)).toHaveAccessibleName('JSON Editor');
+  const editor = dialog(page).getByRole('textbox', { name: 'Project JSON' });
+  const status = dialog(page).getByRole('status');
+  const file = JSON.parse(await editor.inputValue());
+  expect(file.format).toBe('gantt-chart');
+
+  await editor.fill('{\n  "format": "gantt-chart",\n}');
+  await dialog(page).getByRole('button', { name: 'Validate' }).click();
+  await expect(status).toHaveText("This isn't valid JSON (line 3, column 1).");
+
+  file.project.name = 'Edited in JSON';
+  file.project.tasks[file.project.taskOrder[0]].name = 'Design v2';
+  await editor.fill(JSON.stringify(file, null, 2));
+  await expect(status).toHaveText('');
+  await dialog(page).getByRole('button', { name: 'Validate' }).click();
+  await expect(status).toHaveText('Valid: 1 task and 0 milestones.');
+
+  await dialog(page).getByRole('button', { name: 'Save' }).click();
+  await expect(dialog(page)).toBeHidden();
+  await expect(open).toBeFocused();
+  const title = page.getByRole('textbox', { name: 'Project Title' });
+  await expect(title).toHaveValue('Edited in JSON');
+  await expect(page.getByRole('button', { name: 'Design v2', exact: true })).toBeVisible();
+
+  await page.waitForTimeout(800); // autosave
+  await page.reload();
+  await expect(title).toHaveValue('Edited in JSON');
+});
+
 test('milestones are managed in a dialog and shown in green', async ({ page }) => {
   await page.getByRole('button', { name: 'Milestones' }).click();
   await dialog(page).getByRole('button', { name: 'Add Milestone' }).click();
