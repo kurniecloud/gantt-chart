@@ -33,6 +33,8 @@ export type Task = {
   color?: string;
   /** Plain text, shown as "Remarks" in the task dialog. */
   notes?: string;
+  /** Who is responsible: one free-text name (schema 5). */
+  owner?: string;
   custom?: Record<string, unknown>;
 };
 

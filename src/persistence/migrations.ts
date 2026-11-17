@@ -26,6 +26,8 @@ const MIGRATIONS: Record<number, (project: RawProject) => RawProject> = {
   2: (project) => ({ ...project, milestones: [] }),
   // v4: optional actual start/finish on tasks — nothing to add.
   3: (project) => project,
+  // v5: optional task owner — nothing to add.
+  4: (project) => project,
 };
 
 function isRecord(value: unknown): value is RawProject {

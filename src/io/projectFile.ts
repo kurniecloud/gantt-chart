@@ -112,6 +112,9 @@ function contentProblems(project: Project): string[] {
     if (value.notes !== undefined && typeof value.notes !== 'string') {
       problems.push(`${label} has invalid remarks`);
     }
+    if (value.owner !== undefined && typeof value.owner !== 'string') {
+      problems.push(`${label} has an invalid owner`);
+    }
     if (value.collapsed !== undefined && typeof value.collapsed !== 'boolean') {
       problems.push(`${label} has an invalid collapsed flag`);
     }

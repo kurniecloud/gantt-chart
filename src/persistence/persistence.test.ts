@@ -56,9 +56,15 @@ describe('migrateProject', () => {
     });
   });
 
-  it('upgrades a v3 project unchanged apart from the version', () => {
-    const v3 = { ...makeProject({ tasks: [{ id: 'A', start: '2026-11-02' }] }), schemaVersion: 3 };
-    expect(migrateProject(structuredClone(v3))).toEqual({ ...v3, schemaVersion: 4 });
+  it.each([3, 4])('upgrades a v%i project unchanged apart from the version', (version) => {
+    const old = {
+      ...makeProject({ tasks: [{ id: 'A', start: '2026-11-02' }] }),
+      schemaVersion: version,
+    };
+    expect(migrateProject(structuredClone(old))).toEqual({
+      ...old,
+      schemaVersion: CURRENT_SCHEMA_VERSION,
+    });
   });
 
   it('names the invalid fields', () => {

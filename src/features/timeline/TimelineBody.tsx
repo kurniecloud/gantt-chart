@@ -130,7 +130,7 @@ export function TimelineBody({
           <Fragment key={row.id}>
             <TaskBar
               id={row.id}
-              label={barLabel(task.name, span, task.priority, critical)}
+              label={barLabel(task, span, critical)}
               x={x}
               width={width}
               top={top}

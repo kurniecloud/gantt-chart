@@ -68,6 +68,7 @@ type Task = {
   collapsed?: boolean;
   color?: string;
   notes?: string; // plain text, shown as "Remarks" in the task dialog
+  owner?: string; // one free-text name, "Owner" in the task dialog (schema 5)
   custom?: Record<string, unknown>;
 };
 

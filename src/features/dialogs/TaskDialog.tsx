@@ -3,6 +3,7 @@ import { Button } from '../../components/Button';
 import { DatePicker } from '../../components/DatePicker';
 import { Dialog, DialogActions } from '../../components/Dialog';
 import { linkCandidates, predecessorIds, successorIds } from '../../domain/dependencies';
+import { ownerNames } from '../../domain/owners';
 import { effectiveSpans } from '../../domain/taskDates';
 import {
   PRIORITIES,
@@ -51,6 +52,8 @@ export function TaskDialog(props: TaskDialogProps) {
   const [actualFinish, setActualFinish] = useState(task?.actualFinish);
   const [priority, setPriority] = useState<Priority | undefined>(task?.priority);
   const [notes, setNotes] = useState(task?.notes ?? '');
+  const [owner, setOwner] = useState(task?.owner ?? '');
+  const owners = useMemo(() => ownerNames(project), [project]);
   const [blockedBy, setBlockedBy] = useState<string[]>(() =>
     editTaskId ? predecessorIds(project, editTaskId) : [],
   );
@@ -68,13 +71,15 @@ export function TaskDialog(props: TaskDialogProps) {
   const nameId = useId();
   const nameErrorId = useId();
   const remarksId = useId();
+  const ownerId = useId();
+  const ownerListId = useId();
 
   const title =
     props.mode === 'edit' ? 'Edit Task' : parent ? `Add Subtask to “${parent.name}”` : 'Add Task';
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
-    const input = { name, start, finish, actualStart, actualFinish, priority, notes };
+    const input = { name, start, finish, actualStart, actualFinish, priority, notes, owner };
     const found = validateTaskInput(input);
     setErrors(found);
     if (Object.keys(found).length > 0) return;
@@ -198,6 +203,26 @@ export function TaskDialog(props: TaskDialogProps) {
               </div>
             )}
           </fieldset>
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor={ownerId} className={styles.label}>
+            Owner
+          </label>
+          {/* Suggests the names already used, so the same person is spelled the same way. */}
+          <input
+            id={ownerId}
+            className={styles.input}
+            list={ownerListId}
+            autoComplete="off"
+            value={owner}
+            onChange={(e) => setOwner(e.target.value)}
+          />
+          <datalist id={ownerListId}>
+            {owners.map((name) => (
+              <option key={name} value={name} />
+            ))}
+          </datalist>
         </div>
 
         <LinkField

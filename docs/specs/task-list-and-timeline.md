@@ -57,7 +57,8 @@ are specified separately — see [Related specs](#related-specs).
 - Fields: Task Name (required) · a **Planned** box and an **Actual** box, each with Start Date and
   End Date (calendar pickers, optional, weekdays only, with a Clear button; End Date disabled
   until its Start Date is set — [end-date-needs-start](end-date-needs-start.md);
-  actual dates — [drag-and-actuals](drag-and-actuals.md)) · Is Blocked By / Is Blocking links
+  actual dates — [drag-and-actuals](drag-and-actuals.md)) · Owner (free text with suggestions —
+  [task-owner](task-owner.md)) · Is Blocked By / Is Blocking links
   ([dependency-arrows](dependency-arrows.md)) · Priority (radio group with colour swatches) ·
   Remarks (plain text box — [task-remarks](task-remarks.md)).
 - A parent with dated subtasks shows its planned (and, when subtasks have them, actual) dates as
@@ -85,7 +86,7 @@ are specified separately — see [Related specs](#related-specs).
 - Scrolls about 10 years back and forward; only visible rows and columns are rendered.
 - Opens with today as the first column (the next Monday on weekends); "Today" returns there.
 - Bars coloured by priority; parent bars use a thinner bracket shape; click a bar to edit;
-  hover shows e.g. "Design: Mon 2 Nov 2026 – Fri 6 Nov 2026 · High Priority".
+  hover shows e.g. "Design: Mon 2 Nov 2026 – Fri 6 Nov 2026 · High Priority · Owner: Ana".
 - Task list and timeline share one scroll area so rows always line up; the task list and the
   date header stay pinned.
 
@@ -117,5 +118,5 @@ milestones, "(nD)" labels) · [dependency-arrows](dependency-arrows.md) (links, 
 path) · [drag-and-actuals](drag-and-actuals.md) (reorder, drag bars, planned vs actual) ·
 [summaries-and-actual-toggle](summaries-and-actual-toggle.md) (totals, milestone count, Actual
 Dates toggle, focus ring) · [end-date-needs-start](end-date-needs-start.md) ·
-[task-remarks](task-remarks.md) · [new-project](new-project.md) ·
+[task-remarks](task-remarks.md) · [task-owner](task-owner.md) · [new-project](new-project.md) ·
 [json-editor](json-editor.md).

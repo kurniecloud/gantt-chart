@@ -128,7 +128,17 @@ describe('import', () => {
   });
 });
 
-describe('remarks in files', () => {
+describe('remarks and owner in files', () => {
+  it('keeps a task’s owner and rejects one that is not text', () => {
+    const project = sample();
+    project.tasks.A = { ...project.tasks.A!, owner: 'Ana' };
+    expect(parseProjectFile(serializeProject(project, '2026-11-01')).tasks.A?.owner).toBe('Ana');
+    (project.tasks.A as { owner: unknown }).owner = ['Ana'];
+    expect(() => parseProjectFile(serializeProject(project, '2026-11-01'))).toThrow(
+      /“Design” has an invalid owner/,
+    );
+  });
+
   it('round-trips remarks, line breaks included, and rejects damaged ones', () => {
     const project = sample();
     project.tasks.A = { ...project.tasks.A!, notes: 'Line one\nLine two' };

@@ -344,6 +344,83 @@ describe('remarks', () => {
   });
 });
 
+describe('owner', () => {
+  const owner = () => within(dialog()).getByRole('combobox', { name: 'Owner' });
+  const stored = (id: string) => useProjectStore.getState().project.tasks[id];
+  const suggestions = () =>
+    [
+      ...document.querySelectorAll(`datalist#${CSS.escape(owner().getAttribute('list')!)} option`),
+    ].map((option) => (option as HTMLOptionElement).value);
+
+  it('sits just above Is Blocked By and is saved, trimmed, with a new task', async () => {
+    const user = setup();
+    await user.click(screen.getByRole('button', { name: 'Add Task' }));
+    const blockedBy = within(dialog()).getByRole('combobox', { name: 'Is Blocked By' });
+    const fields = within(dialog()).getAllByRole('combobox');
+    expect(fields.indexOf(owner())).toBe(fields.indexOf(blockedBy) - 1);
+    expect(owner()).toHaveValue('');
+
+    await user.type(within(dialog()).getByRole('textbox', { name: 'Task Name' }), 'Design');
+    await user.type(owner(), '  Ana  ');
+    await user.click(within(dialog()).getByRole('button', { name: 'Add' }));
+    const { taskOrder, tasks } = useProjectStore.getState().project;
+    expect(tasks[taskOrder[0]!]?.owner).toBe('Ana');
+  });
+
+  it('suggests the names already used in the project, once each', async () => {
+    const user = setup({
+      tasks: [
+        { id: 'A', name: 'Design', owner: 'Ben' },
+        { id: 'B', name: 'Build', owner: 'Ana' },
+        { id: 'C', name: 'Test', owner: 'Ben' },
+      ],
+    });
+    await user.click(screen.getByRole('button', { name: 'Add Task' }));
+    expect(suggestions()).toEqual(['Ana', 'Ben']);
+  });
+
+  it('is on subtasks too (a parent keeps its own), and one undo takes it back', async () => {
+    const user = setup({
+      tasks: [
+        { id: 'P', name: 'Website', owner: 'Ana' },
+        { id: 'C', name: 'Design', parent: 'P' },
+      ],
+    });
+    await user.click(screen.getByRole('button', { name: 'Design' }));
+    expect(owner()).toHaveValue(''); // not copied from the parent
+    await user.type(owner(), 'Ben');
+    await user.click(within(dialog()).getByRole('button', { name: 'Save' }));
+    expect(stored('C')?.owner).toBe('Ben');
+    expect(stored('P')?.owner).toBe('Ana');
+
+    await user.click(screen.getByRole('button', { name: 'Undo' }));
+    expect(stored('C')).not.toHaveProperty('owner');
+  });
+
+  it('shows the saved owner when editing, and emptying the box removes it', async () => {
+    const user = setup({ tasks: [{ id: 'A', name: 'Design', owner: 'Ana' }] });
+    await user.click(screen.getByRole('button', { name: 'Design' }));
+    expect(owner()).toHaveValue('Ana');
+    await user.clear(owner());
+    await user.click(within(dialog()).getByRole('button', { name: 'Save' }));
+    expect(stored('A')).not.toHaveProperty('owner');
+  });
+
+  it('discards changes on Cancel', async () => {
+    const user = setup({ tasks: [{ id: 'A', name: 'Design', owner: 'Ana' }] });
+    await user.click(screen.getByRole('button', { name: 'Design' }));
+    await user.type(owner(), ' and Ben');
+    await user.click(within(dialog()).getByRole('button', { name: 'Cancel' }));
+    expect(stored('A')?.owner).toBe('Ana');
+  });
+
+  it('shows in the bar tooltip, not in the task list', () => {
+    setup({ tasks: [{ id: 'A', name: 'Design', start: '2026-11-02', owner: 'Ana' }] });
+    expect(screen.getByRole('button', { name: /^Design: .* · Owner: Ana$/ })).toBeInTheDocument();
+    expect(screen.queryByText('Ana')).not.toBeInTheDocument();
+  });
+});
+
 describe('editing tasks', () => {
   it('opens the edit dialog from the row or the name, prefilled', async () => {
     const user = setup({

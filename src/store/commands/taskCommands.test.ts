@@ -87,6 +87,13 @@ describe('addTask', () => {
 
 describe('remarks', () => {
   it('addTask stores them and updateTask replaces or clears them', () => {
+    state().dispatch(addTask({ name: 'Owned', owner: 'Ana' }, null, 'O'));
+    expect(state().project.tasks.O?.owner).toBe('Ana');
+    state().dispatch(updateTask('O', { name: 'Owned', owner: 'Ben' }));
+    expect(state().project.tasks.O?.owner).toBe('Ben');
+    state().dispatch(updateTask('O', { name: 'Owned' }));
+    expect(state().project.tasks.O).not.toHaveProperty('owner');
+
     state().dispatch(addTask({ name: 'New', notes: 'First' }, null, 'N'));
     expect(state().project.tasks.N?.notes).toBe('First');
     state().dispatch(updateTask('N', { name: 'New', notes: 'Second' }));

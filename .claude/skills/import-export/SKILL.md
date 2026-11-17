@@ -17,7 +17,7 @@ validation.
 ## The `.gantt.json` file — `src/io/projectFile.ts`
 
 ```json
-{ "format": "gantt-chart", "schemaVersion": 4, "exportedAt": "2026-11-04", "project": { ... } }
+{ "format": "gantt-chart", "schemaVersion": 5, "exportedAt": "2026-11-04", "project": { ... } }
 ```
 
 - Export: header button (and Yes in the New dialog) → `downloadProject()` (`src/io/download.ts`):

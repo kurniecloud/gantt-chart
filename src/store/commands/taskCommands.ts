@@ -85,6 +85,8 @@ export function updateTask(id: string, fields: TaskFields, links: TaskLinks = {}
       else delete task.priority;
       if (fields.notes) task.notes = fields.notes;
       else delete task.notes;
+      if (fields.owner) task.owner = fields.owner;
+      else delete task.owner;
     },
   };
 }
