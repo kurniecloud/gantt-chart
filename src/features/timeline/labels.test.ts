@@ -26,11 +26,21 @@ describe('header labels', () => {
 
 describe('barLabel', () => {
   it('names the task, its dates and its priority', () => {
-    expect(barLabel('Design', { start: '2026-11-02', finish: '2026-11-06' }, 'high')).toBe(
-      'Design: Mon 2 Nov 2026 – Fri 6 Nov 2026 · High Priority',
-    );
-    expect(barLabel('Launch', { start: '2026-11-06', finish: '2026-11-06' }, undefined)).toBe(
+    expect(
+      barLabel({ name: 'Design', priority: 'high' }, { start: '2026-11-02', finish: '2026-11-06' }),
+    ).toBe('Design: Mon 2 Nov 2026 – Fri 6 Nov 2026 · High Priority');
+    expect(barLabel({ name: 'Launch' }, { start: '2026-11-06', finish: '2026-11-06' })).toBe(
       'Launch: Fri 6 Nov 2026 · No Priority',
+    );
+  });
+
+  it('adds the owner, before "Critical"', () => {
+    const span = { start: '2026-11-06', finish: '2026-11-06' };
+    expect(barLabel({ name: 'Launch', owner: 'Ana' }, span)).toBe(
+      'Launch: Fri 6 Nov 2026 · No Priority · Owner: Ana',
+    );
+    expect(barLabel({ name: 'Launch', owner: 'Ana' }, span, true)).toBe(
+      'Launch: Fri 6 Nov 2026 · No Priority · Owner: Ana · Critical',
     );
   });
 });

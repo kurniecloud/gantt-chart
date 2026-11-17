@@ -72,7 +72,7 @@ E2E-guarded.
 
 ## Data model
 
-No change (schema stays 4).
+No change to the saved data.
 
 ## Out of scope
 

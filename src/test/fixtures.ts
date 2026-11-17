@@ -11,6 +11,7 @@ type TaskSpec = {
   parent?: string;
   priority?: Priority;
   notes?: string;
+  owner?: string;
   collapsed?: boolean;
   deps?: { from: string; type?: DependencyType; lag?: number }[];
 };
@@ -52,6 +53,7 @@ export function makeProject(spec: ProjectSpec = {}): Project {
       ...(t.actualFinish && { actualFinish: t.actualFinish }),
       ...(t.priority && { priority: t.priority }),
       ...(t.notes && { notes: t.notes }),
+      ...(t.owner && { owner: t.owner }),
       ...(t.collapsed && { collapsed: true }),
     };
     project.taskOrder.push(t.id);

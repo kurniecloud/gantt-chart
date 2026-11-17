@@ -35,7 +35,7 @@ export function validateTaskInput(input: TaskFields): TaskInputErrors {
   return errors;
 }
 
-/** Trims the name and remarks and drops empty optional fields. Call after `validateTaskInput`. */
+/** Trims the name, remarks and owner and drops empty optional fields. Call after `validateTaskInput`. */
 export function normalizeTaskInput(input: TaskFields): TaskFields {
   const fields: TaskFields = { name: input.name.trim() };
   if (input.start) fields.start = input.start;
@@ -45,5 +45,7 @@ export function normalizeTaskInput(input: TaskFields): TaskFields {
   if (input.priority) fields.priority = input.priority;
   const notes = input.notes?.trim();
   if (notes) fields.notes = notes;
+  const owner = input.owner?.trim();
+  if (owner) fields.owner = owner;
   return fields;
 }

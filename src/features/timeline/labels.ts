@@ -1,6 +1,6 @@
 import { addDays } from '../../domain/dates';
 import type { DateSpan } from '../../domain/taskDates';
-import type { ISODate, Milestone, Priority } from '../../domain/types';
+import type { ISODate, Milestone, Task } from '../../domain/types';
 import { formatDate } from '../../utils/formatDate';
 import { PRIORITY_LABELS } from '../../utils/priority';
 import { dayRange, type TimelineScale } from './scale';
@@ -25,11 +25,13 @@ export function monthKey(date: ISODate): string {
   return date.slice(0, 7);
 }
 
-/** Tooltip and accessible name for a bar, e.g. "Design: Mon 2 Nov 2026 – Fri 6 Nov 2026 · High Priority". */
+/**
+ * Tooltip and accessible name for a bar, e.g.
+ * "Design: Mon 2 Nov 2026 – Fri 6 Nov 2026 · High Priority · Owner: Ana".
+ */
 export function barLabel(
-  name: string,
+  { name, priority, owner }: Pick<Task, 'name' | 'priority' | 'owner'>,
   span: DateSpan,
-  priority: Priority | undefined,
   critical = false,
 ): string {
   const dates =
@@ -37,7 +39,8 @@ export function barLabel(
       ? formatDate(span.start)
       : `${formatDate(span.start)} – ${formatDate(span.finish)}`;
   const level = priority ? `${PRIORITY_LABELS[priority]} Priority` : 'No Priority';
-  return `${name}: ${dates} · ${level}${critical ? ' · Critical' : ''}`;
+  const ownerPart = owner ? ` · Owner: ${owner}` : '';
+  return `${name}: ${dates} · ${level}${ownerPart}${critical ? ' · Critical' : ''}`;
 }
 
 export type MilestoneMark = {

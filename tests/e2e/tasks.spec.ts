@@ -156,3 +156,41 @@ test('remarks are saved with the task and survive a reload', async ({ page }) =>
     'Waiting on the quote\nThen start',
   );
 });
+
+test('owner sits above Is Blocked By, suggests used names and shows on the bar', async ({
+  page,
+}) => {
+  await page.clock.setFixedTime(new Date(2026, 10, 4, 10, 0));
+  await page.goto('./');
+  await page.getByRole('button', { name: 'Add Task', exact: true }).click();
+  await dialog(page).getByRole('textbox', { name: 'Task Name' }).fill('Design');
+  const owner = dialog(page).getByRole('combobox', { name: 'Owner' });
+  const blockedBy = (await dialog(page)
+    .getByRole('combobox', { name: 'Is Blocked By' })
+    .boundingBox())!;
+  const ownerBox = (await owner.boundingBox())!;
+  expect(ownerBox.y + ownerBox.height).toBeLessThan(blockedBy.y);
+  await owner.fill('Ana');
+  await dialog(page)
+    .getByRole('button', { name: /^Planned Start Date/ })
+    .click();
+  await dialog(page).locator('[data-day="2026-11-04"] button').click();
+  await dialog(page).getByRole('button', { name: 'Add', exact: true }).click();
+  await expect(dialog(page)).toBeHidden();
+
+  // A second task is offered the name already used.
+  await page.getByRole('button', { name: 'Add Task', exact: true }).click();
+  const listId = await dialog(page).getByRole('combobox', { name: 'Owner' }).getAttribute('list');
+  await expect(page.locator(`datalist[id="${listId}"] option`)).toHaveAttribute('value', 'Ana');
+  await dialog(page).getByRole('button', { name: 'Cancel' }).click();
+
+  const bar = page.getByRole('button', {
+    name: /^Design: Wed 4 Nov 2026 · No Priority · Owner: Ana$/,
+  });
+  await expect(bar).toHaveAttribute('title', /Owner: Ana/);
+
+  await page.waitForTimeout(800); // autosave is debounced
+  await page.reload();
+  await taskName(page, 'Design').click();
+  await expect(dialog(page).getByRole('combobox', { name: 'Owner' })).toHaveValue('Ana');
+});

@@ -52,6 +52,20 @@ describe('normalizeTaskInput', () => {
     });
   });
 
+  it.each([
+    ['  Ana  ', 'Ana'],
+    ['Ana & Ben', 'Ana & Ben'],
+  ])('trims the owner: %j', (owner, expected) => {
+    expect(normalizeTaskInput({ name: 'Design', owner })).toEqual({
+      name: 'Design',
+      owner: expected,
+    });
+  });
+
+  it.each(['', '   ', undefined])('drops an empty owner: %j', (owner) => {
+    expect(normalizeTaskInput({ name: 'Design', owner })).toEqual({ name: 'Design' });
+  });
+
   it.each(['', '   ', '\n \n', undefined])('drops empty remarks: %j', (notes) => {
     expect(normalizeTaskInput({ name: 'Design', notes })).toEqual({ name: 'Design' });
   });
