@@ -73,7 +73,9 @@ jobs:
 ```
 
 Check for newer major versions of these actions when creating the file.
-A separate `ci.yml` should run the same checks (plus Playwright) on pull requests.
+A separate `ci.yml` runs the same checks (plus Playwright) on pull requests. **Every workflow
+declares its `permissions`** with the least it needs: `ci.yml` has `contents: read` only (code
+scanning flags a workflow without a `permissions` block).
 
 ## 3. Repository settings (the user does this once)
 
