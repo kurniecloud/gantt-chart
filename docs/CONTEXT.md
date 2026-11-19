@@ -3,7 +3,7 @@
 **Read this at the start of every task. Update it in the same PR as any change that alters
 what's below** (status, a decision, a lesson learned, the backlog). It is the memory of the
 project between sessions; `CLAUDE.md` holds the always-on rules, this file holds the history
-and the why. Last updated: 2026-11-17, after PR #15.
+and the why. Last updated: 2026-11-19, after PR #16.
 
 ---
 
@@ -15,7 +15,7 @@ and the why. Last updated: 2026-11-17, after PR #15.
 | Live site      | https://kurniecloud.github.io/gantt-chart/ (deployed by `.github/workflows/deploy.yml` on `main`)                                               |
 | Product owner  | GitHub user **kurniecloud** — sets priorities, answers design questions, merges PRs                                                             |
 | Stack          | Vite 8 · React 19 · TypeScript 6 (strict) · Zustand 5 + immer 11 · `@tanstack/react-virtual` 3 · `react-day-picker` 10 · `date-fns` 4 · `idb` 8 |
-| Tests          | Vitest 5 + Testing Library (441 tests, 31 files) · Playwright 1.64 Chromium (32 e2e)                                                            |
+| Tests          | Vitest 5 + Testing Library (441 tests, 31 files) · Playwright 1.64 Chromium (35 e2e)                                                            |
 | Runtime        | Node 26 LTS (`.nvmrc`), npm 11                                                                                                                  |
 | Schema version | **5** (`src/domain/project.ts`, migrations in `src/persistence/migrations.ts`)                                                                  |
 | Bundle         | ~409 KB JS / 128 KB gzipped (PR #15)                                                                                                            |
@@ -41,6 +41,8 @@ and the why. Last updated: 2026-11-17, after PR #15.
 | #14 | `feat/json-editor` | "JSON Editor" button right of Export: the whole project as the export file's text, with Validate / Cancel / Save, for when files are blocked | [json-editor](specs/json-editor.md) |
 
 | #15 | `feat/task-owner` | "Owner" text box above "Is Blocked By" (suggests names already used), shown in the bar tooltip; schema 5 | [task-owner](specs/task-owner.md) |
+
+| #16 | `fix/milestone-date-picker` | Milestones calendar days centred under their weekdays (as in the task dialog); calendar arrows and today in the theme accent; an open calendar no longer stretches the box beside it | — |
 
 ### What the app does today (user's view)
 
@@ -196,6 +198,14 @@ it was last decided; a changed decision is overwritten here and in its spec (see
 - SVG boxes include stroke and markers; to check where a line really starts/ends, use
   `getPointAtLength()` + `getScreenCTM()` (see the arrow e2e test).
 
+- **Nested tables**: the date picker's calendar is a `<table>`, so a descendant rule like
+  `.table td` in a dialog also styles the calendar's cells (padding, lines, left-aligned
+  headings — the Milestones calendar's days sat off-centre until PR #16). Style a table's own
+  cells with child selectors (`.table > tbody > tr > td`).
+- The calendar library sets its `--rdp-*` variables on `.rdp-root`, so overrides on a wrapper
+  never apply: theme them on `.calendar :global(.rdp-root)`. Until PR #16 the arrows and today
+  were the library's pure blue (≈ 1.8:1 in dark mode). Day cells use the library's 44 px.
+
 **React / dialogs**
 
 - React's `autoFocus` runs before `<dialog>.showModal()` (content hidden) → mark the target
@@ -249,6 +259,10 @@ it was last decided; a changed decision is overwritten here and in its spec (see
   temporary Playwright script (visible headless browser). Pin the clock to a weekday to see
   today's highlight.
 
+- Playwright reuses a server already listening on port 4173 (`reuseExistingServer` locally), so
+  a `preview` server left running from the browser pane makes e2e run against **that old
+  build**. Stop it first — especially when checking that a new test fails without the fix.
+
 **Git / GitHub**
 
 - `main` ruleset: PR required, CodeQL results required, signed commits required. Commits are
@@ -283,6 +297,7 @@ Roughly in the order they'd make sense; confirm with the owner before starting.
 | Drag-to-link between bars (1.9)                           | Links are edited in the dialog only.                                                                                                                                          |
 | Project list / switch UI (0.4)                            | Storage supports several projects; the UI shows one, and New empties it.                                                                                                      |
 | Light/dark toggle (1.12)                                  | Follows the OS today.                                                                                                                                                         |
+| Milestones date picker on phones                          | The date column is ~106 px at 375 px, so the calendar scrolls sideways (only ~3 weekdays show). Stacking each row (name above date) on phones would fit it.                   |
 | Resources (Phase 3) vs Owner                              | Owner is free text on each task. A people list / workload view should decide whether owners become resources.                                                                 |
 | Baselines (2.6) / variance                                | Overlaps with planned vs actual — decide how they relate before building.                                                                                                     |
 | Search / filter / group (4.2), PWA (4.6)                  | Phase 4.                                                                                                                                                                      |
