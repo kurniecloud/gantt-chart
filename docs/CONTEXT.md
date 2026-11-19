@@ -3,7 +3,7 @@
 **Read this at the start of every task. Update it in the same PR as any change that alters
 what's below** (status, a decision, a lesson learned, the backlog). It is the memory of the
 project between sessions; `CLAUDE.md` holds the always-on rules, this file holds the history
-and the why. Last updated: 2026-11-19, after PR #16.
+and the why. Last updated: 2026-11-19, after PR #17.
 
 ---
 
@@ -40,6 +40,7 @@ and the why. Last updated: 2026-11-19, after PR #16.
 | #14 | `feat/json-editor`                     | "JSON Editor" button right of Export: the whole project as the export file's text, with Validate / Cancel / Save, for when files are blocked                                                                                                                                                                                                                  | [json-editor](specs/json-editor.md)                                                       |
 | #15 | `feat/task-owner`                      | "Owner" text box above "Is Blocked By" (suggests names already used), shown in the bar tooltip; schema 5                                                                                                                                                                                                                                                      | [task-owner](specs/task-owner.md)                                                         |
 | #16 | `feat/resizable-task-panel`            | Draggable divider between the task panel and the timeline (320 px up to half the window, remembered per browser; keyboard and double-click reset; none on phones). Also: Milestones calendar days centred under their weekdays (as in the task dialog), calendar arrows and today in the theme accent, an open calendar no longer stretches the box beside it | [resizable-task-panel](specs/resizable-task-panel.md)                                     |
+| #17 | `ci/workflow-permissions`              | CI workflow limited to a read-only token (`permissions: contents: read`), closing the code-scanning alert                                                                                                                                                                                                                                                     | —                                                                                         |
 
 ### What the app does today (user's view)
 
@@ -278,6 +279,10 @@ it was last decided; a changed decision is overwritten here and in its spec (see
   the compare URL `https://github.com/kurniecloud/gantt-chart/compare/main...<branch>?expand=1`.
 - Verifying GitHub's own merge commits locally prints "cannot run gpg" (no gpg installed) —
   harmless.
+- **Every workflow declares `permissions`** (code scanning raises "Workflow does not contain
+  permissions" otherwise): `ci.yml` `contents: read`; `deploy.yml` `contents: read`, `pages:
+write`, `id-token: write`. A new workflow or job starts from `contents: read` and adds only
+  what it needs.
 
 ---
 
