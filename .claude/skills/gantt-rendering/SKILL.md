@@ -24,9 +24,12 @@ Behaviour is specified in `docs/specs/task-list-and-timeline.md`. This skill is 
 
 - Rows line up because both sides are in the same scroll container. **Never** add a second
   scroller or sync scroll positions in JS.
-- Sizes come from TS constants in `Workspace.tsx` (`ROW_HEIGHT` 36, `HEADER_HEIGHT` 56, task
-  panel 320 px, 196 px under 720 px wide) and are passed down as CSS custom properties.
-- Stacking: corner 4 › **taskColumn 3 › timelineHeader 2** › body 1. The task panel sits above
+- Sizes come from TS constants in `Workspace.tsx` (`ROW_HEIGHT` 36, `HEADER_HEIGHT` 56) and
+  `panelWidth.ts` (task panel 320 px up to half the window, chosen with `PanelDivider` and
+  remembered in `viewStore.taskPanelWidth`; a fixed 196 px at 720 px wide or less) and are passed
+  down as CSS custom properties (`--task-panel-width`, which the toolbar row, the grid and the
+  sticky month labels all use).
+- Stacking: divider 5 › corner 4 › **taskColumn 3 › timelineHeader 2** › body 1. The task panel sits above
   the date header because a milestone's ◆ hangs 6 px below the header; once its day scrolls
   behind the panel, the panel must cover it (e2e-guarded).
 - The corner is two halves level with the header's month and day rows: `ProjectTotals`

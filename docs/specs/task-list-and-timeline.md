@@ -36,13 +36,17 @@ are specified separately — see [Related specs](#related-specs).
 
 ### Task list (left panel)
 
+- Width: 320 px by default, widened by dragging the divider on its right edge up to half the
+  window, remembered per browser; phones keep a fixed 196 px
+  ([resizable-task-panel](resizable-task-panel.md)).
 - Header cell: the project totals on top, "Task Name" below
   ([summaries-and-actual-toggle](summaries-and-actual-toggle.md)).
 - Tasks nest to any depth; each level is indented 20 px (12 px on phones).
 - Row: ⋮⋮ grip (drag to reorder — [drag-and-actuals](drag-and-actuals.md)) · expand/collapse
   chevron (only when the task has subtasks) · task name · "(7D)" weekday count in a darker shade
   of the priority colour (parents count their span; no dates → no label) · ⊕ "Add Subtask to …"
-  · ✕ "Delete …". Names truncate with "…" before the count. Clicking the row or the name opens
+  · ✕ "Delete …". Names take the room the panel leaves and end in "…" (before the count) only
+  when they don't fit. Clicking the row or the name opens
   the edit dialog; the icons do only their action.
 - The last row is always a blank row with a "+" button ("Add Task") that adds a top-level task.
 - A new subtask is inserted after its parent's existing subtasks; the parent expands.
@@ -88,7 +92,7 @@ are specified separately — see [Related specs](#related-specs).
 - Bars coloured by priority; parent bars use a thinner bracket shape; click a bar to edit;
   hover shows e.g. "Design: Mon 2 Nov 2026 – Fri 6 Nov 2026 · High Priority · Owner: Ana".
 - Task list and timeline share one scroll area so rows always line up; the task list and the
-  date header stay pinned.
+  date header stay pinned. Resizing the task panel keeps the same dates in view.
 
 ## Data model (introduced in schema v2)
 
@@ -119,4 +123,5 @@ path) · [drag-and-actuals](drag-and-actuals.md) (reorder, drag bars, planned vs
 [summaries-and-actual-toggle](summaries-and-actual-toggle.md) (totals, milestone count, Actual
 Dates toggle, focus ring) · [end-date-needs-start](end-date-needs-start.md) ·
 [task-remarks](task-remarks.md) · [task-owner](task-owner.md) · [new-project](new-project.md) ·
+[resizable-task-panel](resizable-task-panel.md) ·
 [json-editor](json-editor.md).

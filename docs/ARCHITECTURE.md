@@ -91,7 +91,7 @@ back from the last task over the user's dates and finish-to-start links) in
 `src/domain/criticalPath.ts`; arrow routing in `src/features/timeline/arrows.ts`.
 
 UI-only state that must never be saved or undone lives in `src/store/uiStore.ts` (which dialog
-is open) and `src/store/viewStore.ts` (Daily/Weekly, Actual Dates and Critical Path toggles,
+is open) and `src/store/viewStore.ts` (Daily/Weekly, task panel width, Actual Dates and Critical Path toggles,
 recalculating). Whether the user is using the keyboard (for focus rings) is tracked by
 `src/utils/inputModality.ts`. Expand/collapse is saved with the project (`Task.collapsed`) but
 applied with `setCollapsed()`, outside undo history.
@@ -130,8 +130,8 @@ Details: `.claude/skills/gantt-rendering/SKILL.md`.
 ## Persistence
 
 - IndexedDB database `gantt-chart`, stores `projects` (by id) and `meta` (last opened project).
-- The Daily/Weekly choice and Actual Dates on/off are per-browser preferences in
-  `localStorage` (`store/viewStore.ts`), not part of the project.
+- The Daily/Weekly choice, the task panel width and Actual Dates on/off are per-browser
+  preferences in `localStorage` (`store/viewStore.ts`), not part of the project.
 - Autosave debounced 500 ms after each command; save on `visibilitychange` too.
 - On load, run migrations from the stored `schemaVersion` to the current one.
 

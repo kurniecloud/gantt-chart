@@ -1,4 +1,5 @@
 .workspace {
+  position: relative;
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -171,4 +172,47 @@
   .shortLabel {
     display: inline;
   }
+}
+
+/* The task panel's right edge: an 8 px grab area over the border, above the pinned panel and
+   header (corner 4 › task panel 3 › date header 2 › body 1). */
+.divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--task-panel-width) - 5px);
+  z-index: 5;
+  width: 8px;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.divider::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 3px;
+  width: 2px;
+  content: '';
+}
+
+.divider:hover::after,
+.divider[data-dragging]::after {
+  background: var(--color-accent);
+}
+
+.divider:focus {
+  outline: none;
+}
+
+/* Not after a mouse press: see the input-modality rule in global.css. */
+:global(:root:not([data-input='pointer'])) .divider:focus-visible::after {
+  left: 2px;
+  width: 4px;
+  background: var(--color-focus);
+}
+
+:global(body[data-dragging='panel']) {
+  cursor: col-resize;
+  user-select: none;
 }

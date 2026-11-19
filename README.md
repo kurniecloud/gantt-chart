@@ -11,7 +11,8 @@ see the [roadmap](docs/PRODUCT.md).
 ## What it does today
 
 - Project title and description, edited in place; undo / redo for every change.
-- Nested tasks to any depth: add, edit, delete, collapse, reorder and nest by drag or keyboard.
+- Nested tasks to any depth: add, edit, delete, collapse, reorder and nest by drag or keyboard;
+  the task panel can be widened by dragging its edge.
 - Task dialog: Planned and Actual dates (weekday-only pickers; an end date needs a start),
   owner (with suggestions of names already used), "Is Blocked By" / "Is Blocking" links,
   priority, remarks.
