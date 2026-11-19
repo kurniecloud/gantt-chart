@@ -3,7 +3,7 @@
 **Read this at the start of every task. Update it in the same PR as any change that alters
 what's below** (status, a decision, a lesson learned, the backlog). It is the memory of the
 project between sessions; `CLAUDE.md` holds the always-on rules, this file holds the history
-and the why. Last updated: 2026-11-17, after PR #15.
+and the why. Last updated: 2026-11-19, after PR #16.
 
 ---
 
@@ -15,32 +15,31 @@ and the why. Last updated: 2026-11-17, after PR #15.
 | Live site      | https://kurniecloud.github.io/gantt-chart/ (deployed by `.github/workflows/deploy.yml` on `main`)                                               |
 | Product owner  | GitHub user **kurniecloud** — sets priorities, answers design questions, merges PRs                                                             |
 | Stack          | Vite 8 · React 19 · TypeScript 6 (strict) · Zustand 5 + immer 11 · `@tanstack/react-virtual` 3 · `react-day-picker` 10 · `date-fns` 4 · `idb` 8 |
-| Tests          | Vitest 5 + Testing Library (441 tests, 31 files) · Playwright 1.64 Chromium (32 e2e)                                                            |
+| Tests          | Vitest 5 + Testing Library (460 tests, 33 files) · Playwright 1.64 Chromium (37 e2e)                                                            |
 | Runtime        | Node 26 LTS (`.nvmrc`), npm 11                                                                                                                  |
 | Schema version | **5** (`src/domain/project.ts`, migrations in `src/persistence/migrations.ts`)                                                                  |
-| Bundle         | ~409 KB JS / 128 KB gzipped (PR #15)                                                                                                            |
+| Bundle         | ~411 KB JS / 128 KB gzipped (PR #16)                                                                                                            |
 
 ### History of merged work
 
-| PR  | Branch                                 | What it delivered                                                                                                                                                                                             | Spec                                                                                      |
-| --- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| #1  | `chore/initial-scaffold`               | Vite/React/TS scaffold, domain types + calendar maths, store with undo/redo, IndexedDB autosave, CI + Pages deploy, Claude Code setup                                                                         | —                                                                                         |
-| #2  | `feat/task-list`                       | Title + description header, nested task list, add/edit/delete dialogs, weekday-only date pickers, priority, schema v2                                                                                         | [task-list-and-timeline](specs/task-list-and-timeline.md)                                 |
-| #3  | `feat/timeline`                        | Daily/weekly weekday-only timeline, bars, today highlight, shared sticky scroll area, virtualization                                                                                                          | same                                                                                      |
-| #4  | `feat/import-milestones-critical-path` | JSON import/export, milestones, dependencies, critical path toggle, "(nD)" labels, visual polish, scroll-jump fix, schema v3                                                                                  | [import-export-milestones-critical-path](specs/import-export-milestones-critical-path.md) |
-| #5  | `feat/dependency-arrows`               | Arrows (grey / amber when broken), "Is Blocked By" / "Is Blocking", driving-chain critical path, weekly gridline fix, new colours                                                                             | [dependency-arrows](specs/dependency-arrows.md)                                           |
-| #6  | `feat/drag-and-actuals`                | Drag rows to reorder/nest (+ keyboard), drag/resize bars, planned vs actual dates + blue line, blocking critical-path refresh, schema v4                                                                      | [drag-and-actuals](specs/drag-and-actuals.md)                                             |
-| #7  | `docs/context-handover`                | This handover document                                                                                                                                                                                        | —                                                                                         |
-| #8  | `feat/summaries-actual-toggle`         | Project totals above "Task Name", milestone count, "Actual Dates" toggle, milestone ◆ stacking fix                                                                                                            | [summaries-and-actual-toggle](specs/summaries-and-actual-toggle.md)                       |
-| #9  | `fix/focus-ring-task-count`            | Focus ring only after real keyboard use (not Shift/⌘ after a click); totals count top-level tasks (hover: main / edge); Title Case labels                                                                     | [summaries-and-actual-toggle](specs/summaries-and-actual-toggle.md)                       |
-| #10 | `feat/end-date-needs-start`            | End Date disabled until its Start Date is set (Planned and Actual); clearing a start clears its end; every doc rewritten to current behaviour                                                                 | [end-date-needs-start](specs/end-date-needs-start.md)                                     |
-| #11 | `feat/task-remarks`                    | "Remarks" text box in the task dialog, below Priority; removed all mentions of other products from the docs; JSON made the only import/export format (CSV, XML and image/PDF export dropped from the roadmap) | [task-remarks](specs/task-remarks.md)                                                     |
-| #12 | `docs/fix-pr-numbers`                  | Corrected the PR numbers in the docs                                                                                                                                                                          | —                                                                                         |
-| #13 | `feat/new-project`                     | "New" button left of Import: offers to export, then empties the project (one undo); focus returns to the opener after every dialog                                                                            | [new-project](specs/new-project.md)                                                       |
-
-| #14 | `feat/json-editor` | "JSON Editor" button right of Export: the whole project as the export file's text, with Validate / Cancel / Save, for when files are blocked | [json-editor](specs/json-editor.md) |
-
-| #15 | `feat/task-owner` | "Owner" text box above "Is Blocked By" (suggests names already used), shown in the bar tooltip; schema 5 | [task-owner](specs/task-owner.md) |
+| PR  | Branch                                 | What it delivered                                                                                                                                                                                                                                                                                                                                             | Spec                                                                                      |
+| --- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| #1  | `chore/initial-scaffold`               | Vite/React/TS scaffold, domain types + calendar maths, store with undo/redo, IndexedDB autosave, CI + Pages deploy, Claude Code setup                                                                                                                                                                                                                         | —                                                                                         |
+| #2  | `feat/task-list`                       | Title + description header, nested task list, add/edit/delete dialogs, weekday-only date pickers, priority, schema v2                                                                                                                                                                                                                                         | [task-list-and-timeline](specs/task-list-and-timeline.md)                                 |
+| #3  | `feat/timeline`                        | Daily/weekly weekday-only timeline, bars, today highlight, shared sticky scroll area, virtualization                                                                                                                                                                                                                                                          | same                                                                                      |
+| #4  | `feat/import-milestones-critical-path` | JSON import/export, milestones, dependencies, critical path toggle, "(nD)" labels, visual polish, scroll-jump fix, schema v3                                                                                                                                                                                                                                  | [import-export-milestones-critical-path](specs/import-export-milestones-critical-path.md) |
+| #5  | `feat/dependency-arrows`               | Arrows (grey / amber when broken), "Is Blocked By" / "Is Blocking", driving-chain critical path, weekly gridline fix, new colours                                                                                                                                                                                                                             | [dependency-arrows](specs/dependency-arrows.md)                                           |
+| #6  | `feat/drag-and-actuals`                | Drag rows to reorder/nest (+ keyboard), drag/resize bars, planned vs actual dates + blue line, blocking critical-path refresh, schema v4                                                                                                                                                                                                                      | [drag-and-actuals](specs/drag-and-actuals.md)                                             |
+| #7  | `docs/context-handover`                | This handover document                                                                                                                                                                                                                                                                                                                                        | —                                                                                         |
+| #8  | `feat/summaries-actual-toggle`         | Project totals above "Task Name", milestone count, "Actual Dates" toggle, milestone ◆ stacking fix                                                                                                                                                                                                                                                            | [summaries-and-actual-toggle](specs/summaries-and-actual-toggle.md)                       |
+| #9  | `fix/focus-ring-task-count`            | Focus ring only after real keyboard use (not Shift/⌘ after a click); totals count top-level tasks (hover: main / edge); Title Case labels                                                                                                                                                                                                                     | [summaries-and-actual-toggle](specs/summaries-and-actual-toggle.md)                       |
+| #10 | `feat/end-date-needs-start`            | End Date disabled until its Start Date is set (Planned and Actual); clearing a start clears its end; every doc rewritten to current behaviour                                                                                                                                                                                                                 | [end-date-needs-start](specs/end-date-needs-start.md)                                     |
+| #11 | `feat/task-remarks`                    | "Remarks" text box in the task dialog, below Priority; removed all mentions of other products from the docs; JSON made the only import/export format (CSV, XML and image/PDF export dropped from the roadmap)                                                                                                                                                 | [task-remarks](specs/task-remarks.md)                                                     |
+| #12 | `docs/fix-pr-numbers`                  | Corrected the PR numbers in the docs                                                                                                                                                                                                                                                                                                                          | —                                                                                         |
+| #13 | `feat/new-project`                     | "New" button left of Import: offers to export, then empties the project (one undo); focus returns to the opener after every dialog                                                                                                                                                                                                                            | [new-project](specs/new-project.md)                                                       |
+| #14 | `feat/json-editor`                     | "JSON Editor" button right of Export: the whole project as the export file's text, with Validate / Cancel / Save, for when files are blocked                                                                                                                                                                                                                  | [json-editor](specs/json-editor.md)                                                       |
+| #15 | `feat/task-owner`                      | "Owner" text box above "Is Blocked By" (suggests names already used), shown in the bar tooltip; schema 5                                                                                                                                                                                                                                                      | [task-owner](specs/task-owner.md)                                                         |
+| #16 | `feat/resizable-task-panel`            | Draggable divider between the task panel and the timeline (320 px up to half the window, remembered per browser; keyboard and double-click reset; none on phones). Also: Milestones calendar days centred under their weekdays (as in the task dialog), calendar arrows and today in the theme accent, an open calendar no longer stretches the box beside it | [resizable-task-panel](specs/resizable-task-panel.md)                                     |
 
 ### What the app does today (user's view)
 
@@ -50,7 +49,8 @@ and the why. Last updated: 2026-11-17, after PR #15.
 - **Totals** above "Task Name": "5 Tasks · Planned 45D · Actual 30D" — top-level tasks (hover:
   "5 Main Tasks, 10 Edge Tasks (Without Subtasks)"), and the project's length in weekdays
   (earliest start → latest finish; actual runs to today while in progress). Hover for the dates.
-- **Task list** (left): nested to any depth, collapse/expand, "(nD)" weekday count in the
+- **Task list** (left): **resizable** by dragging its right edge (320 px up to half the window,
+  remembered per browser; fixed on phones); nested to any depth, collapse/expand, "(nD)" weekday count in the
   priority's text colour, ⊕ add subtask, ✕ delete (confirm, warns about subtasks), "+" row.
   Reorder/nest by dragging the ⋮⋮ grip or Alt+Shift+arrows.
 - **Task dialog**: name, **Planned** box and **Actual** box (weekday-only pickers; each End Date
@@ -103,6 +103,7 @@ it was last decided; a changed decision is overwritten here and in its spec (see
 
 | Date       | Area                 | Decision                                                                                                                                                                                                                                                                                                                                                             | Spec                                                                                      |
 | ---------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| 2026-11-19 | Task panel width     | **Draggable divider** between the task panel and the timeline: **320 px (the old fixed width) up to half the window**; names use the room and end in "…" only when they don't fit. **Remembered per browser.** **No divider on phones** (fixed 196 px).                                                                                                              | [resizable-task-panel](specs/resizable-task-panel.md)                                     |
 | 2026-11-17 | Task owner           | **"Owner" text box directly above "Is Blocked By"**, every task and subtask. **One** free-text name, **suggestions** of names already used in the project. Shown in the **dialog and the bar tooltip** ("· Owner: Ana"), not on rows. Not inherited by subtasks. `Task.owner`, schema 5.                                                                             | [task-owner](specs/task-owner.md)                                                         |
 | 2026-11-16 | JSON Editor          | **"JSON Editor" to the right of Export**: a big text box with exactly the export file's text. **Validate** runs everything Import checks and shows a message in the dialog (green / red with the reason, line and column for broken JSON). **Cancel** discards edits. **Save** straight away (no confirm), one undo; refuses invalid text and keeps the editor open. | [json-editor](specs/json-editor.md)                                                       |
 | 2026-11-09 | New button           | **"New" to the left of Import.** No task or milestone → nothing happens. Otherwise asks to export: **Yes** exports (same as Export) then clears at once, **No** asks to confirm clearing, **Cancel** stops. Clears **everything** (as a first launch); **one undo** restores it.                                                                                     | [new-project](specs/new-project.md)                                                       |
@@ -153,6 +154,7 @@ it was last decided; a changed decision is overwritten here and in its spec (see
 | UI-only state             | `store/uiStore.ts` (open dialog), `store/viewStore.ts` (view mode, actual dates, critical, busy)                                             |
 | Totals / milestone count  | `domain/summary.ts` (`projectSummary`, `milestoneSummary`), `features/workspace/ProjectTotals.tsx`, `MilestonesTool.tsx`, `summaryLabels.ts` |
 | Focus-ring modality       | `utils/inputModality.ts` (installed in `main.tsx`) + the `data-input` rules in `styles/global.css`                                           |
+| Task panel width          | `features/workspace/panelWidth.ts` (limits, keys), `PanelDivider.tsx`, `viewStore.taskPanelWidth`                                            |
 | Owner suggestions         | `domain/owners.ts` (`ownerNames`), the `<datalist>` in `features/dialogs/TaskDialog.tsx`                                                     |
 | JSON Editor               | `features/dialogs/JsonEditorDialog.tsx`, `io/projectFile.ts` (`parseProjectFile`, `jsonErrorLocation`), command `saveProjectJson`            |
 | New button                | `features/header/FileActions.tsx`, `features/dialogs/NewProjectDialogs.tsx`, command `clearProject`                                          |
@@ -181,7 +183,7 @@ it was last decided; a changed decision is overwritten here and in its spec (see
   modifiers and shortcuts; a new focus style must respect `:root[data-input='pointer']` (see the
   Daily/Weekly and priority rules). The desktop app's browser pane sends Shift with `key: ""`,
   which is ignored too; verify keys with Playwright (real key events).
-- **Stacking in the workspace**: corner 4 › task panel 3 › date header 2 › body 1. The task panel
+- **Stacking in the workspace**: divider 5 › corner 4 › task panel 3 › date header 2 › body 1. The task panel
   must sit above the header: a milestone's ◆ hangs below the header and showed over the first
   task row once its day scrolled behind the panel (fixed in PR #8, e2e-guarded).
 - **Phone width (375 px)** is tight: the timeline toolbar only just fitted before PR #8 and now
@@ -195,6 +197,14 @@ it was last decided; a changed decision is overwritten here and in its spec (see
   the light surface.
 - SVG boxes include stroke and markers; to check where a line really starts/ends, use
   `getPointAtLength()` + `getScreenCTM()` (see the arrow e2e test).
+
+- **Nested tables**: the date picker's calendar is a `<table>`, so a descendant rule like
+  `.table td` in a dialog also styles the calendar's cells (padding, lines, left-aligned
+  headings — the Milestones calendar's days sat off-centre until PR #16). Style a table's own
+  cells with child selectors (`.table > tbody > tr > td`).
+- The calendar library sets its `--rdp-*` variables on `.rdp-root`, so overrides on a wrapper
+  never apply: theme them on `.calendar :global(.rdp-root)`. Until PR #16 the arrows and today
+  were the library's pure blue (≈ 1.8:1 in dark mode). Day cells use the library's 44 px.
 
 **React / dialogs**
 
@@ -224,9 +234,15 @@ it was last decided; a changed decision is overwritten here and in its spec (see
   `npm run build`, which the e2e web server runs ("Process from config.webServer was not able to
   start. Exit code: 2"). Run `npm run typecheck` before e2e.
 - E2E tests that reload must wait for the debounced autosave first (`waitForTimeout(800)`).
+- **E2E tests must not depend on font metrics**: CI runs on Linux, whose fonts are wider than
+  macOS's. A test that assumed a name fits at a fixed width passed locally and failed in CI
+  (PR #16); it now measures the overflow (`scrollWidth - clientWidth`) and widens by that. To
+  check locally, inject a wide font (e.g. Verdana with letter-spacing) with `addInitScript`.
 - Run unit tests in several timezones (CI does UTC-8 and UTC+9; locally also UTC, UTC+14).
 - An `<input>` with a `list` (the Owner box's suggestions) has the **combobox** role, not
   textbox: query it as `getByRole('combobox', { name: 'Owner' })`.
+- jsdom has no `matchMedia`: tests that need a phone-sized screen stub it with
+  `vi.stubGlobal('matchMedia', …)` (see `PanelDivider.test.tsx`).
 - jsdom has no `showModal`, layout, `scrollTo` or scroll events → shims in `src/test/setup.ts`
   (every element is 1024×768; `scrollTo` fires `scroll`).
 - Unit tests that open a **new** task's date pickers must pin the clock too: with no value the
@@ -238,6 +254,8 @@ it was last decided; a changed decision is overwritten here and in its spec (see
 **Tooling**
 
 - Prettier re-wraps files after edits: re-read before string-replacing, or use the Edit tool.
+- A new Markdown table row goes **directly under the last row**: a blank line ends the table, and
+  the rows after it show as plain text (history rows #14–#15 did, until PR #16).
 - Writing ` ` through tools can produce a literal non-breaking space; keep explicit escapes
   and check with a byte dump.
 - `tsc` type-checks `tests/`, and the e2e web server runs `npm run build` (which type-checks):
@@ -248,6 +266,10 @@ it was last decided; a changed decision is overwritten here and in its spec (see
   and CSS animations pause. Verify by reading DOM/state with JS, or take screenshots with a
   temporary Playwright script (visible headless browser). Pin the clock to a weekday to see
   today's highlight.
+
+- Playwright reuses a server already listening on port 4173 (`reuseExistingServer` locally), so
+  a `preview` server left running from the browser pane makes e2e run against **that old
+  build**. Stop it first — especially when checking that a new test fails without the fix.
 
 **Git / GitHub**
 
@@ -283,6 +305,7 @@ Roughly in the order they'd make sense; confirm with the owner before starting.
 | Drag-to-link between bars (1.9)                           | Links are edited in the dialog only.                                                                                                                                          |
 | Project list / switch UI (0.4)                            | Storage supports several projects; the UI shows one, and New empties it.                                                                                                      |
 | Light/dark toggle (1.12)                                  | Follows the OS today.                                                                                                                                                         |
+| Milestones date picker on phones                          | The date column is ~106 px at 375 px, so the calendar scrolls sideways (only ~3 weekdays show). Stacking each row (name above date) on phones would fit it.                   |
 | Resources (Phase 3) vs Owner                              | Owner is free text on each task. A people list / workload view should decide whether owners become resources.                                                                 |
 | Baselines (2.6) / variance                                | Overlaps with planned vs actual — decide how they relate before building.                                                                                                     |
 | Search / filter / group (4.2), PWA (4.6)                  | Phase 4.                                                                                                                                                                      |

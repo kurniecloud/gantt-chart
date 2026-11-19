@@ -4,6 +4,7 @@ export type ViewMode = 'daily' | 'weekly';
 
 const MODE_KEY = 'gantt-chart:view-mode';
 const ACTUAL_DATES_KEY = 'gantt-chart:show-actual-dates';
+const PANEL_WIDTH_KEY = 'gantt-chart:task-panel-width';
 
 // Per-browser preferences, so localStorage rather than the project. Storage can be blocked
 // (private mode, sandboxed previews), in which case the choice just isn't remembered.
@@ -23,12 +24,23 @@ function writeSetting(key: string, value: string) {
   }
 }
 
+function readPanelWidth(): number | null {
+  const width = Number(readSetting(PANEL_WIDTH_KEY));
+  return Number.isFinite(width) && width > 0 ? Math.round(width) : null;
+}
+
 type ViewState = {
   mode: ViewMode;
   setMode: (mode: ViewMode) => void;
   /** Whether the blue actual-dates lines are drawn. Remembered per browser; on by default. */
   showActualDates: boolean;
   toggleActualDates: () => void;
+  /**
+   * The task panel width the user chose, in px, or null for the narrowest. Remembered per
+   * browser; the workspace shows it within the limits of the current window.
+   */
+  taskPanelWidth: number | null;
+  setTaskPanelWidth: (width: number) => void;
   /** Whether critical-path lines are drawn (recalculated live while on). Not remembered. */
   showCriticalPath: boolean;
   toggleCriticalPath: () => void;
@@ -50,6 +62,11 @@ export const useViewStore = create<ViewState>()((set) => ({
       writeSetting(ACTUAL_DATES_KEY, showActualDates ? 'shown' : 'hidden');
       return { showActualDates };
     }),
+  taskPanelWidth: readPanelWidth(),
+  setTaskPanelWidth: (width) => {
+    writeSetting(PANEL_WIDTH_KEY, String(width));
+    set({ taskPanelWidth: width });
+  },
   showCriticalPath: false,
   toggleCriticalPath: () => set((state) => ({ showCriticalPath: !state.showCriticalPath })),
   recalculating: false,

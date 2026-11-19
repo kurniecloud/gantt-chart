@@ -82,8 +82,8 @@ src/
     dialogs/     Task, delete, milestones, import, new-project and JSON editor dialogs; AppDialogs
                  shows the one in uiStore.
     timeline/    Right panel: weekday scale, date header, bars (drag/resize), arrows, actual line.
-    workspace/   The shared scroll area: sticky task panel + header, row/column virtualization,
-                 project totals and the Milestones button with its count.
+    workspace/   The shared scroll area: sticky task panel (resizable divider) + header,
+                 row/column virtualization, project totals and the Milestones button with its count.
     criticalPath/ Recalculation after every change while on, and the input-blocking overlay.
   components/    Shared UI: Button/IconButton, Dialog (native <dialog>), DatePicker, icons.
   persistence/   IndexedDB autosave, project list, migrations between schema versions.

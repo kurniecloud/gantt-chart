@@ -83,12 +83,11 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface-raised);
+}
 
+/* The calendar sets its own defaults on its root (pure blue), so the theme goes there too. */
+.calendar :global(.rdp-root) {
   --rdp-accent-color: var(--color-accent);
   --rdp-accent-background-color: var(--color-accent-soft);
   --rdp-today-color: var(--color-accent);
-  --rdp-day-height: 34px;
-  --rdp-day-width: 34px;
-  --rdp-disabled-opacity: 0.3;
-  --rdp-nav-height: 36px;
 }

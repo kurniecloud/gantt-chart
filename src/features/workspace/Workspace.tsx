@@ -1,5 +1,13 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type CSSProperties,
+} from 'react';
 import { todayISO } from '../../domain/dates';
 import { projectSummary } from '../../domain/summary';
 import { effectiveSpans } from '../../domain/taskDates';
@@ -23,13 +31,13 @@ import {
   type TimelineScale,
 } from '../timeline/scale';
 import { MilestonesTool } from './MilestonesTool';
+import { PanelDivider } from './PanelDivider';
 import { ProjectTotals } from './ProjectTotals';
 import styles from './Workspace.module.css';
+import { MIN_PANEL_WIDTH, PHONE_PANEL_WIDTH, clampPanelWidth, maxPanelWidth } from './panelWidth';
 
 export const ROW_HEIGHT = 36;
 export const HEADER_HEIGHT = 56;
-const TASK_PANEL_WIDTH = 320;
-const TASK_PANEL_WIDTH_PHONE = 196;
 const PHONE_QUERY = '(max-width: 720px)';
 /** Assumed viewport until the scroll area is measured, so the first paint isn't empty. */
 const INITIAL_RECT = { width: 1024, height: 768 };
@@ -38,7 +46,7 @@ function matches(query: string): boolean {
   return typeof window.matchMedia === 'function' && window.matchMedia(query).matches;
 }
 
-function useTaskPanelWidth(): number {
+function useIsPhone(): boolean {
   const [isPhone, setIsPhone] = useState(() => matches(PHONE_QUERY));
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return;
@@ -47,7 +55,16 @@ function useTaskPanelWidth(): number {
     query.addEventListener('change', onChange);
     return () => query.removeEventListener('change', onChange);
   }, []);
-  return isPhone ? TASK_PANEL_WIDTH_PHONE : TASK_PANEL_WIDTH;
+  return isPhone;
+}
+
+function subscribeToResize(onChange: () => void) {
+  window.addEventListener('resize', onChange);
+  return () => window.removeEventListener('resize', onChange);
+}
+
+function useWindowWidth(): number {
+  return useSyncExternalStore(subscribeToResize, () => window.innerWidth);
 }
 
 /**
@@ -61,7 +78,17 @@ export function Workspace() {
   const showActualDates = useViewStore((s) => s.showActualDates);
   const showCriticalPath = useViewStore((s) => s.showCriticalPath);
   const [today] = useState(todayISO);
-  const panelWidth = useTaskPanelWidth();
+  const isPhone = useIsPhone();
+  const windowWidth = useWindowWidth();
+  const chosenWidth = useViewStore((s) => s.taskPanelWidth);
+  const setChosenWidth = useViewStore((s) => s.setTaskPanelWidth);
+  // While dragging, the width follows the pointer; it's remembered when the drag ends.
+  const [dragWidth, setDragWidth] = useState<number | null>(null);
+  const maxWidth = maxPanelWidth(windowWidth);
+  const resizable = !isPhone && maxWidth > MIN_PANEL_WIDTH;
+  const panelWidth = isPhone
+    ? PHONE_PANEL_WIDTH
+    : clampPanelWidth(dragWidth ?? chosenWidth ?? MIN_PANEL_WIDTH, maxWidth);
   const scrollerRef = useRef<HTMLDivElement>(null);
 
   const rows = useMemo(() => visibleTaskRows(project), [project]);
@@ -205,6 +232,17 @@ export function Workspace() {
           </div>
         </div>
       </div>
+      {resizable && (
+        <PanelDivider
+          width={panelWidth}
+          max={maxWidth}
+          onDrag={setDragWidth}
+          onChange={(width) => {
+            setChosenWidth(width);
+            setDragWidth(null);
+          }}
+        />
+      )}
     </div>
   );
 }

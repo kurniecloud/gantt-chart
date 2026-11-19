@@ -28,7 +28,8 @@ Specs: 1.1–1.6, 1.10 [task-list-and-timeline](specs/task-list-and-timeline.md)
 [drag-and-actuals](specs/drag-and-actuals.md) · 1.16–1.18
 [summaries-and-actual-toggle](specs/summaries-and-actual-toggle.md) · 1.3 (end needs a start)
 [end-date-needs-start](specs/end-date-needs-start.md) · 1.19 [task-remarks](specs/task-remarks.md) · 1.20
-[new-project](specs/new-project.md) · 1.21 [json-editor](specs/json-editor.md) · 1.22 [task-owner](specs/task-owner.md).
+[new-project](specs/new-project.md) · 1.21 [json-editor](specs/json-editor.md) · 1.22 [task-owner](specs/task-owner.md) · 1.23
+[resizable-task-panel](specs/resizable-task-panel.md).
 
 | #    | Feature                                                                                                        | Status |
 | ---- | -------------------------------------------------------------------------------------------------------------- | ------ |
@@ -54,6 +55,7 @@ Specs: 1.1–1.6, 1.10 [task-list-and-timeline](specs/task-list-and-timeline.md)
 | 1.20 | "New" button: offers to export, then empties the project (one undo)                                            | ✅     |
 | 1.21 | "JSON Editor": view and edit the whole project as text (Validate / Cancel / Save), for when files are blocked  | ✅     |
 | 1.22 | Task owner: one free-text name per task, with suggestions; shown in the dialog and the bar tooltip             | ✅     |
+| 1.23 | Resizable task panel: drag the divider from 320 px up to half the window (remembered per browser)              | ✅     |
 
 ## Phase 2 — Advanced scheduling
 
