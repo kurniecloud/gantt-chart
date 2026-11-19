@@ -1,6 +1,6 @@
 # Spec: resizable task panel
 
-Status: done (PR #17).
+Status: done (PR #16).
 
 ## Decisions (agreed with the product owner)
 
