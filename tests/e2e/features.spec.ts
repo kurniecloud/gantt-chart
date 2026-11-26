@@ -10,6 +10,11 @@ test.beforeEach(async ({ page }) => {
 const dialog = (page: Page) => page.getByRole('dialog');
 const timeline = (page: Page) => page.getByRole('group', { name: 'Timeline' });
 const day = (page: Page, iso: string) => dialog(page).locator(`[data-day="${iso}"] button`);
+/** The Milestones dialog's names, top to bottom. */
+const milestoneNames = (page: Page) =>
+  dialog(page)
+    .getByRole('textbox')
+    .evaluateAll((boxes) => boxes.map((box) => (box as HTMLInputElement).value));
 
 async function addTask(page: Page, name: string, dates?: [string, string], blockedBy?: string) {
   await page.getByRole('button', { name: 'Add Task', exact: true }).click();
@@ -183,6 +188,74 @@ test('milestones are managed in a dialog and shown in green', async ({ page }) =
   const friday = (await page.getByText('Fri 6', { exact: true }).boundingBox())!;
   const box = (await green.boundingBox())!;
   expect(Math.abs(box.x - friday.x)).toBeLessThanOrEqual(1);
+});
+
+test('milestones re-sort by date as dates are picked or cleared, flashing the moved row', async ({
+  page,
+}) => {
+  await page.getByRole('button', { name: 'Milestones' }).click();
+  const rows = dialog(page).locator('tbody > tr');
+  const dateOf = (name: string) =>
+    dialog(page).getByRole('button', { name: new RegExp(`^Date for ${name}`) });
+  const addMilestone = async (name: string, iso: string) => {
+    await dialog(page).getByRole('button', { name: 'Add Milestone' }).click();
+    await dialog(page).getByRole('textbox').last().fill(name);
+    await dateOf(name).click();
+    await day(page, iso).click();
+  };
+
+  await addMilestone('Launch', '2026-11-20');
+  await addMilestone('Kick-off', '2026-11-02');
+  await expect.poll(() => milestoneNames(page)).toEqual(['Kick-off', 'Launch']);
+  await expect(dateOf('Kick-off')).toBeFocused();
+  await expect(rows.nth(0)).toHaveClass(/moved/);
+  await expect(rows.nth(1)).not.toHaveClass(/moved/);
+  // The tint shows, then fades and the flash ends by itself.
+  const tint = await rows.nth(0).evaluate((row) => getComputedStyle(row).animationName);
+  expect(tint).toMatch(/moved/);
+  await expect(rows.nth(0)).not.toHaveClass(/moved/, { timeout: 3000 });
+
+  await dialog(page).getByRole('button', { name: 'Clear Date for Kick-off' }).click();
+  await expect.poll(() => milestoneNames(page)).toEqual(['Launch', 'Kick-off']);
+  await expect(dateOf('Kick-off')).toBeFocused();
+  await expect(rows.nth(1)).toHaveClass(/moved/);
+
+  await dateOf('Kick-off').click();
+  await day(page, '2026-11-02').click();
+  await dialog(page).getByRole('button', { name: 'Save' }).click();
+  await expect(dialog(page)).toBeHidden();
+  await page.getByRole('button', { name: 'Milestones' }).click();
+  await expect.poll(() => milestoneNames(page)).toEqual(['Kick-off', 'Launch']);
+});
+
+test('a milestone that moves out of view is scrolled into view', async ({ page }) => {
+  // Fifteen weekday milestones, 9–27 Nov, are more than the dialog shows in a short window.
+  await page.setViewportSize({ width: 1280, height: 480 });
+  const dates = [9, 10, 11, 12, 13, 16, 17, 18, 19, 20, 23, 24, 25, 26, 27];
+  await page.getByRole('button', { name: 'JSON Editor' }).click();
+  const editor = dialog(page).getByRole('textbox', { name: 'Project JSON' });
+  const file = JSON.parse(await editor.inputValue());
+  file.project.milestones = dates.map((d, i) => ({
+    id: `m${i}`,
+    name: `M${i + 1}`,
+    date: `2026-11-${String(d).padStart(2, '0')}`,
+  }));
+  await editor.fill(JSON.stringify(file));
+  await dialog(page).getByRole('button', { name: 'Save' }).click();
+  await expect(dialog(page)).toBeHidden();
+
+  await page.getByRole('button', { name: 'Milestones' }).click();
+  await dialog(page).evaluate((box) => box.scrollTo({ top: 0 }));
+  const rows = dialog(page).locator('tbody > tr');
+  await expect(rows.last()).not.toBeInViewport();
+  const pageScroll = await page.evaluate(() => document.scrollingElement!.scrollTop);
+  await dialog(page).getByRole('button', { name: 'Clear Date for M1', exact: true }).click();
+  await expect(dialog(page).getByRole('textbox').last()).toHaveValue('M1');
+  await expect(rows.last()).toBeInViewport();
+  await expect(rows.last()).toHaveClass(/moved/);
+  await expect(dialog(page).getByRole('button', { name: /^Date for M1 / })).toBeFocused();
+  // Only the dialog scrolls, never the page behind it.
+  expect(await page.evaluate(() => document.scrollingElement!.scrollTop)).toBe(pageScroll);
 });
 
 test('a milestone scrolled behind the task panel does not show over it', async ({ page }) => {

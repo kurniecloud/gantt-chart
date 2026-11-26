@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId, useRef } from 'react';
 import { DayPicker, type Matcher } from 'react-day-picker';
 import 'react-day-picker/style.css';
 import { todayISO } from '../domain/dates';
@@ -55,6 +55,7 @@ export function DatePicker({
   const errorId = useId();
   const calendarId = useId();
   const hintId = useId();
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const hint = disabled ? disabledHint : undefined;
   const describedBy = [error && errorId, hint && hintId].filter(Boolean).join(' ') || undefined;
   const disabledDays: Matcher[] = minDate
@@ -73,6 +74,7 @@ export function DatePicker({
       </span>
       <div className={styles.controls}>
         <button
+          ref={triggerRef}
           id={buttonId}
           type="button"
           className={styles.trigger}
@@ -97,6 +99,8 @@ export function DatePicker({
             onClick={() => {
               onChange(undefined);
               onOpenChange(false);
+              // The Clear button disappears; keep focus in the field instead of losing it.
+              triggerRef.current?.focus();
             }}
           >
             Clear
@@ -126,6 +130,8 @@ export function DatePicker({
             onSelect={(date) => {
               if (date) onChange(localDateToISO(date));
               onOpenChange(false);
+              // The calendar (holding focus) closes; return focus to the field it belongs to.
+              triggerRef.current?.focus();
             }}
           />
         </div>

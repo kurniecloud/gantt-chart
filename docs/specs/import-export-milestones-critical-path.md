@@ -41,8 +41,10 @@ Status: done (PR #4; kept current with later changes).
 - The Milestones button (in the toolbar above the task list, with "5 Milestones · 3 Upcoming"
   beside it — [summaries-and-actual-toggle](summaries-and-actual-toggle.md)) opens a dialog with
   a table: Milestone Name, Milestone Date, delete. "Add Milestone" adds a row (placeholder
-  "e.g. Design Sign-Off"). Save applies all changes as one undoable step, sorted by date; Cancel
-  discards. Name and date are required ("Enter a name", "Pick a date"); dates are weekdays only.
+  "e.g. Design Sign-Off"). Rows stay in date order: picking or clearing a date moves the row to
+  its place, a cleared one to the bottom ([milestone-auto-sort](milestone-auto-sort.md)). Save
+  applies all changes as one undoable step, in the order shown; Cancel discards. Name and date are
+  required ("Enter a name", "Pick a date"); dates are weekdays only.
 - Timeline: each milestone's day is light green (column in daily view, day slice in weekly
   view) with a ◆ marker on the header's bottom edge; hovering shows
   "Milestone: Kick-off — Mon 26 Oct 2026" (names joined when several share a day).

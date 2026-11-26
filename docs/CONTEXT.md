@@ -3,7 +3,7 @@
 **Read this at the start of every task. Update it in the same PR as any change that alters
 what's below** (status, a decision, a lesson learned, the backlog). It is the memory of the
 project between sessions; `CLAUDE.md` holds the always-on rules, this file holds the history
-and the why. Last updated: 2026-11-19, after PR #17.
+and the why. Last updated: 2026-11-26, PR #18 (milestones kept in date order).
 
 ---
 
@@ -15,7 +15,7 @@ and the why. Last updated: 2026-11-19, after PR #17.
 | Live site      | https://kurniecloud.github.io/gantt-chart/ (deployed by `.github/workflows/deploy.yml` on `main`)                                               |
 | Product owner  | GitHub user **kurniecloud** — sets priorities, answers design questions, merges PRs                                                             |
 | Stack          | Vite 8 · React 19 · TypeScript 6 (strict) · Zustand 5 + immer 11 · `@tanstack/react-virtual` 3 · `react-day-picker` 10 · `date-fns` 4 · `idb` 8 |
-| Tests          | Vitest 5 + Testing Library (460 tests, 33 files) · Playwright 1.64 Chromium (37 e2e)                                                            |
+| Tests          | Vitest 5 + Testing Library (479 tests, 34 files) · Playwright 1.64 Chromium (39 e2e)                                                            |
 | Runtime        | Node 26 LTS (`.nvmrc`), npm 11                                                                                                                  |
 | Schema version | **5** (`src/domain/project.ts`, migrations in `src/persistence/migrations.ts`)                                                                  |
 | Bundle         | ~411 KB JS / 128 KB gzipped (PR #16)                                                                                                            |
@@ -41,6 +41,7 @@ and the why. Last updated: 2026-11-19, after PR #17.
 | #15 | `feat/task-owner`                      | "Owner" text box above "Is Blocked By" (suggests names already used), shown in the bar tooltip; schema 5                                                                                                                                                                                                                                                      | [task-owner](specs/task-owner.md)                                                         |
 | #16 | `feat/resizable-task-panel`            | Draggable divider between the task panel and the timeline (320 px up to half the window, remembered per browser; keyboard and double-click reset; none on phones). Also: Milestones calendar days centred under their weekdays (as in the task dialog), calendar arrows and today in the theme accent, an open calendar no longer stretches the box beside it | [resizable-task-panel](specs/resizable-task-panel.md)                                     |
 | #17 | `ci/workflow-permissions`              | CI workflow limited to a read-only token (`permissions: contents: read`), closing the code-scanning alert                                                                                                                                                                                                                                                     | —                                                                                         |
+| #18 | `feat/milestone-auto-sort`             | Milestones dialog keeps its rows in date order as dates are picked or cleared (cleared → bottom, same day keeps its order, the moved row flashes and is scrolled into view); Save keeps that order. Every date field now keeps focus after a pick or Clear                                                                                                    | [milestone-auto-sort](specs/milestone-auto-sort.md)                                       |
 
 ### What the app does today (user's view)
 
@@ -61,7 +62,8 @@ and the why. Last updated: 2026-11-19, after PR #17.
 - **Timeline** (right): Daily / Weekly, Today, ±10 years, weekends hidden; bars coloured by
   priority, parents as brackets; drag to move, edges to resize; grey link arrows (dashed amber
   when dates break a link); blue actual-dates line; light-yellow today; light-green milestones
-  with ◆ markers; **Milestones** dialog with "5 Milestones · 3 Upcoming" beside the button;
+  with ◆ markers; **Milestones** dialog (rows re-sort by date as dates are picked or cleared, a
+  cleared one drops to the bottom, the moved row flashes) with "5 Milestones · 3 Upcoming" beside the button;
   **Actual Dates** toggle button (show/hide the blue lines, remembered per browser); **Critical
   Path** toggle (red line, live, input blocked while recalculating).
 
@@ -104,6 +106,7 @@ it was last decided; a changed decision is overwritten here and in its spec (see
 
 | Date       | Area                 | Decision                                                                                                                                                                                                                                                                                                                                                             | Spec                                                                                      |
 | ---------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| 2026-11-26 | Milestone order      | The Milestones dialog **re-sorts by date as soon as a date is picked or cleared**; a **cleared** one goes to the **bottom**. Same-day milestones **keep their order** (the one just dated goes after the others); **Save keeps the dialog's order**. A moved row is **scrolled into view and flashes** the accent tint (~1.5 s).                                     | [milestone-auto-sort](specs/milestone-auto-sort.md)                                       |
 | 2026-11-19 | Task panel width     | **Draggable divider** between the task panel and the timeline: **320 px (the old fixed width) up to half the window**; names use the room and end in "…" only when they don't fit. **Remembered per browser.** **No divider on phones** (fixed 196 px).                                                                                                              | [resizable-task-panel](specs/resizable-task-panel.md)                                     |
 | 2026-11-17 | Task owner           | **"Owner" text box directly above "Is Blocked By"**, every task and subtask. **One** free-text name, **suggestions** of names already used in the project. Shown in the **dialog and the bar tooltip** ("· Owner: Ana"), not on rows. Not inherited by subtasks. `Task.owner`, schema 5.                                                                             | [task-owner](specs/task-owner.md)                                                         |
 | 2026-11-16 | JSON Editor          | **"JSON Editor" to the right of Export**: a big text box with exactly the export file's text. **Validate** runs everything Import checks and shows a message in the dialog (green / red with the reason, line and column for broken JSON). **Cancel** discards edits. **Save** straight away (no confirm), one undo; refuses invalid text and keeps the editor open. | [json-editor](specs/json-editor.md)                                                       |
@@ -141,26 +144,27 @@ it was last decided; a changed decision is overwritten here and in its spec (see
 
 ## 4. Where things live (beyond `CLAUDE.md`'s layout)
 
-| Concern                   | Code                                                                                                                                         |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Weekday coordinate system | `domain/workweek.ts` (`weekdayIndex`), `features/timeline/scale.ts` (daily/weekly scale)                                                     |
-| Planned / actual spans    | `domain/taskDates.ts` — `effectiveSpans(project, 'planned' \| 'actual', today?)`, `shiftSpan`                                                |
-| Hierarchy                 | `domain/tree.ts` (`visibleTaskRows`, `descendantIds`, insert positions)                                                                      |
-| Moves                     | `domain/move.ts` (`planMove`), command `moveTask`, UI `features/tasks/useRowDrag.ts`                                                         |
-| Links                     | `domain/dependencies.ts` (`linkCandidates`, `leafSuccessors`, `linkProblem`)                                                                 |
-| Critical path             | `domain/criticalPath.ts` (driving chain), `features/criticalPath/` (refresh + overlay)                                                       |
-| Arrows                    | `features/timeline/arrows.ts` (routing), `DependencyArrows.tsx` (SVG)                                                                        |
-| Bar drag                  | `features/timeline/useBarDrag.ts`, command `shiftTaskDates`                                                                                  |
-| Commands (undo)           | `store/commands/*` — `{ label, apply(draft) }`, immer patches                                                                                |
-| UI-only state             | `store/uiStore.ts` (open dialog), `store/viewStore.ts` (view mode, actual dates, critical, busy)                                             |
-| Totals / milestone count  | `domain/summary.ts` (`projectSummary`, `milestoneSummary`), `features/workspace/ProjectTotals.tsx`, `MilestonesTool.tsx`, `summaryLabels.ts` |
-| Focus-ring modality       | `utils/inputModality.ts` (installed in `main.tsx`) + the `data-input` rules in `styles/global.css`                                           |
-| Task panel width          | `features/workspace/panelWidth.ts` (limits, keys), `PanelDivider.tsx`, `viewStore.taskPanelWidth`                                            |
-| Owner suggestions         | `domain/owners.ts` (`ownerNames`), the `<datalist>` in `features/dialogs/TaskDialog.tsx`                                                     |
-| JSON Editor               | `features/dialogs/JsonEditorDialog.tsx`, `io/projectFile.ts` (`parseProjectFile`, `jsonErrorLocation`), command `saveProjectJson`            |
-| New button                | `features/header/FileActions.tsx`, `features/dialogs/NewProjectDialogs.tsx`, command `clearProject`                                          |
-| File format               | `io/projectFile.ts` (validation of untrusted files), `io/download.ts`                                                                        |
-| Test helpers              | `src/test/fixtures.ts` (`makeProject`), `src/test/setup.ts` (jsdom shims)                                                                    |
+| Concern                   | Code                                                                                                                                          |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Weekday coordinate system | `domain/workweek.ts` (`weekdayIndex`), `features/timeline/scale.ts` (daily/weekly scale)                                                      |
+| Planned / actual spans    | `domain/taskDates.ts` — `effectiveSpans(project, 'planned' \| 'actual', today?)`, `shiftSpan`                                                 |
+| Hierarchy                 | `domain/tree.ts` (`visibleTaskRows`, `descendantIds`, insert positions)                                                                       |
+| Moves                     | `domain/move.ts` (`planMove`), command `moveTask`, UI `features/tasks/useRowDrag.ts`                                                          |
+| Links                     | `domain/dependencies.ts` (`linkCandidates`, `leafSuccessors`, `linkProblem`)                                                                  |
+| Critical path             | `domain/criticalPath.ts` (driving chain), `features/criticalPath/` (refresh + overlay)                                                        |
+| Arrows                    | `features/timeline/arrows.ts` (routing), `DependencyArrows.tsx` (SVG)                                                                         |
+| Bar drag                  | `features/timeline/useBarDrag.ts`, command `shiftTaskDates`                                                                                   |
+| Commands (undo)           | `store/commands/*` — `{ label, apply(draft) }`, immer patches                                                                                 |
+| UI-only state             | `store/uiStore.ts` (open dialog), `store/viewStore.ts` (view mode, actual dates, critical, busy)                                              |
+| Totals / milestone count  | `domain/summary.ts` (`projectSummary`, `milestoneSummary`), `features/workspace/ProjectTotals.tsx`, `MilestonesTool.tsx`, `summaryLabels.ts`  |
+| Focus-ring modality       | `utils/inputModality.ts` (installed in `main.tsx`) + the `data-input` rules in `styles/global.css`                                            |
+| Task panel width          | `features/workspace/panelWidth.ts` (limits, keys), `PanelDivider.tsx`, `viewStore.taskPanelWidth`                                             |
+| Milestone order           | `domain/milestones.ts` (`sortByDate`, `placeByDate`, `sameMilestones`), `features/dialogs/MilestonesDialog.tsx` (flash, scroll, announcement) |
+| Owner suggestions         | `domain/owners.ts` (`ownerNames`), the `<datalist>` in `features/dialogs/TaskDialog.tsx`                                                      |
+| JSON Editor               | `features/dialogs/JsonEditorDialog.tsx`, `io/projectFile.ts` (`parseProjectFile`, `jsonErrorLocation`), command `saveProjectJson`             |
+| New button                | `features/header/FileActions.tsx`, `features/dialogs/NewProjectDialogs.tsx`, command `clearProject`                                           |
+| File format               | `io/projectFile.ts` (validation of untrusted files), `io/download.ts`                                                                         |
+| Test helpers              | `src/test/fixtures.ts` (`makeProject`), `src/test/setup.ts` (jsdom shims)                                                                     |
 
 ---
 
@@ -196,6 +200,12 @@ it was last decided; a changed decision is overwritten here and in its spec (see
   text without `aria-hidden` parts (see `summaries.test.tsx`).
 - Small text in the actual blue needs `--color-actual-text`; `--color-actual` is only ~3.4:1 on
   the light surface.
+- **Chrome's scroll anchoring** can bring a re-sorted row into view by itself (a row jumping up
+  past the visible ones), which hid a missing `scrollIntoView` in the first e2e test (PR #18). Test
+  the direction anchoring can't help (a row dropping below the view) and check the test fails
+  without the fix.
+- Dialogs open scrolled to their `data-autofocus` element: with many milestones the Milestones
+  dialog opens scrolled to the bottom ("Add Milestone").
 - SVG boxes include stroke and markers; to check where a line really starts/ends, use
   `getPointAtLength()` + `getScreenCTM()` (see the arrow e2e test).
 
@@ -215,6 +225,12 @@ it was last decided; a changed decision is overwritten here and in its spec (see
   the browser's own focus restore doesn't run and focus fell to `<body>`. `Dialog` refocuses its
   opener itself, with `preventScroll` so returning to the pinned task panel can't move the
   timeline. Going from one dialog straight to another keeps the original opener (e2e-guarded).
+- **Removing the focused element drops focus to `<body>`** (a calendar day after a pick, the Clear
+  button after clearing). `DatePicker` focuses its own field after either. React keeps focus on an
+  element it moves while re-ordering a keyed list, so focus follows a re-sorted Milestones row.
+- Don't compare data with `JSON.stringify`: it depends on key order (fixtures and imported files
+  build objects in another order). The Milestones dialog's "nothing changed" check uses
+  `sameMilestones` (PR #18).
 - A `<dialog>`'s `close` event is async; with StrictMode remounts it can arrive after reopening →
   `Dialog` ignores `close` while still open.
 - `eslint-plugin-react-hooks` v7 forbids `setState` directly in effects: remount with a `key`
@@ -244,8 +260,9 @@ it was last decided; a changed decision is overwritten here and in its spec (see
   textbox: query it as `getByRole('combobox', { name: 'Owner' })`.
 - jsdom has no `matchMedia`: tests that need a phone-sized screen stub it with
   `vi.stubGlobal('matchMedia', …)` (see `PanelDivider.test.tsx`).
-- jsdom has no `showModal`, layout, `scrollTo` or scroll events → shims in `src/test/setup.ts`
-  (every element is 1024×768; `scrollTo` fires `scroll`).
+- jsdom has no `showModal`, layout, `scrollTo`, `scrollIntoView` or scroll events → shims in
+  `src/test/setup.ts` (every element is 1024×768; `scrollTo` fires `scroll`; `scrollIntoView` does
+  nothing, so tests can spy on it).
 - Unit tests that open a **new** task's date pickers must pin the clock too: with no value the
   calendar opens on today's month, so day labels like "Wednesday, November 4th, 2026" only exist
   in that month (see the "End Date needs a Start Date" tests).
@@ -310,6 +327,7 @@ Roughly in the order they'd make sense; confirm with the owner before starting.
 | Drag-to-link between bars (1.9)                           | Links are edited in the dialog only.                                                                                                                                          |
 | Project list / switch UI (0.4)                            | Storage supports several projects; the UI shows one, and New empties it.                                                                                                      |
 | Light/dark toggle (1.12)                                  | Follows the OS today.                                                                                                                                                         |
+| Milestones dialog opens at the bottom                     | With more rows than fit, focus on "Add Milestone" scrolls the dialog to the end. Focusing the first row, or the button above the table, would open at the top.                |
 | Milestones date picker on phones                          | The date column is ~106 px at 375 px, so the calendar scrolls sideways (only ~3 weekdays show). Stacking each row (name above date) on phones would fit it.                   |
 | Resources (Phase 3) vs Owner                              | Owner is free text on each task. A people list / workload view should decide whether owners become resources.                                                                 |
 | Baselines (2.6) / variance                                | Overlaps with planned vs actual — decide how they relate before building.                                                                                                     |

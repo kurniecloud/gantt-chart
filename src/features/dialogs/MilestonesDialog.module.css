@@ -62,3 +62,37 @@
 .add {
   margin-top: var(--space-3);
 }
+
+/*
+ * A row that just moved to its place by date: tinted, then fading out. Two identical animations
+ * so that a second move of the same row restarts the flash (a changed animation name restarts it).
+ */
+.movedA {
+  animation: moved-a 1.5s ease-out;
+}
+
+.movedB {
+  animation: moved-b 1.5s ease-out;
+}
+
+@keyframes moved-a {
+  0%,
+  50% {
+    background-color: var(--color-accent-soft);
+  }
+
+  100% {
+    background-color: transparent;
+  }
+}
+
+@keyframes moved-b {
+  0%,
+  50% {
+    background-color: var(--color-accent-soft);
+  }
+
+  100% {
+    background-color: transparent;
+  }
+}
