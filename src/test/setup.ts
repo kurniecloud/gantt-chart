@@ -33,6 +33,8 @@ Element.prototype.scrollTo = function scrollTo(this: Element, options?: ScrollTo
   if (options.top !== undefined) this.scrollTop = options.top;
   this.dispatchEvent(new Event('scroll'));
 } as Element['scrollTo'];
+// …and has no scrollIntoView at all; a no-op lets code call it (and tests spy on it).
+Element.prototype.scrollIntoView ??= function scrollIntoView() {};
 
 afterEach(() => {
   cleanup();

@@ -19,7 +19,7 @@ see the [roadmap](docs/PRODUCT.md).
 - Timeline: daily and weekly views, weekends hidden, today highlighted; bars coloured by
   priority, drag to move and resize; link arrows (amber when the dates break a link); blue
   actual-dates lines (Actual Dates toggle); Critical Path toggle (driving chain).
-- Milestones (dialog, green days with ◆ markers) and project totals (tasks, planned and actual
+- Milestones (dialog kept in date order, green days with ◆ markers) and project totals (tasks, planned and actual
   length).
 - New (offers to export, then starts over), import / export of the native `.gantt.json` file,
   and a JSON Editor to read and change the same text where files are blocked; follows the OS

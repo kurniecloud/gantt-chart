@@ -196,6 +196,18 @@ describe('date pickers', () => {
     expect(task).not.toHaveProperty('start');
     expect(task).not.toHaveProperty('finish');
   });
+
+  it('returns focus to the field after a day is picked or the date is cleared', async () => {
+    const user = await editDated();
+    const start = () => within(dialog()).getByRole('button', { name: /^Planned Start Date/ });
+    await user.click(start());
+    await user.click(within(dialog()).getByRole('button', { name: /Friday, November 6th, 2026/ }));
+    expect(start()).toHaveTextContent('Fri 6 Nov 2026');
+    expect(start()).toHaveFocus();
+    await user.click(within(dialog()).getByRole('button', { name: 'Clear Planned Start Date' }));
+    expect(start()).toHaveTextContent('No Date');
+    expect(start()).toHaveFocus();
+  });
 });
 
 describe('End Date needs a Start Date', () => {

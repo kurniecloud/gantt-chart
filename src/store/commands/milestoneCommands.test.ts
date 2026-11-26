@@ -11,7 +11,7 @@ beforeEach(() => {
 });
 
 describe('setMilestones', () => {
-  it('replaces all milestones, sorted by date then name, undoable in one step', () => {
+  it('replaces all milestones, sorted by date, undoable in one step', () => {
     state().dispatch(
       setMilestones([
         { id: 'b', name: 'Launch', date: '2026-11-20' },
@@ -19,7 +19,8 @@ describe('setMilestones', () => {
         { id: 'a', name: 'Alpha', date: '2026-11-13' },
       ]),
     );
-    expect(state().project.milestones.map((m) => m.name)).toEqual(['Alpha', 'Beta', 'Launch']);
+    // Same-day milestones keep the order they were given in (the dialog's), not name order.
+    expect(state().project.milestones.map((m) => m.name)).toEqual(['Beta', 'Alpha', 'Launch']);
     state().undo();
     expect(state().project.milestones.map((m) => m.name)).toEqual(['Old']);
   });
