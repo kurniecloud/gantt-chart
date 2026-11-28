@@ -19,7 +19,7 @@
 └────────────┬───────────────────────────────────────────────┘
              │
 ┌────────────▼──────────────┐   ┌────────────────────────────┐
-│ Persistence: IndexedDB    │   │ IO: .gantt.json (JSON)     │
+│ Persistence: IndexedDB    │   │ IO: .gantt.json, clipboard │
 └───────────────────────────┘   └────────────────────────────┘
 ```
 
@@ -136,6 +136,18 @@ Details: `.claude/skills/gantt-rendering/SKILL.md`.
   preferences in `localStorage` (`store/viewStore.ts`), not part of the project.
 - Autosave debounced 500 ms after each command; save on `visibilitychange` too.
 - On load, run migrations from the stored `schemaVersion` to the current one.
+
+## Spreadsheet copy
+
+The JSON Editor's Spreadsheet view ([spec](specs/spreadsheet-copy.md)) is read-only and has no
+command. `domain/taskTable.ts` turns the project into flat rows (outline numbers, status,
+parent rollups, links as numbers); `io/spreadsheet.ts` builds one model from them
+(`projectSheet`) that is both drawn (`features/dialogs/SpreadsheetTable.tsx`) and written to the
+clipboard as an HTML table (`sheetHtml`, with the `mso-*` cell styles spreadsheet apps read)
+and as tab-separated text (`sheetText`). `io/clipboard.ts` writes both from a `copy` event
+fired by `execCommand('copy')`, which needs no clipboard permission and writes the HTML exactly
+as given; the async clipboard API (refused in some embedded browsers, and it rewraps the HTML in
+a new document) is only the fallback.
 
 ## Deployment
 

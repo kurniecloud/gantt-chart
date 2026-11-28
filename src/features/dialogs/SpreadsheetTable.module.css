@@ -1,0 +1,61 @@
+.title {
+  margin: 0;
+  font-weight: 600;
+  font-size: var(--font-size-lg);
+  white-space: pre-wrap;
+}
+
+.description {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-muted);
+  white-space: pre-wrap;
+}
+
+/* Separate borders so the sticky header keeps its lines while the rows scroll under it. */
+.table {
+  margin-top: var(--space-4);
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--font-size-md);
+  line-height: 1.45;
+}
+
+.table > thead > tr > th,
+.table > tbody > tr > td {
+  padding: var(--space-1) var(--space-2);
+  border-right: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+  white-space: pre;
+}
+
+.table > thead > tr > th:first-child,
+.table > tbody > tr > td:first-child {
+  border-left: 1px solid var(--color-border);
+}
+
+.table > thead > tr > th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-weight: 600;
+}
+
+.bold > td {
+  font-weight: 600;
+}
+
+.date {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Remarks: may hold several lines, wraps within a readable width. */
+.table > tbody > tr > td.wide {
+  min-width: 200px;
+  max-width: 360px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

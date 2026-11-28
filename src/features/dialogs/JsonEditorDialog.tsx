@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { Button } from '../../components/Button';
 import { Dialog, DialogActions } from '../../components/Dialog';
 import { todayISO } from '../../domain/dates';
@@ -10,10 +10,14 @@ import {
   parseProjectFile,
   serializeProject,
 } from '../../io/projectFile';
+import { copyFormatted } from '../../io/clipboard';
+import type { ProjectSheet } from '../../io/spreadsheet';
+import { projectSheet, sheetHtml, sheetText } from '../../io/spreadsheet';
 import { saveProjectJson } from '../../store/commands/projectCommands';
 import { useProjectStore } from '../../store/projectStore';
 import { isMac } from '../../utils/platform';
 import styles from './JsonEditorDialog.module.css';
+import { SpreadsheetTable } from './SpreadsheetTable';
 
 type CheckResult = { ok: true; project: Project } | { ok: false; message: string };
 
@@ -41,7 +45,10 @@ type JsonEditorDialogProps = {
   onClose: () => void;
 };
 
-/** The whole project as the text Export downloads, edited in place (for when files are blocked). */
+/**
+ * The whole project as the text Export downloads, edited in place (for when files are blocked).
+ * Spreadsheet swaps the text for a table of the same data, to copy into a spreadsheet.
+ */
 export function JsonEditorDialog({ onClose }: JsonEditorDialogProps) {
   const dispatch = useProjectStore((s) => s.dispatch);
   const [initialText] = useState(() =>
@@ -49,7 +56,12 @@ export function JsonEditorDialog({ onClose }: JsonEditorDialogProps) {
   );
   const [text, setText] = useState(initialText);
   const [status, setStatus] = useState<Status>(null);
+  /** The table view's data; `null` while the JSON text is shown. */
+  const [sheet, setSheet] = useState<ProjectSheet | null>(null);
   const editorRef = useRef<HTMLTextAreaElement>(null);
+  const tableRef = useRef<HTMLDivElement>(null);
+  const copyRef = useRef<HTMLButtonElement>(null);
+  const switched = useRef(false);
   const hintId = useId();
   const statusId = useId();
 
@@ -76,6 +88,51 @@ export function JsonEditorDialog({ onClose }: JsonEditorDialogProps) {
     );
   };
 
+  const showSpreadsheet = () => {
+    const result = check(text);
+    if (!result.ok) {
+      setStatus({ valid: false, message: result.message });
+      return;
+    }
+    switched.current = true;
+    setSheet(projectSheet(result.project));
+    setStatus(null);
+  };
+
+  const backToJson = () => {
+    switched.current = true;
+    setSheet(null);
+    setStatus(null);
+  };
+
+  // The button pressed to switch views goes away with its view: move focus to where the work
+  // continues (Copy Table, or the text, which kept its cursor and scroll position).
+  useLayoutEffect(() => {
+    if (!switched.current) return;
+    switched.current = false;
+    if (sheet) copyRef.current?.focus();
+    else editorRef.current?.focus();
+  }, [sheet]);
+
+  const copyTable = async () => {
+    if (!sheet || !tableRef.current) return;
+    const copied = await copyFormatted(sheetHtml(sheet), sheetText(sheet), tableRef.current);
+    setStatus(
+      copied
+        ? {
+            valid: true,
+            message: `Copied ${count(sheet.tasks.length, 'task row')} and ${count(
+              sheet.milestones.length,
+              'milestone',
+            )}. Paste them into a spreadsheet.`,
+          }
+        : {
+            valid: false,
+            message: 'The browser blocked copying. Select the table and copy it instead.',
+          },
+    );
+  };
+
   const save = () => {
     if (text === initialText) {
       onClose();
@@ -93,10 +150,25 @@ export function JsonEditorDialog({ onClose }: JsonEditorDialogProps) {
   return (
     <Dialog title="JSON Editor" size="large" onClose={onClose}>
       <p id={hintId} className={styles.hint}>
-        The whole project, as in an exported .gantt.json file. Saving replaces the project; you can
-        undo it with {isMac ? '⌘Z' : 'Ctrl+Z'}.
+        {sheet
+          ? 'The project as a table. Copy it, then paste it into a spreadsheet.'
+          : `The whole project, as in an exported .gantt.json file. Saving replaces the project; you can undo it with ${isMac ? '⌘Z' : 'Ctrl+Z'}.`}
       </p>
+      {sheet && (
+        <div
+          ref={tableRef}
+          role="region"
+          aria-label="Spreadsheet Table"
+          aria-describedby={`${hintId} ${statusId}`}
+          // Scrollable, so keyboard users must be able to reach it to scroll.
+          tabIndex={0}
+          className={styles.sheet}
+        >
+          <SpreadsheetTable sheet={sheet} />
+        </div>
+      )}
       <textarea
+        hidden={sheet !== null}
         ref={editorRef}
         data-autofocus
         className={styles.editor}
@@ -123,9 +195,25 @@ export function JsonEditorDialog({ onClose }: JsonEditorDialogProps) {
         {status?.message}
       </p>
       <DialogActions>
-        <Button className={styles.validate} onClick={validate}>
-          Validate
-        </Button>
+        {sheet ? (
+          <>
+            <Button key="back" onClick={backToJson}>
+              Back to JSON
+            </Button>
+            <Button key="copy" ref={copyRef} className={styles.lastOnLeft} onClick={copyTable}>
+              Copy Table
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button key="validate" onClick={validate}>
+              Validate
+            </Button>
+            <Button key="spreadsheet" className={styles.lastOnLeft} onClick={showSpreadsheet}>
+              Spreadsheet
+            </Button>
+          </>
+        )}
         <Button onClick={onClose}>Cancel</Button>
         <Button variant="primary" onClick={save}>
           Save

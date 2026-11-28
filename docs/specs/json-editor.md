@@ -7,15 +7,15 @@ changed as text, with no file involved.
 
 ## Decisions (agreed with the product owner)
 
-| Date       | Topic        | Decision                                                                                                                                                       |
-| ---------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-11-16 | Button       | A **"JSON Editor"** button in the header, **to the right of Export**: New · Import · Export · JSON Editor.                                                     |
-| 2026-11-16 | Content      | The dialog shows **exactly the text Export downloads** (the `.gantt.json` file: a small header plus the project) in a big text box, and accepts the same text. |
-| 2026-11-16 | Buttons      | **Validate, Cancel, Save**, at the bottom of the dialog.                                                                                                       |
-| 2026-11-16 | Validate     | Runs **everything Import checks**: JSON syntax and the project rules. "Valid" therefore means Save will work.                                                  |
-| 2026-11-16 | Notification | **A message in the dialog**, just above the buttons: green when valid, red with the reason when not. It clears as soon as the text changes.                    |
-| 2026-11-16 | Cancel       | Closes the editor and **discards any changes**, without asking.                                                                                                |
-| 2026-11-16 | Save         | **Saves straight away**, with no confirmation: replaces the whole project and closes. **One undo** restores the previous project.                              |
+| Date       | Topic        | Decision                                                                                                                                                                             |
+| ---------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-11-16 | Button       | A **"JSON Editor"** button in the header, **to the right of Export**: New · Import · Export · JSON Editor.                                                                           |
+| 2026-11-16 | Content      | The dialog shows **exactly the text Export downloads** (the `.gantt.json` file: a small header plus the project) in a big text box, and accepts the same text.                       |
+| 2026-11-28 | Buttons      | **Validate, Spreadsheet, Cancel, Save**, at the bottom of the dialog. Spreadsheet shows the project as a table to copy into a spreadsheet ([spreadsheet-copy](spreadsheet-copy.md)). |
+| 2026-11-16 | Validate     | Runs **everything Import checks**: JSON syntax and the project rules. "Valid" therefore means Save will work.                                                                        |
+| 2026-11-16 | Notification | **A message in the dialog**, just above the buttons: green when valid, red with the reason when not. It clears as soon as the text changes.                                          |
+| 2026-11-16 | Cancel       | Closes the editor and **discards any changes**, without asking.                                                                                                                      |
+| 2026-11-16 | Save         | **Saves straight away**, with no confirmation: replaces the whole project and closes. **One undo** restores the previous project.                                                    |
 
 ## Behaviour
 
@@ -41,7 +41,10 @@ changed as text, with no file involved.
 - As with Import: the project keeps its id (storage still holds one project); text from an older
   schema version is upgraded; the `exportedAt` date in the text is ignored.
 - Focus returns to the JSON Editor button when the dialog closes.
-- On phones the header's file buttons show text only and Undo / Redo move to a second line.
+- Spreadsheet swaps the text box for a read-only table of the same data, with Copy Table and
+  Back to JSON; see [spreadsheet-copy](spreadsheet-copy.md).
+- On phones the header's file buttons show text only and Undo / Redo move to a second line; the
+  dialog's buttons wrap onto two lines (Validate · Spreadsheet, then Cancel · Save).
 
 ## Data model
 

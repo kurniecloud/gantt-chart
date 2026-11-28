@@ -29,34 +29,36 @@ Specs: 1.1–1.6, 1.10 [task-list-and-timeline](specs/task-list-and-timeline.md)
 [summaries-and-actual-toggle](specs/summaries-and-actual-toggle.md) · 1.3 (end needs a start)
 [end-date-needs-start](specs/end-date-needs-start.md) · 1.19 [task-remarks](specs/task-remarks.md) · 1.20
 [new-project](specs/new-project.md) · 1.21 [json-editor](specs/json-editor.md) · 1.22 [task-owner](specs/task-owner.md) · 1.23
-[resizable-task-panel](specs/resizable-task-panel.md) · 1.24 [milestone-auto-sort](specs/milestone-auto-sort.md).
+[resizable-task-panel](specs/resizable-task-panel.md) · 1.24 [milestone-auto-sort](specs/milestone-auto-sort.md) · 1.25
+[spreadsheet-copy](specs/spreadsheet-copy.md).
 
-| #    | Feature                                                                                                        | Status |
-| ---- | -------------------------------------------------------------------------------------------------------------- | ------ |
-| 1.1  | Project title and description at the top, edited in place                                                      | ✅     |
-| 1.2  | Nested tasks to any depth, indented per level, expand / collapse                                               | ✅     |
-| 1.3  | Add / edit dialog: name, weekday-only start & end pickers (end needs a start), priority                        | ✅     |
-| 1.4  | Add subtask (⊕) and delete with confirmation (✕) on every row                                                  | ✅     |
-| 1.5  | Timeline: daily / weekly views, weekdays only, scroll past & future, today highlighted                         | ✅     |
-| 1.6  | Task bars: colour by priority, parents span subtasks, 1-day bars for single dates                              | ✅     |
-| 1.7  | Native JSON import / export                                                                                    | ✅     |
-| 1.8  | Drag bar to move, drag edges to resize (tasks without subtasks)                                                | ✅     |
-| 1.9  | Finish-to-start links: "Is Blocked By" / "Is Blocking" ✅, grey arrows (amber when broken) ✅, drag-to-link ⬜ | 🟨     |
-| 1.10 | Undo / redo (Ctrl/Cmd+Z, Shift+Ctrl/Cmd+Z, Ctrl+Y)                                                             | ✅     |
-| 1.11 | Reorder / nest tasks by dragging the grip, or Alt+Shift+arrow keys                                             | ✅     |
-| 1.12 | Light / dark theme                                                                                             | 🟨     |
-| 1.13 | Project milestones: managed in a dialog, highlighted green with a ◆ marker                                     | ✅     |
-| 1.14 | Weekday count "(7D)" per task in its priority colour                                                           | ✅     |
-| 1.15 | Planned vs actual dates: two boxes in the dialog, blue actual line under the bar                               | ✅     |
-| 1.16 | Project totals above "Task Name": top-level tasks (hover: main / edge counts), planned and actual length       | ✅     |
-| 1.17 | Milestone count beside the Milestones button ("5 Milestones · 3 Upcoming")                                     | ✅     |
-| 1.18 | "Actual Dates" toggle button to show / hide the blue actual lines (remembered per browser)                     | ✅     |
-| 1.19 | Remarks: a plain-text box in the task dialog, below Priority                                                   | ✅     |
-| 1.20 | "New" button: offers to export, then empties the project (one undo)                                            | ✅     |
-| 1.21 | "JSON Editor": view and edit the whole project as text (Validate / Cancel / Save), for when files are blocked  | ✅     |
-| 1.22 | Task owner: one free-text name per task, with suggestions; shown in the dialog and the bar tooltip             | ✅     |
-| 1.23 | Resizable task panel: drag the divider from 320 px up to half the window (remembered per browser)              | ✅     |
-| 1.24 | Milestones dialog keeps its rows in date order as dates are picked or cleared (cleared → bottom)               | ✅     |
+| #    | Feature                                                                                                                                        | Status |
+| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| 1.1  | Project title and description at the top, edited in place                                                                                      | ✅     |
+| 1.2  | Nested tasks to any depth, indented per level, expand / collapse                                                                               | ✅     |
+| 1.3  | Add / edit dialog: name, weekday-only start & end pickers (end needs a start), priority                                                        | ✅     |
+| 1.4  | Add subtask (⊕) and delete with confirmation (✕) on every row                                                                                  | ✅     |
+| 1.5  | Timeline: daily / weekly views, weekdays only, scroll past & future, today highlighted                                                         | ✅     |
+| 1.6  | Task bars: colour by priority, parents span subtasks, 1-day bars for single dates                                                              | ✅     |
+| 1.7  | Native JSON import / export                                                                                                                    | ✅     |
+| 1.8  | Drag bar to move, drag edges to resize (tasks without subtasks)                                                                                | ✅     |
+| 1.9  | Finish-to-start links: "Is Blocked By" / "Is Blocking" ✅, grey arrows (amber when broken) ✅, drag-to-link ⬜                                 | 🟨     |
+| 1.10 | Undo / redo (Ctrl/Cmd+Z, Shift+Ctrl/Cmd+Z, Ctrl+Y)                                                                                             | ✅     |
+| 1.11 | Reorder / nest tasks by dragging the grip, or Alt+Shift+arrow keys                                                                             | ✅     |
+| 1.12 | Light / dark theme                                                                                                                             | 🟨     |
+| 1.13 | Project milestones: managed in a dialog, highlighted green with a ◆ marker                                                                     | ✅     |
+| 1.14 | Weekday count "(7D)" per task in its priority colour                                                                                           | ✅     |
+| 1.15 | Planned vs actual dates: two boxes in the dialog, blue actual line under the bar                                                               | ✅     |
+| 1.16 | Project totals above "Task Name": top-level tasks (hover: main / edge counts), planned and actual length                                       | ✅     |
+| 1.17 | Milestone count beside the Milestones button ("5 Milestones · 3 Upcoming")                                                                     | ✅     |
+| 1.18 | "Actual Dates" toggle button to show / hide the blue actual lines (remembered per browser)                                                     | ✅     |
+| 1.19 | Remarks: a plain-text box in the task dialog, below Priority                                                                                   | ✅     |
+| 1.20 | "New" button: offers to export, then empties the project (one undo)                                                                            | ✅     |
+| 1.21 | "JSON Editor": view and edit the whole project as text (Validate / Cancel / Save), for when files are blocked                                  | ✅     |
+| 1.22 | Task owner: one free-text name per task, with suggestions; shown in the dialog and the bar tooltip                                             | ✅     |
+| 1.23 | Resizable task panel: drag the divider from 320 px up to half the window (remembered per browser)                                              | ✅     |
+| 1.24 | Milestones dialog keeps its rows in date order as dates are picked or cleared (cleared → bottom)                                               | ✅     |
+| 1.25 | Spreadsheet copy: the JSON Editor shows the project as a table (tasks with outline Ids and status, milestones) and copies it for a spreadsheet | ✅     |
 
 ## Phase 2 — Advanced scheduling
 

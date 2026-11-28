@@ -37,6 +37,26 @@ validation.
   keeps the id. Broken JSON reports "line L, column C" via `jsonErrorLocation()`, which reads the
   browser's `JSON.parse` message (line/column, a position, or nothing — Safari).
 
+## Spreadsheet copy (clipboard, not a file)
+
+The JSON Editor's **Spreadsheet** button shows the editor's text as a read-only table and
+**Copy Table** puts it on the clipboard (spec `docs/specs/spreadsheet-copy.md`). It is not a file
+format: nothing is downloaded or imported.
+
+- Rows: `domain/taskTable.ts` (`taskTable`, `taskStatus`) — outline numbers, status from actual
+  dates, parents' dates from their subtasks, links as outline numbers.
+- Model: `io/spreadsheet.ts` — `projectSheet()` (title, description, task rows, milestone rows;
+  text and date cells) feeds both the on-screen table and the clipboard: `sheetHtml()` (one
+  `<table>`, every text cell `mso-number-format:'\@'`, dates `'d mmm yyyy'`, indents
+  `mso-char-indent-count`, line breaks `<br style="mso-data-placement:same-cell">`, kept spaces
+  `mso-spacerun`) and `sheetText()` (tab-separated, quoted when a cell holds a tab, line break
+  or quote).
+- Clipboard: `io/clipboard.ts` `copyFormatted()` — `execCommand('copy')` with a `copy` listener
+  that sets both types, briefly selecting the table (some browsers fire `copy` only with a
+  selection). It needs no permission and writes the HTML exactly as given; the async clipboard
+  API is the fallback (the desktop app's browser pane refuses it: "Write permission denied").
+  All user text is HTML-escaped.
+
 ## Tests
 
 `src/io/projectFile.test.ts` builds files in code. Required: a round trip (export → import →

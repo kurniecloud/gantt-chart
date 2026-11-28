@@ -63,6 +63,12 @@ are manually dated (`mode: 'manual'`) with no dates, top-level unless `parent` i
   IndexedDB (new browser context) and pin the clock (`page.clock.setFixedTime`). For drag tests
   use `page.mouse` with explicit coordinates derived from the bar's bounding box. Wait 800 ms
   before a reload (autosave is debounced).
+- Clipboard: jsdom has no clipboard or `execCommand` — unit tests define
+  `document.execCommand` to fire a `copy` event with a recording `clipboardData` (see
+  `src/io/clipboard.test.ts`); component tests mock `io/clipboard`. In e2e, grant
+  `clipboard-read`/`clipboard-write`, record what the app wrote from a `copy` listener on
+  `window`, and read the plain text back with `navigator.clipboard.readText()` (see the
+  spreadsheet test in `features.spec.ts`).
 - Run tests in a second timezone in CI (`TZ=America/Los_Angeles` and `TZ=Asia/Tokyo`) to
   catch date bugs.
 
