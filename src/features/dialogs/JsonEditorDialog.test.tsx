@@ -2,10 +2,13 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from '../../App';
+import { copyFormatted } from '../../io/clipboard';
 import { serializeProject } from '../../io/projectFile';
 import { useProjectStore } from '../../store/projectStore';
 import { useUiStore } from '../../store/uiStore';
 import { makeProject } from '../../test/fixtures';
+
+vi.mock('../../io/clipboard', () => ({ copyFormatted: vi.fn(async () => true) }));
 
 const current = () =>
   makeProject({
@@ -66,12 +69,14 @@ describe('JSON Editor', () => {
     expect(status()).toHaveTextContent('');
   });
 
-  it('offers Validate, Cancel and Save', async () => {
-    await open();
-    const names = within(editorDialog())
+  const buttonNames = () =>
+    within(editorDialog())
       .getAllByRole('button')
       .map((b) => b.textContent);
-    expect(names).toEqual(['Validate', 'Cancel', 'Save']);
+
+  it('offers Validate, Spreadsheet, Cancel and Save', async () => {
+    await open();
+    expect(buttonNames()).toEqual(['Validate', 'Spreadsheet', 'Cancel', 'Save']);
   });
 
   it('Validate says the text is valid, counting tasks as the totals do', async () => {
@@ -157,5 +162,140 @@ describe('JSON Editor', () => {
     expect(useProjectStore.getState().project).toEqual(before);
     await user.click(screen.getByRole('button', { name: 'JSON Editor' }));
     expect(editor()).toHaveValue(original);
+  });
+
+  describe('Spreadsheet', () => {
+    beforeEach(() => vi.mocked(copyFormatted).mockClear());
+
+    const table = () => within(editorDialog()).getByRole('region', { name: 'Spreadsheet Table' });
+    const rowsOf = (name: string) =>
+      within(within(table()).getByRole('table', { name }))
+        .getAllByRole('row')
+        .map((row) => [...row.querySelectorAll('th, td')].map((cell) => cell.textContent));
+
+    it('shows the text in the editor as tables, with focus on Copy Table', async () => {
+      const user = await open();
+      setText(edited((p) => void (p.tasks.A!.actualStart = '2026-11-03')));
+      await user.click(button('Spreadsheet'));
+
+      // Hidden (it keeps its text and cursor for Back to JSON).
+      expect(
+        within(editorDialog()).queryByRole('textbox', { name: 'Project JSON' }),
+      ).not.toBeInTheDocument();
+      expect(table()).toHaveTextContent('Old plan');
+      expect(table()).toHaveTextContent('To be edited');
+      expect(rowsOf('Tasks')).toEqual([
+        [
+          'Task Id',
+          'Task Name',
+          'Planned Start Date',
+          'Planned End Date',
+          'Actual Start Date',
+          'Actual End Date',
+          'Status',
+          'Owner',
+          'Is Blocked By',
+          'Is Blocking',
+          'Priority',
+          'Remarks',
+        ],
+        [
+          '1',
+          'Website',
+          '2 Nov 2026',
+          '6 Nov 2026',
+          '3 Nov 2026',
+          '',
+          'In Progress',
+          '',
+          '',
+          '',
+          'None',
+          '',
+        ],
+        [
+          '1.1',
+          'Design',
+          '2 Nov 2026',
+          '6 Nov 2026',
+          '3 Nov 2026',
+          '',
+          'In Progress',
+          '',
+          '',
+          '',
+          'None',
+          '',
+        ],
+      ]);
+      expect(rowsOf('Milestones')).toEqual([
+        ['Milestone Name', 'Date'],
+        ['Sign-off', '13 Nov 2026'],
+      ]);
+      expect(buttonNames()).toEqual(['Back to JSON', 'Copy Table', 'Cancel', 'Save']);
+      expect(button('Copy Table')).toHaveFocus();
+      expect(editorDialog()).toHaveTextContent(
+        'The project as a table. Copy it, then paste it into a spreadsheet.',
+      );
+    });
+
+    it('refuses invalid text with the same message as Validate', async () => {
+      const user = await open();
+      setText('{ "format": "gantt-chart" ');
+      await user.click(button('Spreadsheet'));
+      expect(status()).toHaveTextContent("This isn't valid JSON");
+      expect(editor()).toBeVisible();
+      expect(within(editorDialog()).queryByRole('region')).not.toBeInTheDocument();
+    });
+
+    it('Copy Table copies the formatted table and the plain text, and says so', async () => {
+      const user = await open();
+      await user.click(button('Spreadsheet'));
+      await user.click(button('Copy Table'));
+
+      expect(copyFormatted).toHaveBeenCalledTimes(1);
+      const [html, text, selectable] = vi.mocked(copyFormatted).mock.calls[0]!;
+      expect(html).toContain('<table>');
+      expect(html).toContain('Design');
+      expect(text.split('\n')[0]).toBe('Old plan');
+      expect(selectable).toBe(table());
+      expect(status()).toHaveTextContent(
+        'Copied 2 task rows and 1 milestone. Paste them into a spreadsheet.',
+      );
+    });
+
+    it('says so when the browser blocks copying', async () => {
+      vi.mocked(copyFormatted).mockResolvedValueOnce(false);
+      const user = await open();
+      await user.click(button('Spreadsheet'));
+      await user.click(button('Copy Table'));
+      expect(status()).toHaveTextContent(
+        'The browser blocked copying. Select the table and copy it instead.',
+      );
+    });
+
+    it('Back to JSON returns to the edited text, with focus in it', async () => {
+      const user = await open();
+      setText(edited((p) => void (p.name = 'Edited')));
+      const text = (editor() as HTMLTextAreaElement).value;
+      await user.click(button('Spreadsheet'));
+      await user.click(button('Copy Table'));
+      await user.click(button('Back to JSON'));
+
+      expect(editor()).toBeVisible();
+      expect(editor()).toHaveValue(text);
+      expect(editor()).toHaveFocus();
+      expect(status()).toHaveTextContent('');
+      expect(buttonNames()).toEqual(['Validate', 'Spreadsheet', 'Cancel', 'Save']);
+    });
+
+    it('Save in the table view saves the edited text', async () => {
+      const user = await open();
+      setText(edited((p) => void (p.name = 'Saved from table view')));
+      await user.click(button('Spreadsheet'));
+      await user.click(button('Save'));
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(useProjectStore.getState().project.name).toBe('Saved from table view');
+    });
   });
 });

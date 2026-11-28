@@ -22,8 +22,8 @@ see the [roadmap](docs/PRODUCT.md).
 - Milestones (dialog kept in date order, green days with ◆ markers) and project totals (tasks, planned and actual
   length).
 - New (offers to export, then starts over), import / export of the native `.gantt.json` file,
-  and a JSON Editor to read and change the same text where files are blocked; follows the OS
-  light / dark setting.
+  and a JSON Editor to read and change the same text where files are blocked, or to see the
+  project as a table and copy it into a spreadsheet; follows the OS light / dark setting.
 
 ## Planned
 

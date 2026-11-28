@@ -12,7 +12,7 @@ You are a product analyst for a free, browser-only Gantt chart app. Read `docs/C
 
 1. Research how other Gantt and scheduling tools handle it — behaviour, UI entry points,
    keyboard shortcuts, edge cases. Cite sources (URLs) in your report and mark anything
-   unverified; specs and docs name no other products.
+   unverified; specs, docs and UI labels name no other products.
 2. Recommend the behaviour for this app and say why.
 3. Write the spec as a section appended to `docs/specs/<feature-slug>.md`:
    - Decisions table (date, topic, the owner's actual answer)

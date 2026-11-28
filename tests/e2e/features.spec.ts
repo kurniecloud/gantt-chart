@@ -169,6 +169,109 @@ test('JSON Editor edits the whole project as text, without any file', async ({ p
   await expect(title).toHaveValue('Edited in JSON');
 });
 
+test('JSON Editor shows the project as a table and copies it for a spreadsheet', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  // What the copy writes, as the spreadsheet app will read it.
+  await page.evaluate(() => {
+    window.addEventListener('copy', (event) => {
+      const copied = {
+        html: event.clipboardData?.getData('text/html'),
+        text: event.clipboardData?.getData('text/plain'),
+      };
+      Object.assign(window, { copied });
+    });
+  });
+  await page.getByRole('button', { name: 'JSON Editor' }).click();
+  const editor = dialog(page).getByRole('textbox', { name: 'Project JSON' });
+  const file = JSON.parse(await editor.inputValue());
+  const task = (id: string, name: string, parentId: string | null, extra = {}) => ({
+    id,
+    parentId,
+    name,
+    mode: 'manual',
+    percentComplete: 0,
+    ...extra,
+  });
+  const tasks = [
+    task('t1', 'Test', null),
+    task('t2', 'sub test 1', 't1'),
+    task('t3', 'sub sub test', 't2'),
+    task('t4', 'sub sub sub test a', 't3', {
+      start: '2026-11-02',
+      finish: '2026-11-06',
+      actualStart: '2026-11-02',
+      actualFinish: '2026-11-05',
+      owner: 'Ana',
+      notes: 'First line\nSecond line',
+    }),
+    task('t5', 'sub sub test 2', 't3', { start: '2026-11-09', actualStart: '2026-11-10' }),
+    task('t6', 'Build', null),
+    task('t7', 'Design UI', 't6', { priority: 'high' }),
+  ];
+  Object.assign(file.project, {
+    name: 'Website',
+    tasks: Object.fromEntries(tasks.map((t) => [t.id, t])),
+    taskOrder: tasks.map((t) => t.id),
+    dependencies: {
+      d1: { id: 'd1', predecessorId: 't4', successorId: 't5', type: 'FS', lagDays: 0 },
+    },
+    milestones: [{ id: 'm1', name: 'Go live', date: '2026-11-20' }],
+  });
+  const text = JSON.stringify(file, null, 2);
+  // Not saved: the table comes from the text in the editor.
+  await editor.fill(text);
+
+  await dialog(page).getByRole('button', { name: 'Spreadsheet' }).click();
+  await expect(dialog(page).getByRole('button', { name: 'Copy Table' })).toBeFocused();
+  const tasksTable = dialog(page).getByRole('table', { name: 'Tasks' });
+  await expect(tasksTable.getByRole('row')).toHaveCount(8);
+  await expect(tasksTable.getByRole('row').nth(5).getByRole('cell')).toHaveText([
+    '1.1.1.2',
+    'sub sub test 2',
+    '9 Nov 2026',
+    '',
+    '10 Nov 2026',
+    '',
+    'In Progress',
+    '',
+    '1.1.1.1',
+    '',
+    'None',
+    '',
+  ]);
+  await expect(tasksTable.getByRole('row').nth(1).getByRole('cell').nth(6)).toHaveText(
+    'In Progress',
+  );
+
+  await dialog(page).getByRole('button', { name: 'Copy Table' }).click();
+  await expect(dialog(page).getByRole('status')).toHaveText(
+    'Copied 7 task rows and 1 milestone. Paste them into a spreadsheet.',
+  );
+  const copied = await page.evaluate(
+    () => (window as unknown as { copied: { html: string; text: string } }).copied,
+  );
+  expect(copied.html).toContain(`mso-number-format:'\\@'">1.1.1.2</td>`);
+  expect(copied.html).toContain(`First line<br style="mso-data-placement:same-cell">Second line`);
+  expect(copied.text.split('\n').slice(0, 4)).toEqual([
+    'Website',
+    '',
+    'Task Id\tTask Name\tPlanned Start Date\tPlanned End Date\tActual Start Date\tActual End Date\tStatus\tOwner\tIs Blocked By\tIs Blocking\tPriority\tRemarks',
+    '1\tTest\t2026-11-02\t2026-11-09\t2026-11-02\t\tIn Progress\t\t\t\tNone\t',
+  ]);
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(copied.text);
+
+  await page.setViewportSize({ width: 375, height: 812 });
+  await expect(dialog(page).getByRole('button', { name: 'Save' })).toBeInViewport();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
+
+  await dialog(page).getByRole('button', { name: 'Back to JSON' }).click();
+  await expect(editor).toBeFocused();
+  await expect(editor).toHaveValue(text);
+});
+
 test('milestones are managed in a dialog and shown in green', async ({ page }) => {
   await page.getByRole('button', { name: 'Milestones' }).click();
   await dialog(page).getByRole('button', { name: 'Add Milestone' }).click();

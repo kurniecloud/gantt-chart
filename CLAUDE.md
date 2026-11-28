@@ -24,7 +24,8 @@ Reference: roadmap [docs/PRODUCT.md](docs/PRODUCT.md) · architecture
   (`docs/specs/<slug>.md`, dated Decisions table) and in docs/CONTEXT.md §3.
 - A changed decision is **overwritten everywhere** it is described (older specs, CONTEXT,
   PRODUCT, ARCHITECTURE, README, skills) — no superseded text (docs/CONTEXT.md §2.4).
-- Docs and code comments describe the app on its own terms: they name no other products.
+- Docs, code comments and UI labels describe the app on its own terms: they name no other
+  products.
 - Report plainly: what changed, how it was verified, what wasn't, trade-offs.
 
 ## Tech stack
@@ -87,7 +88,8 @@ src/
     criticalPath/ Recalculation after every change while on, and the input-blocking overlay.
   components/    Shared UI: Button/IconButton, Dialog (native <dialog>), DatePicker, icons.
   persistence/   IndexedDB autosave, project list, migrations between schema versions.
-  io/            Import/export of the native .gantt.json file, the only supported format.
+  io/            Import/export of the native .gantt.json file (the only file format); the
+                 spreadsheet copy (table model, clipboard).
   utils/         Small generic helpers (date formatting, priority labels, input modality, platform).
 tests/e2e/       Playwright specs.
 docs/            Product and architecture docs.
