@@ -59,7 +59,8 @@ are specified separately — see [Related specs](#related-specs).
 
 - Titles: "Add Task", "Add Subtask to “Parent”", "Edit Task". Buttons: Add or Save, and Cancel.
 - Fields: Task Name (required) · a **Planned** box and an **Actual** box, each with Start Date and
-  End Date (calendar pickers, optional, weekdays only, with a Clear button; End Date disabled
+  End Date (calendar pickers, optional, weekdays only, with a Clear button; focus returns to the
+  field after a day is picked or Clear is pressed; End Date disabled
   until its Start Date is set — [end-date-needs-start](end-date-needs-start.md);
   actual dates — [drag-and-actuals](drag-and-actuals.md)) · Owner (free text with suggestions —
   [task-owner](task-owner.md)) · Is Blocked By / Is Blocking links
