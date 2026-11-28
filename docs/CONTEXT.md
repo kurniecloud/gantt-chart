@@ -3,7 +3,7 @@
 **Read this at the start of every task. Update it in the same PR as any change that alters
 what's below** (status, a decision, a lesson learned, the backlog). It is the memory of the
 project between sessions; `CLAUDE.md` holds the always-on rules, this file holds the history
-and the why. Last updated: 2026-11-26, PR #18 (milestones kept in date order).
+and the why. Last updated: 2026-11-28, PR #18 (milestones kept in date order).
 
 ---
 

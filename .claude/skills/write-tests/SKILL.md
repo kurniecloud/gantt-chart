@@ -53,6 +53,9 @@ are manually dated (`mode: 'manual'`) with no dates, top-level unless `parent` i
   `undo()`, expect the project to equal the snapshot (see `src/store/projectStore.test.ts`).
 - Persistence: `fake-indexeddb` is loaded in `src/test/setup.ts`, so `src/persistence` code
   runs against a real IndexedDB implementation in tests.
+- jsdom shims (`showModal`, layout, `scrollTo`, `scrollIntoView`, scroll events) are in
+  `src/test/setup.ts` too. `scrollIntoView` does nothing: spy on `Element.prototype.scrollIntoView`
+  to check that something is scrolled into view (see `MilestonesDialog.test.tsx`).
 - Components: query by role / label (`getByRole('button', { name: 'Add Task' })`,
   `getByRole('dialog')`), interact with `@testing-library/user-event`. Accessible names are in
   Title Case like the UI. No snapshot tests of large trees.

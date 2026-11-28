@@ -27,7 +27,8 @@ validation.
   task order, dependency and milestone. Any problem → `ProjectFileError` with a readable reason
   shown in a dialog; nothing changes. Valid → confirm dialog → `importProject()` command
   replaces the open project's content (keeps its id), undoable in one step.
-- Task order is rebuilt so each task precedes its subtasks. Dialog titles: `Import “file”?`
+- Task order is rebuilt so each task precedes its subtasks. Milestones keep the file's order (the
+  Milestones dialog sorts them by date when it opens). Dialog titles: `Import “file”?`
   (confirm) and `Couldn’t Import “file”` (error).
 
 - JSON Editor (`features/dialogs/JsonEditorDialog.tsx`): the same file text without a file —

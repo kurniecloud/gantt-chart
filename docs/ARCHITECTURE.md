@@ -48,7 +48,7 @@ type Project = {
   assignments: Record<string, Assignment>;
   baselines: Baseline[];
   customFields: CustomFieldDef[];
-  milestones: { id: string; name: string; date: ISODate }[]; // highlighted days on the timeline
+  milestones: { id: string; name: string; date: ISODate }[]; // highlighted days; saved in date order
 };
 
 type Task = {
@@ -88,7 +88,9 @@ in `src/domain/tree.ts`; timeline coordinates (weekday index, week starts) in
 `src/domain/workweek.ts`; dependency rules (allowed predecessors, loop checks through parent
 tasks, both link directions) in `src/domain/dependencies.ts`; the critical path (driving chain
 back from the last task over the user's dates and finish-to-start links) in
-`src/domain/criticalPath.ts`; arrow routing in `src/features/timeline/arrows.ts`.
+`src/domain/criticalPath.ts`; milestone order (earliest first, rows without a date last, where a
+picked or cleared row goes) in `src/domain/milestones.ts`; arrow routing in
+`src/features/timeline/arrows.ts`.
 
 UI-only state that must never be saved or undone lives in `src/store/uiStore.ts` (which dialog
 is open) and `src/store/viewStore.ts` (Daily/Weekly, task panel width, Actual Dates and Critical Path toggles,
